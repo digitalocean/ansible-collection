@@ -10,6 +10,7 @@ This repository contains the `digitalocean.cloud` Ansible Collection.
 <!-- [![CI](https://github.com/ansible-collections/REPONAMEHERE/workflows/CI/badge.svg?event=push)](https://github.com/ansible-collections/REPONAMEHERE/actions) [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/REPONAMEHERE)](https://codecov.io/gh/ansible-collections/REPONAMEHERE) -->
 
 This collection can be used to manage infrastructure in the [DigitalOcean](https://www.digitalocean.com/) cloud.
+The API documentation is located [here](https://docs.digitalocean.com/reference/api/api-reference/).
 
 ## Code of Conduct
 
@@ -57,26 +58,36 @@ Every voice is important. If you have something on your mind, create an issue or
 ## Tested with Ansible
 
 <!-- List the versions of Ansible the collection has been tested with. Must match what is in galaxy.yml. -->
+
 TBD
 
 ## External requirements
 
 <!-- List any external resources the collection depends on, for example minimum versions of an OS, libraries, or utilities. Do not list other Ansible collections here. -->
-TBD
+
+```text
+azure-core==1.26.1
+pydo==0.1.4
+```
 
 ### Supported connections
 
 <!-- Optional. If your collection supports only specific connection types (such as HTTPAPI, netconf, or others), list them here. -->
+
 TBD
 
 ## Included content
 
 <!-- Galaxy will eventually list the module docs within the UI, but until that is ready, you may need to either describe your plugins etc here, or point to an external docsite to cover that information. -->
-TBD
+
+| Module                            | Description                                     |
+| --------------------------------- | ----------------------------------------------- |
+| `digitalocean.cloud.account_info` | Show information about the current user account |
 
 ## Using this collection
 
 <!--Include some quick examples that cover the most common use cases for your collection content. It can include the following examples of installation and upgrade (change NAMESPACE.COLLECTION_NAME correspondingly):-->
+
 TBD
 
 ### Installing the Collection from Ansible Galaxy
@@ -118,6 +129,7 @@ See the [changelog](https://github.com/digitalocean/ansible-collection/tree/main
 ## Roadmap
 
 <!-- Optional. Include the roadmap for this collection, and the proposed release/versioning strategy so users can anticipate the upgrade/update cycle. -->
+
 TBD
 
 ## More information

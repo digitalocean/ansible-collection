@@ -1,0 +1,37 @@
+name: Sanity tests
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "10 10 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  sanity:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    name: Sanity (Ⓐ${{ matrix.ansible }}/${{ matrix.module }})
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        ansible:
+          - stable-2.12
+          - stable-2.13
+          - stable-2.14
+        module:
+          - account_info
+
+    steps:
+      - name: Perform testing
+        uses: ansible-community/ansible-test-gh-action@release/v1
+        with:
+          ansible-core-version: ${{ matrix.ansible }}
+          origin-python-version: 3.9
+          target: ${{ matrix.module }}
+          target-python-version: 3.9
+          testing-type: sanity
