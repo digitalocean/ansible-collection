@@ -1,0 +1,28 @@
+name: Python psf/black
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - plugins/module_utils/**
+      - plugins/modules/**
+  push:
+    branches: [main]
+  schedule:
+    - cron: "10 10 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  psf-black:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Run psf/black
+        uses: psf/black@stable

@@ -4,21 +4,18 @@ name: cloud
 version: 0.1.0
 readme: README.md
 authors:
-  - YOUR NAME (github.com/YOURGITHUB)
+  - Mark Mercado (@mamercad)
 description: DigitalOcean Ansible Collection
 license_file: GPL-3.0
 tags:
-# tags so people can search for collections https://galaxy.ansible.com/search
-# tags are all lower-case, no spaces, no dashes.
   - cloud
   - digitalocean
   - droplet
   - sammy
-repository: https://github.com/ansible-collections/community.REPO_NAME
-documentation: https://github.com/ansible-collection-migration/community.REPO_NAME/tree/main/docs
-homepage: https://github.com/ansible-collections/community.REPO_NAME
-issues: https://github.com/ansible-collections/community.REPO_NAME/issues
+repository: https://github.com/digitalocean/ansible-collection
+documentation: https://github.com/digitalocean/ansible-collection/blob/main/README.md
+homepage: https://github.com/digitalocean/ansible-collection
+issues: https://github.com/digitalocean/ansible-collection/issues
 build_ignore:
-# https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_distributing.html#ignoring-files-and-folders
   - .gitignore
   - changelogs/.plugin-cache.yaml

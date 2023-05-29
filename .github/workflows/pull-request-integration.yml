@@ -1,0 +1,91 @@
+name: Pull request integration tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - plugins/module_utils/**
+      - plugins/modules/**
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+    paths:
+      - plugins/module_utils/**
+      - plugins/modules/**
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  test-sanity:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        ansible:
+          - stable-2.14
+        python:
+          - "3.9"
+    steps:
+      - name: Perform sanity testing
+        uses: ansible-community/ansible-test-gh-action@release/v1
+        with:
+          ansible-core-version: ${{ matrix.ansible }}
+          origin-python-version: ${{ matrix.python }}
+          target-python-version: ${{ matrix.python }}
+          testing-type: sanity
+
+  test-units:
+    needs: test-sanity
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        ansible:
+          - stable-2.14
+        python:
+          - "3.9"
+    steps:
+      - name: Perform unit testing
+        uses: ansible-community/ansible-test-gh-action@release/v1
+        with:
+          ansible-core-version: ${{ matrix.ansible }}
+          origin-python-version: ${{ matrix.python }}
+          target-python-version: ${{ matrix.python }}
+          testing-type: units
+
+  test-integration:
+    needs: [test-units, test-sanity]
+    runs-on: ubuntu-22.04
+    environment: integration
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        ansible:
+          - stable-2.14
+        module:
+          - account_info
+        python:
+          - "3.9"
+    steps:
+      - name: Perform integration testing
+        uses: ansible-community/ansible-test-gh-action@release/v1
+        with:
+          pre-test-cmd: >-
+            DIGITALOCEAN_TOKEN=${{ secrets.DIGITALOCEAN_TOKEN }}
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            ./tests/utils/render.sh
+            tests/integration/integration_config.yml.template
+            > tests/integration/integration_config.yml
+          ansible-core-version: ${{ matrix.ansible }}
+          origin-python-version: ${{ matrix.python }}
+          target: ${{ matrix.module }}
+          target-python-version: ${{ matrix.python }}
+          testing-type: integration

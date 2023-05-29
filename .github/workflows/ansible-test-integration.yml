@@ -1,0 +1,48 @@
+name: Integration tests
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "10 10 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  integration:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    name: Integration (Ⓐ${{ matrix.ansible }}/${{ matrix.module }})
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        ansible:
+          - stable-2.12
+          - stable-2.13
+          - stable-2.14
+        module:
+          - account_info
+
+    steps:
+      - name: Perform testing
+        uses: ansible-community/ansible-test-gh-action@release/v1
+        with:
+          pre-test-cmd: >-
+            DIGITALOCEAN_TOKEN=${{ secrets.DIGITALOCEAN_TOKEN }}
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            ./tests/utils/render.sh
+            tests/integration/integration_config.yml.template
+            > tests/integration/integration_config.yml
+          ansible-core-version: ${{ matrix.ansible }}
+          origin-python-version: 3.9
+          target: ${{ matrix.module }}
+          target-python-version: 3.9
+          testing-type: integration
+          # test-deps: >-
+          #   ansible.netcommon:==4.1.0
+          #   ansible.utils
+          #   community.general:==6.0.1

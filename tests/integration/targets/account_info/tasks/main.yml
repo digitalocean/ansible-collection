@@ -1,0 +1,38 @@
+---
+# code: language=ansible
+- name: Test block
+  block:
+    - name: Verify API token
+      ansible.builtin.assert:
+        that:
+          - digitalocean_token is string
+          - digitalocean_token | length > 0
+        fail_msg: digitalocean_token should be defined in tests/integration/integration_config.yml
+
+    - name: Get account information
+      digitalocean.cloud.account_info:
+        token: "{{ digitalocean_token }}"
+      register: result
+
+    - name: Verify result message
+      ansible.builtin.assert:
+        that: result.msg is string
+
+    - name: Verify account information
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == "Current account information"
+          - result.account is defined
+          - result.account.droplet_limit is defined
+          - result.account.email is defined
+          - result.account.email_verified is defined
+          - result.account.floating_ip_limit is defined
+          - result.account.reserved_ip_limit is defined
+          - result.account.status is defined
+          - result.account.status_message is defined
+          - result.account.team is defined
+          - result.account.team.name is defined
+          - result.account.team.uuid is defined
+          - result.account.uuid is defined
+          - result.account.volume_limit is defined
