@@ -13,6 +13,7 @@ concurrency:
 jobs:
   sanity:
     runs-on: ubuntu-22.04
+    environment: main
     timeout-minutes: 30
     name: Sanity (Ⓐ${{ matrix.ansible }}/${{ matrix.module }})
     strategy:
