@@ -19,6 +19,7 @@ concurrency:
 jobs:
   psf-black:
     runs-on: ubuntu-22.04
+    environment: main
     timeout-minutes: 5
     steps:
       - name: Check out code
