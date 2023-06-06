@@ -5,6 +5,19 @@ DigitalOcean Collection Release Notes
 .. contents:: Topics
 
 
+v0.2.0
+======
+
+Release Summary
+---------------
+
+Add more modules.
+
+Minor Changes
+-------------
+
+- add more modules (https://github.com/digitalocean/ansible-collection/pull/10).
+
 v0.1.2
 ======
 

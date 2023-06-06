@@ -1,0 +1,8 @@
+volume_name: ansible-gh-ci-test-vol-0
+region: nyc3
+size_gigabytes: 1
+
+volume_snapshot_name: ansible-gh-ci-test-vol-0
+volume_snapshot_tags:
+  - ansible-gh-ci-test-vol-tag-0
+  - ansible-gh-ci-test-vol-tag-1

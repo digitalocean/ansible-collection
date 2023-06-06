@@ -25,7 +25,8 @@ This repository contains the `digitalocean.cloud` Ansible Collection.
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/digitalocean/ansible-collection?quickstart=1)
 
 This collection can be used to manage infrastructure in the [DigitalOcean](https://www.digitalocean.com/) cloud.
-The API documentation is located [here](https://docs.digitalocean.com/reference/api/api-reference/).
+The DigitalOcean API documentation is located [here](https://docs.digitalocean.com/reference/api/api-reference/).
+The pydo library which this collection is based on is hosted on [GitHub](https://github.com/digitalocean/pydo) and [PyPI](https://pypi.org/project/pydo/).
 
 ## Code of Conduct
 
@@ -96,9 +97,48 @@ There is a [pyproject.toml](./pyproject.toml) is the root of this repository as 
 
 ## Included content
 
-| Module                            | Description                                     |
-| --------------------------------- | ----------------------------------------------- |
-| `digitalocean.cloud.account_info` | Show information about the current user account |
+| Module                                              | Description                                  |
+| --------------------------------------------------- | -------------------------------------------- |
+| `digitalocean.cloud.account_info`                   | Get account information                      |
+| `digitalocean.cloud.balance_info`                   | Get balance information                      |
+| `digitalocean.cloud.billing_history_info`           | Get billing history                          |
+| `digitalocean.cloud.cdn_endpoints_info`             | Get CDN endpoints                            |
+| `digitalocean.cloud.certificate`                    | Create and delete certificates               |
+| `digitalocean.cloud.certificate_info`               | Get certificates                             |
+| `digitalocean.cloud.database_cluster_info`          | Get databases                                |
+| `digitalocean.cloud.domain`                         | Create and delete domains                    |
+| `digitalocean.cloud.domain_record`                  | Create and delete domain records             |
+| `digitalocean.cloud.domain_records_info`            | Get domain records                           |
+| `digitalocean.cloud.domains_info`                   | Get domains                                  |
+| `digitalocean.cloud.droplet`                        | Create and delete Droplets                   |
+| `digitalocean.cloud.droplets_info`                  | Get Droplets                                 |
+| `digitalocean.cloud.firewall`                       | Create and delete firewalls                  |
+| `digitalocean.cloud.firewall_info`                  | Get firewalls                                |
+| `digitalocean.cloud.images_info`                    | Get images                                   |
+| `digitalocean.cloud.kubernetes_cluster`             | Create and delete Kubernetes clusters        |
+| `digitalocean.cloud.kubernetes_cluster_info`        | Get Kubernetes clusters                      |
+| `digitalocean.cloud.load_balancer`                  | Create and delete load balancers             |
+| `digitalocean.cloud.load_balancer_info`             | Get load balancers                           |
+| `digitalocean.cloud.monitoring_alert_policies_info` | Get monitoring alert policies                |
+| `digitalocean.cloud.monitoring_alert_policy`        | Create and deelete monitoring alert policies |
+| `digitalocean.cloud.one_clicks_info`                | Get 1-Clicks                                 |
+| `digitalocean.cloud.projects_info`                  | Get projects                                 |
+| `digitalocean.cloud.regions_info`                   | Get regions                                  |
+| `digitalocean.cloud.reserved_ip`                    | Create and delete reserved IP                |
+| `digitalocean.cloud.reserved_ips_info`              | Get reserved IPs                             |
+| `digitalocean.cloud.sizes_info`                     | Get sizes                                    |
+| `digitalocean.cloud.snapshot`                       | Create and delete snapshots                  |
+| `digitalocean.cloud.snapshots_info`                 | Get snapshots                                |
+| `digitalocean.cloud.ssh_key`                        | Create and delete SSH keys                   |
+| `digitalocean.cloud.ssh_keys_info`                  | Get SSH keys                                 |
+| `digitalocean.cloud.tag`                            | Create and delete tags                       |
+| `digitalocean.cloud.tags_info`                      | Get tags                                     |
+| `digitalocean.cloud.volume`                         | Create and delete volumes                    |
+| `digitalocean.cloud.volume_action`                  | Create and delete volume actions             |
+| `digitalocean.cloud.volume_snapshot`                | Create and delete volume snapshots           |
+| `digitalocean.cloud.volumes_info`                   | Get volumes                                  |
+| `digitalocean.cloud.vpc`                            | Create and delete VPCs                       |
+| `digitalocean.cloud.vpcs_info`                      | Get VPCs                                     |
 
 ## Using this collection
 

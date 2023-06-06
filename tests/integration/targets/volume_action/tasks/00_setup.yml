@@ -1,0 +1,41 @@
+# code: language=ansible
+- block:
+
+    - name: Create Droplet
+      digitalocean.cloud.droplet:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        size: "{{ droplet_size }}"
+        image: "{{ droplet_image }}"
+        unique_name: true
+
+    - name: Create volume
+      digitalocean.cloud.volume:
+        state: present
+        token: "{{ digitalocean_token }}"
+        name: "{{ volume_name }}"
+        region: "{{ volume_region }}"
+        size_gigabytes: "{{ volume_size_gigabytes }}"
+
+    - name: Sleep for a minute
+      ansible.builtin.pause:
+        minutes: 1
+
+  rescue:
+
+    - name: Teardown | Delete volume
+      digitalocean.cloud.volume:
+        state: absent
+        token: "{{ digitalocean_token }}"
+        name: "{{ volume_name }}"
+        region: "{{ volume_region }}"
+
+    - name: Teardown | Delete Droplet
+      digitalocean.cloud.droplet:
+        state: absent
+        token: "{{ digitalocean_token }}"
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        unique_name: true

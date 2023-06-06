@@ -1,0 +1,13 @@
+---
+# code: language=ansible
+# TASK [Get CDN endpoints] *****************************************************
+# ok: [localhost] => changed=false
+#   endpoints: []
+  # msg: No CDN endpoints
+- name: CDN endpoints info
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Get CDN endpoints
+      digitalocean.cloud.cdn_endpoints_info:

@@ -1,0 +1,12 @@
+---
+# code: language=ansible
+# TASK [Get billing history information] ***************************************
+# ok: [localhost] => changed=false
+#   msg: No billing history information
+- name: Billing history info
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Get billing history information
+      digitalocean.cloud.billing_history_info:
