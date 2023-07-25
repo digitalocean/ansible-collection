@@ -40,6 +40,7 @@ jobs:
     name: Sanity (Ⓐ${{ matrix.ansible }})
     strategy:
       matrix:
+        # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html
         ansible:
           # It's important that Sanity is tested against all stable-X.Y branches
           # Testing against `devel` may fail as new tests are added.
@@ -49,9 +50,9 @@ jobs:
           # around creation of a new stable branch, this might cause a problem
           # that two different versions of ansible-test use the same sanity test
           # ignore.txt file.
-          - stable-2.12
           - stable-2.13
           - stable-2.14
+          - stable-2.15
           - devel
     # Ansible-test on various stable branches does not yet work well with cgroups v2.
     # Since ubuntu-latest now uses Ubuntu 22.04, we need to fall back to the ubuntu-20.04
@@ -60,7 +61,7 @@ jobs:
     # for the latest list.
     runs-on: >-
       ${{ contains(fromJson(
-          '["stable-2.12", "stable-2.13", "stable-2.14"]'
+          '["stable-2.13", "stable-2.14", "stable-2.15"]'
       ), matrix.ansible) && 'ubuntu-22.04' || 'ubuntu-latest' }}
     steps:
       # Run sanity tests inside a Docker container.
@@ -96,7 +97,7 @@ jobs:
     # for the latest list.
     runs-on: >-
       ${{ contains(fromJson(
-          '["stable-2.12", "stable-2.13", "stable-2.14"]'
+          '["stable-2.13", "stable-2.14", "stable-2.15"]'
       ), matrix.ansible) && 'ubuntu-22.04' || 'ubuntu-latest' }}
     name: Units (Ⓐ${{ matrix.ansible }})
     strategy:
@@ -104,9 +105,9 @@ jobs:
       fail-fast: true
       matrix:
         ansible:
-          - stable-2.12
           - stable-2.13
           - stable-2.14
+          - stable-2.15
           - devel
 
     steps:
@@ -146,16 +147,17 @@ jobs:
     # for the latest list.
     runs-on: >-
       ${{ contains(fromJson(
-          '["stable-2.12", "stable-2.13", "stable-2.14"]'
+          '["stable-2.13", "stable-2.14", "stable-2.15"]'
       ), matrix.ansible) && 'ubuntu-22.04' || 'ubuntu-latest' }}
     name: I (Ⓐ${{ matrix.ansible }}+py${{ matrix.python }})
     strategy:
       fail-fast: false
       matrix:
+        # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html
         ansible:
-          - stable-2.12
           - stable-2.13
           - stable-2.14
+          - stable-2.15
           - devel
         python:
           - "3.9"
