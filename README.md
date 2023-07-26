@@ -1,5 +1,12 @@
 # DigitalOcean Collection
 
+<p align="left" width="100%">
+<img src="do+a.png"
+     alt="DigitalOcean + Ansible"
+     title="DigitalOcean + Ansible"
+     height=300>
+</p>
+
 > **Warning**
 > This collection is not ready for use!
 
