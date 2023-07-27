@@ -1,0 +1,44 @@
+name: Publish Collection on Galaxy
+
+on:
+  push:
+    tags: [v*]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish:
+    name: Build and publish the Collection on Galaxy
+    runs-on: ubuntu-22.04
+    environment: main
+    timeout-minutes: 5
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Build and publish
+        shell: bash
+        run: |
+          # Ensure ref name looks like semver
+          ref_name="${{ github.ref_name }}"
+          if [[ ! "$ref_name" =~ ^v([0-9]+\.[0-9]+\.[0-9]+) ]]; then
+            echo "Ref name '${ref_name}' is not of the form 'vX.Y.Z'"
+            exit 1
+          fi
+
+          # Ensure version nonempty
+          version="${BASH_REMATCH[1]}"
+          if [[ -z "$version" ]]; then
+            echo "Empty version '${version}'"
+            exit 1
+          fi
+
+          # Build the Collection tarball
+          ansible-galaxy collection build
+
+          # Publish the Collection
+          ansible-galaxy collection publish digitalocean-cloud-${version}.tar.gz \
+            --token ${{ secrets.GALAXY_TOKEN }}

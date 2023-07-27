@@ -25,6 +25,7 @@ jobs:
           - stable-2.13
           - stable-2.14
           - stable-2.15
+          - devel
         module:
           - account_info
 
@@ -44,7 +45,3 @@ jobs:
           target: ${{ matrix.module }}
           target-python-version: 3.9
           testing-type: integration
-          # test-deps: >-
-          #   ansible.netcommon:==4.1.0
-          #   ansible.utils
-          #   community.general:==6.0.1

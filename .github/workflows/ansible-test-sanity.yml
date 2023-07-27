@@ -25,6 +25,7 @@ jobs:
           - stable-2.13
           - stable-2.14
           - stable-2.15
+          - devel
         module:
           - account_info
 
