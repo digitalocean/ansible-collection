@@ -12,3 +12,11 @@ releases:
       name: account_info
       namespace: ''
     release_date: '2023-07-27'
+  0.1.1:
+    changes:
+      minor_changes:
+      - just bumping the version (https://github.com/digitalocean/ansible-collection/pull/8).
+      release_summary: Just bumping the version.
+    fragments:
+    - 8-bump-version.yml
+    release_date: '2023-07-27'
