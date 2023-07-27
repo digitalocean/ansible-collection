@@ -1,1 +1,14 @@
-releases: {}
+ancestor: null
+releases:
+  0.1.0:
+    changes:
+      minor_changes:
+      - add Galaxy publish workflow (https://github.com/digitalocean/ansible-collection/pull/7).
+      release_summary: Initial release of the Collection.
+    fragments:
+    - 7-publish.yml
+    modules:
+    - description: Show information about the current user account
+      name: account_info
+      namespace: ''
+    release_date: '2023-07-27'
