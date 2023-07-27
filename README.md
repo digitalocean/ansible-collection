@@ -14,7 +14,13 @@ This repository contains the `digitalocean.cloud` Ansible Collection.
 
 ## DigitalOcean Collection for Ansible
 
-<!-- [![CI](https://github.com/ansible-collections/REPONAMEHERE/workflows/CI/badge.svg?event=push)](https://github.com/ansible-collections/REPONAMEHERE/actions) [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/REPONAMEHERE)](https://codecov.io/gh/ansible-collections/REPONAMEHERE) -->
+[![Integration tests](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-integration.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-integration.yml)
+[![Lint extra docsite docs and links](https://github.com/digitalocean/ansible-collection/actions/workflows/extra-docs-linting.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/extra-docs-linting.yml)
+[![Publish Collection on Galaxy](https://github.com/digitalocean/ansible-collection/actions/workflows/publish-galaxy.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/publish-galaxy.yml)
+[![Pull request integration tests](https://github.com/digitalocean/ansible-collection/actions/workflows/pull-request-integration.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/pull-request-integration.yml)
+[![Python psf/black](https://github.com/digitalocean/ansible-collection/actions/workflows/psf-black.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/psf-black.yml)
+[![Sanity tests](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-sanity.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-sanity.yml)
+[![Unit tests](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-unit.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-unit.yml)
 
 This collection can be used to manage infrastructure in the [DigitalOcean](https://www.digitalocean.com/) cloud.
 The API documentation is located [here](https://docs.digitalocean.com/reference/api/api-reference/).
@@ -62,15 +68,25 @@ The process of decision making in this collection is based on discussing and fin
 
 Every voice is important. If you have something on your mind, create an issue or dedicated discussion and let's discuss it!
 
-## Tested with Ansible
+## Tested with Ansible and Python
 
-<!-- List the versions of Ansible the collection has been tested with. Must match what is in galaxy.yml. -->
+### Ansible
 
-TBD
+```yaml
+- 2.13
+- 2.14
+- 2.15
+- devel
+```
+
+### Python
+
+```yaml
+- 3.9
+- 3.10
+```
 
 ## External requirements
-
-<!-- List any external resources the collection depends on, for example minimum versions of an OS, libraries, or utilities. Do not list other Ansible collections here. -->
 
 ```text
 azure-core==1.26.1
