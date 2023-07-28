@@ -20,19 +20,24 @@ jobs:
     timeout-minutes: 30
     strategy:
       fail-fast: false
-      max-parallel: 1
+      max-parallel: 4
       matrix:
-        ansible:
-          - stable-2.14
-        python:
-          - "3.9"
+        versions:
+          - ansible: stable-2.13
+            python: "3.9"
+          - ansible: stable-2.14
+            python: "3.9"
+          - ansible: stable-2.15
+            python: "3.10"
+          - ansible: devel
+            python: "3.10"
     steps:
       - name: Perform sanity testing
         uses: ansible-community/ansible-test-gh-action@release/v1
         with:
-          ansible-core-version: ${{ matrix.ansible }}
-          origin-python-version: ${{ matrix.python }}
-          target-python-version: ${{ matrix.python }}
+          ansible-core-version: ${{ matrix.versions.ansible }}
+          origin-python-version: ${{ matrix.versions.python }}
+          target-python-version: ${{ matrix.versions.python }}
           testing-type: sanity
 
   test-units:
@@ -41,19 +46,24 @@ jobs:
     timeout-minutes: 30
     strategy:
       fail-fast: false
-      max-parallel: 1
+      max-parallel: 4
       matrix:
-        ansible:
-          - stable-2.14
-        python:
-          - "3.9"
+        versions:
+          - ansible: stable-2.13
+            python: "3.9"
+          - ansible: stable-2.14
+            python: "3.9"
+          - ansible: stable-2.15
+            python: "3.10"
+          - ansible: devel
+            python: "3.10"
     steps:
       - name: Perform unit testing
         uses: ansible-community/ansible-test-gh-action@release/v1
         with:
-          ansible-core-version: ${{ matrix.ansible }}
-          origin-python-version: ${{ matrix.python }}
-          target-python-version: ${{ matrix.python }}
+          ansible-core-version: ${{ matrix.versions.ansible }}
+          origin-python-version: ${{ matrix.versions.python }}
+          target-python-version: ${{ matrix.versions.python }}
           testing-type: units
 
   test-integration:
@@ -65,12 +75,17 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        ansible:
-          - stable-2.14
+        versions:
+          # - ansible: stable-2.13
+          #   python: "3.9"
+          - ansible: stable-2.14
+            python: "3.9"
+          # - ansible: stable-2.15
+          #   python: "3.10"
+          # - ansible: devel
+          #   python: "3.10"
         module:
           - account_info
-        python:
-          - "3.9"
     steps:
       - name: Perform integration testing
         uses: ansible-community/ansible-test-gh-action@release/v1
@@ -82,8 +97,8 @@ jobs:
             ./tests/utils/render.sh
             tests/integration/integration_config.yml.template
             > tests/integration/integration_config.yml
-          ansible-core-version: ${{ matrix.ansible }}
-          origin-python-version: ${{ matrix.python }}
+          ansible-core-version: ${{ matrix.versions.ansible }}
+          origin-python-version: ${{ matrix.versions.python }}
           target: ${{ matrix.module }}
-          target-python-version: ${{ matrix.python }}
+          target-python-version: ${{ matrix.versions.python }}
           testing-type: integration

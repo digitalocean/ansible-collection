@@ -5,6 +5,24 @@ DigitalOcean Collection Release Notes
 .. contents:: Topics
 
 
+v0.1.2
+======
+
+Release Summary
+---------------
+
+Small Shark-a-Hack iterations.
+
+Minor Changes
+-------------
+
+- small Shark-a-Hack iterations (https://github.com/digitalocean/ansible-collection/pull/9).
+
+Bugfixes
+--------
+
+- common - ignore C(pydo) module unused (https://github.com/digitalocean/ansible-collection/pull/9).
+
 v0.1.1
 ======
 

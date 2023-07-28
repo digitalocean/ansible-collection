@@ -23,7 +23,7 @@ else:
 HAS_PYDO_LIBRARY = False
 PYDO_LIBRARY_IMPORT_ERROR = None
 try:
-    from pydo import Client
+    from pydo import Client  # pylint: disable=unused-import
 except ImportError:
     PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
 else:

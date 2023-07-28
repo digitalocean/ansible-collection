@@ -15,17 +15,21 @@ jobs:
     runs-on: ubuntu-22.04
     environment: main
     timeout-minutes: 60
-    name: Integration (Ⓐ${{ matrix.ansible }}/${{ matrix.module }})
+    name: Integration (Ⓐ${{ matrix.versions.ansible }} on ${{ matrix.versions.python }} / ${{ matrix.module }})
     strategy:
       fail-fast: false
-      max-parallel: 1
+      max-parallel: 4
       matrix:
         # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html
-        ansible:
-          - stable-2.13
-          - stable-2.14
-          - stable-2.15
-          - devel
+        versions:
+          - ansible: stable-2.13
+            python: "3.9"
+          - ansible: stable-2.14
+            python: "3.9"
+          - ansible: stable-2.15
+            python: "3.10"
+          - ansible: devel
+            python: "3.10"
         module:
           - account_info
 
@@ -40,8 +44,8 @@ jobs:
             ./tests/utils/render.sh
             tests/integration/integration_config.yml.template
             > tests/integration/integration_config.yml
-          ansible-core-version: ${{ matrix.ansible }}
-          origin-python-version: 3.9
+          ansible-core-version: ${{ matrix.versions.ansible }}
+          origin-python-version: ${{ matrix.versions.python }}
           target: ${{ matrix.module }}
-          target-python-version: 3.9
+          target-python-version: ${{ matrix.versions.python }}
           testing-type: integration

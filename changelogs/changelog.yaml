@@ -20,3 +20,14 @@ releases:
     fragments:
     - 8-bump-version.yml
     release_date: '2023-07-27'
+  0.1.2:
+    changes:
+      bugfixes:
+      - common - ignore C(pydo) module unused (https://github.com/digitalocean/ansible-collection/pull/9).
+      minor_changes:
+      - small Shark-a-Hack iterations (https://github.com/digitalocean/ansible-collection/pull/9).
+      release_summary: Small Shark-a-Hack iterations.
+    fragments:
+    - 9-common-lint.yml
+    - 9-small-iterations.yaml
+    release_date: '2023-07-28'

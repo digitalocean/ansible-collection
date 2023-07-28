@@ -2,9 +2,6 @@ name: Python psf/black
 
 on:
   pull_request:
-    paths:
-      - plugins/module_utils/**
-      - plugins/modules/**
   push:
     branches: [main]
   schedule:
@@ -18,7 +15,6 @@ concurrency:
 jobs:
   psf-black:
     runs-on: ubuntu-22.04
-    environment: main
     timeout-minutes: 5
     steps:
       - name: Check out code

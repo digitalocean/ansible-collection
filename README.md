@@ -68,23 +68,14 @@ The process of decision making in this collection is based on discussing and fin
 
 Every voice is important. If you have something on your mind, create an issue or dedicated discussion and let's discuss it!
 
-## Tested with Ansible and Python
+## Tested with versions
 
-### Ansible
-
-```yaml
-- 2.13
-- 2.14
-- 2.15
-- devel
-```
-
-### Python
-
-```yaml
-- 3.9
-- 3.10
-```
+| Ansible       | Python |
+| ------------- | ------ |
+| `stable-2.13` | `3.9`  |
+| `stable-2.14` | `3.9`  |
+| `stable-2.15` | `3.10` |
+| `devel`       | `3.10` |
 
 ## External requirements
 
@@ -93,15 +84,15 @@ azure-core==1.26.1
 pydo==0.1.4
 ```
 
-### Supported connections
+The following should install the requirements for your account:
 
-<!-- Optional. If your collection supports only specific connection types (such as HTTPAPI, netconf, or others), list them here. -->
+```shell
+pip3 install --user azure-core==1.26.1 pydo==0.1.4
+```
 
-TBD
+There is a [pyproject.toml](./pyproject.toml) is the root of this repository as well if you use [Poetry](https://python-poetry.org/) or similar.
 
 ## Included content
-
-<!-- Galaxy will eventually list the module docs within the UI, but until that is ready, you may need to either describe your plugins etc here, or point to an external docsite to cover that information. -->
 
 | Module                            | Description                                     |
 | --------------------------------- | ----------------------------------------------- |
@@ -109,9 +100,51 @@ TBD
 
 ## Using this collection
 
-<!--Include some quick examples that cover the most common use cases for your collection content. It can include the following examples of installation and upgrade (change NAMESPACE.COLLECTION_NAME correspondingly):-->
+There are sample playbooks in the [playbooks](./playbooks) directory.
+Be sure to set the `DIGITALOCEAN_TOKEN` environment variable as most modules require authentication.
 
-TBD
+[This](./playbooks/account_info.yml) is a sample playbook which returns your DigitalOcean account information:
+
+```yaml
+---
+- name: Account info
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Get account information
+      digitalocean.cloud.account_info:
+```
+
+Output should look similar to the following:
+
+```shell
+❯ ANSIBLE_STDOUT_CALLBACK=yaml ansible-playbook -i localhost, -c local playbooks/account_info.yml -v
+Using /Users/mmercado/.ansible.cfg as config file
+
+PLAY [Account info] **********************************************************************************************
+
+TASK [Get account information] ***********************************************************************************
+ok: [localhost] => changed=false
+  account:
+    droplet_limit: 25
+    email: mmercado@digitalocean.com
+    email_verified: true
+    floating_ip_limit: 3
+    name: Mark Mercado
+    reserved_ip_limit: 3
+    status: active
+    status_message: ''
+    team:
+      name: FOSS
+      uuid: 3281ad4a-0092-4e6b-abd2-c7a7ed111503
+    uuid: eab13a8a-99e3-4ffd-a587-b8a7789f0090
+    volume_limit: 100
+  msg: Current account information
+
+PLAY RECAP *******************************************************************************************************
+localhost                  : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
 
 ### Installing the Collection from Ansible Galaxy
 
