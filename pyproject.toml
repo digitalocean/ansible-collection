@@ -10,7 +10,7 @@ readme = "README.md"
 python = "3.9.16"
 ansible-core = "2.14.6"
 azure-core = "1.26.1"
-pydo = "0.1.4"
+pydo = "0.1.5"
 boto3 = "1.26.142"
 jmespath = "1.0.1"
 
