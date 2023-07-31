@@ -22,6 +22,8 @@ This repository contains the `digitalocean.cloud` Ansible Collection.
 [![Sanity tests](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-sanity.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-sanity.yml)
 [![Unit tests](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-unit.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-unit.yml)
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/digitalocean/ansible-collection?quickstart=1)
+
 This collection can be used to manage infrastructure in the [DigitalOcean](https://www.digitalocean.com/) cloud.
 The API documentation is located [here](https://docs.digitalocean.com/reference/api/api-reference/).
 
