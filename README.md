@@ -12,6 +12,8 @@
 
 This repository contains the `digitalocean.cloud` Ansible Collection.
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/digitalocean/ansible-collection?quickstart=1)
+
 ## DigitalOcean Collection for Ansible
 
 [![Integration tests](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-integration.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-integration.yml)
