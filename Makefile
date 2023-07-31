@@ -1,4 +1,4 @@
-#!/usr/bin/env make
+#!/usr/bin/make
 
 .PHONY: install
 install:
@@ -14,6 +14,11 @@ clean:
 lint: collection-prep
 	poetry run ansible-lint --profile=production
 	make collection-cleanup
+
+# Assumes ansible-test is available in the global scope, such as within the devcontainer environment
+.PHONY: test-sanity
+test-sanity: collection-cleanup collection-prep
+	cd ~/.ansible/collections/ansible_collections/digitalocean/cloud && ansible-test sanity
 
 # Make a copy of the collection available in an expected Ansible path
 # For running tooling in Codespaces or other environments
