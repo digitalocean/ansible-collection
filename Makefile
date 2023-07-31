@@ -11,5 +11,12 @@ clean:
 	poetry run pre-commit autoupdate
 
 .PHONY: lint
-lint:
+lint: collection-prep
 	poetry run ansible-lint --profile=production
+
+# Make a copy of the collection available in an expected Ansible path
+# For running tooling in Codespaces or other environments
+.PHONY: collection-prep
+collection-prep:
+	mkdir -p ~/.ansible/collections/ansible_collections/digitalocean/cloud
+	cp -r ./ ~/.ansible/collections/ansible_collections/digitalocean/cloud

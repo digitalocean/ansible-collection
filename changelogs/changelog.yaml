@@ -3,31 +3,31 @@ releases:
   0.1.0:
     changes:
       minor_changes:
-      - add Galaxy publish workflow (https://github.com/digitalocean/ansible-collection/pull/7).
+        - add Galaxy publish workflow (https://github.com/digitalocean/ansible-collection/pull/7).
       release_summary: Initial release of the Collection.
     fragments:
-    - 7-publish.yml
+      - 7-publish.yml
     modules:
-    - description: Show information about the current user account
-      name: account_info
-      namespace: ''
+      - description: Show information about the current user account
+        name: account_info
+        namespace: ''
     release_date: '2023-07-27'
   0.1.1:
     changes:
       minor_changes:
-      - just bumping the version (https://github.com/digitalocean/ansible-collection/pull/8).
+        - just bumping the version (https://github.com/digitalocean/ansible-collection/pull/8).
       release_summary: Just bumping the version.
     fragments:
-    - 8-bump-version.yml
+      - 8-bump-version.yml
     release_date: '2023-07-27'
   0.1.2:
     changes:
       bugfixes:
-      - common - ignore C(pydo) module unused (https://github.com/digitalocean/ansible-collection/pull/9).
+        - common - ignore C(pydo) module unused (https://github.com/digitalocean/ansible-collection/pull/9).
       minor_changes:
-      - small Shark-a-Hack iterations (https://github.com/digitalocean/ansible-collection/pull/9).
+        - small Shark-a-Hack iterations (https://github.com/digitalocean/ansible-collection/pull/9).
       release_summary: Small Shark-a-Hack iterations.
     fragments:
-    - 9-common-lint.yml
-    - 9-small-iterations.yaml
+      - 9-common-lint.yml
+      - 9-small-iterations.yaml
     release_date: '2023-07-28'
