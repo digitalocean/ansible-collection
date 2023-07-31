@@ -7,8 +7,12 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    labels:
+      - "dependabot"
 
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
+    labels:
+      - "dependabot"
