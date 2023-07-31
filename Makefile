@@ -11,7 +11,7 @@ clean:
 	poetry run pre-commit autoupdate
 
 .PHONY: lint
-lint: collection-prep
+lint:
 	poetry run ansible-lint --profile=production
 	make collection-cleanup
 
