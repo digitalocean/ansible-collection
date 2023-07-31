@@ -5,6 +5,7 @@ version: 0.1.2
 readme: README.md
 authors:
   - Mark Mercado (@mamercad)
+  - Ari Kalfus (@artis3n)
 description: DigitalOcean Ansible Collection
 license_file: GPL-3.0
 tags:

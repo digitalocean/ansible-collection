@@ -2,7 +2,7 @@
 name = "digitalocean"
 version = "0.0.1"
 description = "Ansible DigitalOcean Collection"
-authors = ["Mark Mercado <mmercado@digitalocean.com>"]
+authors = ["Mark Mercado <mmercado@digitalocean.com>", "Ari Kalfus <akalfus@digitalocean.com>"]
 license = "GPL-3.0"
 readme = "README.md"
 
