@@ -1,0 +1,4 @@
+trivial:
+  - added @artis3n as a collection maintainer (https://github.com/digitalocean/ansible-collection/pull/20).
+minor_changes:
+  - configured ansible-lint to use the production profile (https://github.com/digitalocean/ansible-collection/pull/20).

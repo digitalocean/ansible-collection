@@ -1,0 +1,4 @@
+minor_changes:
+  - set up a devcontainer configuration allowing contributors to the project to use GitHub Codespaces or other tools that leverage devcontainer configurations (https://github.com/digitalocean/ansible-collection/pull/18).
+  - updated python dependencies (https://github.com/digitalocean/ansible-collection/pull/18).
+  - updated the pyproject.toml to more loosely define dependency versions, allowing the poetry lockfile to pin explicit versions (https://github.com/digitalocean/ansible-collection/pull/18).
