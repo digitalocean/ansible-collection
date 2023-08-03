@@ -4,6 +4,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  # NOTE: Yes, the origination is not from a PR :smile: but we do have
+  # integration tests on PR and we want the cloud resources uniquely named
+  PR_NUMBER: 0
+
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: false
