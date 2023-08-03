@@ -31,3 +31,11 @@ releases:
       - 9-common-lint.yml
       - 9-small-iterations.yaml
     release_date: '2023-07-28'
+  0.2.0:
+    changes:
+      minor_changes:
+      - add more modules (https://github.com/digitalocean/ansible-collection/pull/10).
+      release_summary: Add more modules.
+    fragments:
+    - 10-add-more-modules.yaml
+    release_date: '2023-07-28'

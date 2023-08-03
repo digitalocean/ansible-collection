@@ -1,0 +1,22 @@
+# code: language=ansible
+---
+- block:
+
+    - name: Verify API token
+      ansible.builtin.assert:
+        that:
+          - digitalocean_token is string
+          - digitalocean_token | length > 0
+        fail_msg: digitalocean_token should be defined in tests/integration/integration_config.yml
+
+    - name: Get VPCs
+      digitalocean.cloud.vpcs_info:
+        token: "{{ digitalocean_token }}"
+      register: result
+
+    - name: Verify VPCs
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg is string
+          - result.vpcs is iterable

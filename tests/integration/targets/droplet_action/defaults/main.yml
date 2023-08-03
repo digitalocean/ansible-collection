@@ -1,0 +1,6 @@
+droplet_name: "ansible-gh-ci-droplet-1-{{ pr_number }}"
+droplet_region: nyc3
+droplet_size: s-1vcpu-2gb
+droplet_image: ubuntu-22-04-x64
+
+snapshot_name: "ansible-gh-ci-droplet-snapshot-1-{{ pr_number }}"

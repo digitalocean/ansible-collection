@@ -1,0 +1,14 @@
+# code: language=ansible
+---
+- block:
+
+    - name: Verify API token
+      ansible.builtin.assert:
+        that:
+          - digitalocean_token is string
+          - digitalocean_token | length > 0
+        fail_msg: digitalocean_token should be defined in tests/integration/integration_config.yml
+
+    - name: Test domain | Create and delete
+      ansible.builtin.include_tasks:
+        file: 01_create_and_delete.yml
