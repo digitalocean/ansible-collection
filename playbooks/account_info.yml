@@ -1,5 +1,17 @@
 ---
 # code: language=ansible
+# Running this playbook:
+# ansible-playbook -i localhost, -c local playbooks/account_info.yml -v
+
+- name: Account info
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Get account information
+      digitalocean.cloud.account_info:
+
+# Example task output:
 # TASK [Get account information] ***********************************************
 # ok: [localhost] => changed=false
 #   account:
@@ -17,10 +29,3 @@
 #     uuid: eab13a8a-99e3-4ffd-a587-b8a7789f0090
 #     volume_limit: 100
 #   msg: Current account information
-- name: Account info
-  hosts: localhost
-  connection: local
-  gather_facts: false
-  tasks:
-    - name: Get account information
-      digitalocean.cloud.account_info:
