@@ -3,39 +3,184 @@ releases:
   0.1.0:
     changes:
       minor_changes:
-        - add Galaxy publish workflow (https://github.com/digitalocean/ansible-collection/pull/7).
+      - add Galaxy publish workflow (https://github.com/digitalocean/ansible-collection/pull/7).
       release_summary: Initial release of the Collection.
     fragments:
-      - 7-publish.yml
+    - 7-publish.yml
     modules:
-      - description: Show information about the current user account
-        name: account_info
-        namespace: ''
+    - description: Show information about the current user account
+      name: account_info
+      namespace: ''
     release_date: '2023-07-27'
   0.1.1:
     changes:
       minor_changes:
-        - just bumping the version (https://github.com/digitalocean/ansible-collection/pull/8).
+      - just bumping the version (https://github.com/digitalocean/ansible-collection/pull/8).
       release_summary: Just bumping the version.
     fragments:
-      - 8-bump-version.yml
+    - 8-bump-version.yml
     release_date: '2023-07-27'
   0.1.2:
     changes:
       bugfixes:
-        - common - ignore C(pydo) module unused (https://github.com/digitalocean/ansible-collection/pull/9).
+      - common - ignore C(pydo) module unused (https://github.com/digitalocean/ansible-collection/pull/9).
       minor_changes:
-        - small Shark-a-Hack iterations (https://github.com/digitalocean/ansible-collection/pull/9).
+      - small Shark-a-Hack iterations (https://github.com/digitalocean/ansible-collection/pull/9).
       release_summary: Small Shark-a-Hack iterations.
     fragments:
-      - 9-common-lint.yml
-      - 9-small-iterations.yaml
+    - 9-common-lint.yml
+    - 9-small-iterations.yaml
     release_date: '2023-07-28'
   0.2.0:
     changes:
+      bugfixes:
+      - integration tests - fix missing C(PR_NUMBER) when run on C(main) (https://github.com/digitalocean/ansible-collection/pull/22).
       minor_changes:
+      - add many more modules (https://github.com/digitalocean/ansible-collection/pull/10).
       - add more modules (https://github.com/digitalocean/ansible-collection/pull/10).
-      release_summary: Add more modules.
+      - configured ansible-lint to use the production profile (https://github.com/digitalocean/ansible-collection/pull/20).
+      - set up a devcontainer configuration allowing contributors to the project to
+        use GitHub Codespaces or other tools that leverage devcontainer configurations
+        (https://github.com/digitalocean/ansible-collection/pull/18).
+      - updated python dependencies (https://github.com/digitalocean/ansible-collection/pull/18).
+      - updated the pyproject.toml to more loosely define dependency versions, allowing
+        the poetry lockfile to pin explicit versions (https://github.com/digitalocean/ansible-collection/pull/18).
+      release_summary: Add many more modules.
     fragments:
+    - 10-add-many-more-modules.yaml
     - 10-add-more-modules.yaml
-    release_date: '2023-07-28'
+    - 18-devcontainer.yaml
+    - 20-update-codeowners.yaml
+    - 22-integration-tests-on-main.yaml
+    - 23-update-python-deps.yaml
+    modules:
+    - description: Retrieve the balances on a customer's account
+      name: balance_info
+      namespace: ''
+    - description: Retrieve a list of all billing history entries
+      name: billing_history_info
+      namespace: ''
+    - description: Manage CDN endpoints
+      name: cdn_endpoints
+      namespace: ''
+    - description: List all of the CDN endpoints available on your account
+      name: cdn_endpoints_info
+      namespace: ''
+    - description: Manage certificates
+      name: certificate
+      namespace: ''
+    - description: List all of the certificates available on your account
+      name: certificates_info
+      namespace: ''
+    - description: Create or delete database clusters
+      name: database_cluster
+      namespace: ''
+    - description: List all of the database clusters on your account
+      name: database_clusters_info
+      namespace: ''
+    - description: Manage domains
+      name: domain
+      namespace: ''
+    - description: Manage domain records
+      name: domain_record
+      namespace: ''
+    - description: Retrieve a listing of all of the domain records for a domain
+      name: domain_records_info
+      namespace: ''
+    - description: Retrieve a list of all of the domains in your account
+      name: domains_info
+      namespace: ''
+    - description: Create or delete Droplets
+      name: droplet
+      namespace: ''
+    - description: Perform Droplet actions
+      name: droplet_action
+      namespace: ''
+    - description: List all Droplets in your account
+      name: droplets_info
+      namespace: ''
+    - description: Create or delete firewalls
+      name: firewall
+      namespace: ''
+    - description: List all firewalls on your account
+      name: firewalls_info
+      namespace: ''
+    - description: List all of the images available on your account
+      name: images_info
+      namespace: ''
+    - description: Create or delete Kubernetes clusters
+      name: kubernetes_cluster
+      namespace: ''
+    - description: Retrieve a list of all of the Kubernetes clusters in your account
+      name: kubernetes_clusters_info
+      namespace: ''
+    - description: Create or delete load balancers
+      name: load_balancer
+      namespace: ''
+    - description: Retrieve a list of all of the load balancers in your account
+      name: load_balancers_info
+      namespace: ''
+    - description: Returns all alert policies that are configured for the given account
+      name: monitoring_alert_policies_info
+      namespace: ''
+    - description: Create or delete monitoring alert policy
+      name: monitoring_alert_policy
+      namespace: ''
+    - description: List all available 1-Click applications
+      name: one_clicks_info
+      namespace: ''
+    - description: Create or delete projects
+      name: project
+      namespace: ''
+    - description: Retrieve a list of all of the projects in your account
+      name: projects_info
+      namespace: ''
+    - description: List all of the regions that are available
+      name: regions_info
+      namespace: ''
+    - description: Create or delete reserved IPs
+      name: reserved_ip
+      namespace: ''
+    - description: List all reserved IPs on your account
+      name: reserved_ips_info
+      namespace: ''
+    - description: List all of available Droplet sizes
+      name: sizes_info
+      namespace: ''
+    - description: Delete snapshots
+      name: snapshot
+      namespace: ''
+    - description: Retrieve a list of all of the snapshots in your account
+      name: snapshots_info
+      namespace: ''
+    - description: Create or delete SSH keys
+      name: ssh_key
+      namespace: ''
+    - description: List all of the keys in your account
+      name: ssh_keys_info
+      namespace: ''
+    - description: Create or delete tags
+      name: tag
+      namespace: ''
+    - description: List all of the tags on your account
+      name: tags_info
+      namespace: ''
+    - description: Create or delete volumes
+      name: volume
+      namespace: ''
+    - description: Attach or detach volumes from Droplets
+      name: volume_action
+      namespace: ''
+    - description: Create or delete volume snapshots
+      name: volume_snapshot
+      namespace: ''
+    - description: List all of the block storage volumes available on your account
+      name: volumes_info
+      namespace: ''
+    - description: Create or delete VPCs
+      name: vpc
+      namespace: ''
+    - description: List all of the VPCs on your account
+      name: vpcs_info
+      namespace: ''
+    release_date: '2023-08-04'
