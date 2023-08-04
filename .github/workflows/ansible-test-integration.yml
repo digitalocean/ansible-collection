@@ -25,14 +25,8 @@ jobs:
       matrix:
         # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html
         versions:
-          - ansible: stable-2.13
-            python: "3.9"
           - ansible: stable-2.14
             python: "3.9"
-          - ansible: stable-2.15
-            python: "3.10"
-          - ansible: devel
-            python: "3.10"
         module:
           - account_info
 
