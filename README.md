@@ -147,7 +147,7 @@ Modules which create, update, or destroy resources in the cloud will require an 
 Please read [this](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more information on API tokens.
 
 > **Warning**
-> Keep in mind, running the sample playbooks that create cloud resources cloud will cost real money.
+> Keep in mind, running the sample playbooks that create cloud resources will cost real money.
 
 [This](./playbooks/account_info.yml) is a sample playbook which returns your DigitalOcean account information:
 
