@@ -1,0 +1,5 @@
+bugfixes:
+  - integration tests - fix missing C(PR_NUMBER) when run on C(main) (https://github.com/digitalocean/ansible-collection/pull/22).
+trivial:
+  - documentation - remove PR integration testing badge from the C(README.md) (https://github.com/digitalocean/ansible-collection/pull/22).
+  - integration tests - limit PR integration tests by C(module_utils) and C(modules) paths (https://github.com/digitalocean/ansible-collection/pull/22).

@@ -5,7 +5,7 @@ droplet:
   image: ubuntu-22-04-x64
 
 load_balancer:
-  name: ansible-gh-ci-lb-0
+  name: ansible-gh-ci-lb-2-{{ pr_number }}
   region: nyc3
   forwarding_rules:
     - entry_protocol: http
