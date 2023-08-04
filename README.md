@@ -7,9 +7,6 @@
      height=300>
 </p>
 
-> **Warning**
-> This collection is not ready for use!
-
 This repository contains the `digitalocean.cloud` Ansible Collection.
 
 ## DigitalOcean Collection for Ansible
@@ -142,7 +139,15 @@ There is a [pyproject.toml](./pyproject.toml) is the root of this repository as 
 ## Using this collection
 
 There are sample playbooks in the [playbooks](./playbooks) directory.
-Be sure to set the `DIGITALOCEAN_TOKEN` environment variable as most modules require authentication.
+While we may not always have complete coverage of example playbooks, it is the expectation that there is complete module documentation (with `EXAMPLES`) and [integration test coverage](./tests/integration/targets/) for every module in the collection which exercise CRUD (create, read, update if applicable, and delete).
+
+Be sure to set the `$DIGITALOCEAN_TOKEN` environment variable as most modules require authentication.
+This is preferable in contrast to using the `token` module parameter in the play and storing your API token in plaintext within your playbook.
+Modules which create, update, or destroy resources in the cloud will require an API token with "Write" permission.
+Please read [this](https://docs.digitalocean.com/reference/api/create-personal-access-token/) for more information on API tokens.
+
+> **Warning**
+> Keep in mind, running the sample playbooks that create cloud resources cloud will cost real money.
 
 [This](./playbooks/account_info.yml) is a sample playbook which returns your DigitalOcean account information:
 
@@ -211,10 +216,10 @@ ansible-galaxy collection install digitalocean.cloud --upgrade
 ```
 
 You can also install a specific version of the collection, for example, if you need to downgrade when something is broken in the latest version (please report an issue in this repository).
-Use the following syntax to install version `0.1.1`:
+Use the following syntax to install version `0.2.0`:
 
 ```shell
-ansible-galaxy collection install digitalocean.cloud:==0.1.1
+ansible-galaxy collection install digitalocean.cloud:==0.2.0
 ```
 
 See [Ansible Using collections](https://docs.ansible.com/ansible/devel/user_guide/collections_using.html) for more details.
