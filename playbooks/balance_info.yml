@@ -1,5 +1,17 @@
 ---
 # code: language=ansible
+# Running this playbook:
+# ansible-playbook -i localhost, -c local playbooks/balance_info.yml -v
+
+- name: Balance info
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Get balance information
+      digitalocean.cloud.balance_info:
+
+# Example task output:
 # TASK [Get balance information] ***********************************************
 # ok: [localhost] => changed=false
 #   balance:
@@ -8,10 +20,3 @@
 #     month_to_date_balance: '0.00'
 #     month_to_date_usage: '0.00'
 #   msg: Current balance information
-- name: Balance info
-  hosts: localhost
-  connection: local
-  gather_facts: false
-  tasks:
-    - name: Get balance information
-      digitalocean.cloud.balance_info:

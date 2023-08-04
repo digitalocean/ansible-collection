@@ -1,2 +1,0 @@
-trivial:
-  - ci - update C(setup-python) and C(boto3) (https://github.com/digitalocean/ansible-collection/pull/23).
