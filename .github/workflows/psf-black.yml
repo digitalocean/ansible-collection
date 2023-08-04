@@ -2,8 +2,12 @@ name: Python psf/black
 
 on:
   pull_request:
+    paths:
+      - "**.py"
   push:
     branches: [main]
+    paths:
+      - "**.py"
   workflow_dispatch:
 
 concurrency:
