@@ -228,6 +228,21 @@ See [Ansible Using collections](https://docs.ansible.com/ansible/devel/user_guid
 
 See the [changelog](https://github.com/digitalocean/ansible-collection/tree/main/CHANGELOG.rst).
 
+## Releasing instructions
+
+Please review the [upstream documentation](https://docs.ansible.com/ansible/latest/community/collection_contributors/collection_releasing.html) for releasing Ansible collections.
+The utility for creating the release metadata is [antibull-changelog](https://github.com/ansible-community/antsibull-changelog) and can be install from [PyPI](https://pypi.org/project/antsibull-changelog/) with `pip install --user antsibull-changelog`.
+In general, the steps are as follow:
+
+1. Create a new branch for the release with `git checkout -b release/X.Y.Z`
+2. Bump the collection version in [galaxy.yml](./galaxy.yml) to `X.Y.Z`
+3. Run `antsibull-changelog release` to generate the release metadata
+4. Commit all changes, push the branch, and open a pull request against this branch
+5. Once all tests pass and approvals are finalized, merge the pull request
+6. After tests pass after the merge into `main`, create and push the `vX.Y.Z` based off of the merge commit
+7. After the release tag is pushed, create the corresponding GitHub Release for the tag (choosing "automatically generate release notes" is fine) and set it as the latest release
+8. After [this workflow](./github/../.github/workflows/publish-galaxy.yml) passes the new version of the collection should appear on [Ansible Galaxy](https://galaxy.ansible.com/digitalocean/cloud) (it is triggered from tags of the form `v*`)
+
 ## Roadmap
 
 <!-- Optional. Include the roadmap for this collection, and the proposed release/versioning strategy so users can anticipate the upgrade/update cycle. -->

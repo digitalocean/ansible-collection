@@ -1,0 +1,2 @@
+trivial:
+  - documentation - add releasing instructions to the C(README.md) (https://github.com/digitalocean/ansible-collection/issues/25).
