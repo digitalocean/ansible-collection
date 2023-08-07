@@ -11,7 +11,7 @@ python = "~3.9"
 ansible-core = "^2.14.6"
 azure-core = "^1.26.1"
 pydo = "^0.1.4"
-boto3 = "^1.28.16"
+boto3 = "^1.28.20"
 jmespath = "^1.0.1"
 
 [tool.poetry.group.dev.dependencies]
