@@ -22,6 +22,8 @@ test-sanity: collection-cleanup collection-prep
 
 # Make a copy of the collection available in an expected Ansible path
 # For running tooling in Codespaces or other environments
+# If you get ansible-lint errors about unresolved modules in this collection,
+# run this command then re-run ansible-lint.
 .PHONY: collection-prep
 collection-prep:
 	mkdir -p ~/.ansible/collections/ansible_collections/digitalocean/cloud
