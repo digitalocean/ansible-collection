@@ -1,0 +1,2 @@
+trivial:
+  - ci - reconfigure CI integration tests to run from fork PRs, allowing external contributions to be tested (https://github.com/digitalocean/ansible-collection/pull/36). 

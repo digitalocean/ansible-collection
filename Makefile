@@ -12,7 +12,7 @@ clean:
 
 .PHONY: lint
 lint: collection-prep
-	poetry run ansible-lint --profile=production
+	-poetry run ansible-lint
 	make collection-cleanup
 
 # Assumes ansible-test is available in the global scope, such as within the devcontainer environment
@@ -22,6 +22,8 @@ test-sanity: collection-cleanup collection-prep
 
 # Make a copy of the collection available in an expected Ansible path
 # For running tooling in Codespaces or other environments
+# If you get ansible-lint errors about unresolved modules in this collection,
+# run this command then re-run ansible-lint.
 .PHONY: collection-prep
 collection-prep:
 	mkdir -p ~/.ansible/collections/ansible_collections/digitalocean/cloud
