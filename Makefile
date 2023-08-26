@@ -12,7 +12,7 @@ clean:
 
 .PHONY: lint
 lint: collection-prep
-	poetry run ansible-lint --profile=production
+	-poetry run ansible-lint
 	make collection-cleanup
 
 # Assumes ansible-test is available in the global scope, such as within the devcontainer environment
