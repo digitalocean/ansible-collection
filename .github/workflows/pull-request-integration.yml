@@ -1,10 +1,12 @@
 name: Pull request integration tests
 
 on:
-  pull_request:
+  pull_request_target:
+    branches:
+      - main
     paths:
-      - plugins/module_utils/**
-      - plugins/modules/**
+      - 'plugins/module_utils/**'
+      - 'plugins/modules/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -16,6 +18,8 @@ env:
 jobs:
   test-integration:
     runs-on: ubuntu-22.04
+    # MUST keep this environment set if using pull_request_target
+    environment: integration
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -72,6 +76,11 @@ jobs:
       - name: Perform integration testing
         uses: ansible-community/ansible-test-gh-action@release/v1
         with:
+          # MUST set 'git-checkout-ref' if using pull_request_target
+          # MUST use an Environment if using pull_request_target
+          # 'github.event.pull_request.head.sha' checks out the
+          # PR source repo's code, which should be considered untrusted
+          git-checkout-ref: ${{ github.event.pull_request.head.sha }}
           pre-test-cmd: >-
             DIGITALOCEAN_TOKEN=${{ secrets.DIGITALOCEAN_TOKEN }}
             AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
