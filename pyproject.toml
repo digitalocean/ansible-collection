@@ -8,7 +8,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "~3.9"
-ansible-core = "^2.14.6"
+ansible-core = "^2.15.3"
 azure-core = "^1.26.1"
 pydo = "^0.1.4"
 boto3 = "^1.28.16"
