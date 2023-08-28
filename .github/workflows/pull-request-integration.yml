@@ -5,6 +5,8 @@ on:
     branches:
       - main
     paths:
+      - poetry.lock
+      - pyproject.toml
       - 'plugins/module_utils/**'
       - 'plugins/modules/**'
 
