@@ -44,7 +44,10 @@ New Modules
 - domain_records_info - Retrieve a listing of all of the domain records for a domain
 - domains_info - Retrieve a list of all of the domains in your account
 - droplet - Create or delete Droplets
-- droplet_action - Perform Droplet actions
+- droplet_action_power_off - Power off a Droplet
+- droplet_action_power_on - Power on a Droplet
+- droplet_action_resize - Resize a Droplet
+- droplet_action_snapshot - Take a snapshot of a Droplet
 - droplets_info - List all Droplets in your account
 - firewall - Create or delete firewalls
 - firewalls_info - List all firewalls on your account

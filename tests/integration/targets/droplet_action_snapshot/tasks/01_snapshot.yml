@@ -1,7 +1,7 @@
 # code: language=ansible
-- name: Testing block
+- name: 01_snapshot | Testing block
   block:
-    - name: Create Droplet snapshot
+    - name: 01_snapshot | Create Droplet snapshot
       when: true
       digitalocean.cloud.droplet_action:
         token: "{{ digitalocean_token }}"
@@ -12,17 +12,17 @@
         snapshot_name: "{{ snapshot_name }}"
       register: result
 
-    - name: Verify create Droplet snapshot
+    - name: 01_snapshot | Verify create Droplet snapshot
       ansible.builtin.assert:
         that:
           - result.changed
           - result.msg == "Droplet " ~ droplet_name ~ " (" ~ result.action.resource_id ~ ") in " ~ droplet_region ~ " sent action 'snapshot'"
 
-    - name: Sleep for a few seconds
+    - name: 01_snapshot | Sleep for a few seconds
       ansible.builtin.pause:
         seconds: 10
 
-    - name: Delete snapshot
+    - name: 01_snapshot | Delete snapshot
       when: true
       digitalocean.cloud.snapshot:
         token: "{{ digitalocean_token }}"
@@ -30,7 +30,7 @@
         snapshot_name: "{{ snapshot_name }}"
       register: result
 
-    - name: Verify delete snapshot
+    - name: 01_snapshot | Verify delete snapshot
       ansible.builtin.assert:
         that:
           - result.changed

@@ -1,0 +1,25 @@
+---
+# code: language=ansible
+# Running this playbook:
+# ansible-playbook -i localhost, -c local playbooks/droplet.yml -v
+
+- name: Create Droplet
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Create Droplet
+      digitalocean.cloud.droplet:
+        name: test-droplet
+        region: nyc3
+        size: s-1vcpu-2gb
+        image: ubuntu-20-04-x64
+        ssh_keys: 112233
+        unique_name: true
+
+# Example task output:
+# TASK [Get CDN endpoints] *****************************************************
+# ok: [localhost] => changed=false
+#   endpoints: []
+#   msg: No CDN endpoints

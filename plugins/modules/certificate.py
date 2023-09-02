@@ -125,39 +125,17 @@ msg:
 """
 
 import time
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
+    DigitalOceanCommonModule,
     DigitalOceanOptions,
     DigitalOceanFunctions,
 )
 
-import traceback
 
-HAS_AZURE_LIBRARY = False
-AZURE_LIBRARY_IMPORT_ERROR = None
-try:
-    from azure.core.exceptions import HttpResponseError
-except ImportError:
-    AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_AZURE_LIBRARY = True
-
-HAS_PYDO_LIBRARY = False
-PYDO_LIBRARY_IMPORT_ERROR = None
-try:
-    from pydo import Client
-except ImportError:
-    PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYDO_LIBRARY = True
-
-
-class Certificate:
+class Certificate(DigitalOceanCommonModule):
     def __init__(self, module):
-        """Class constructor."""
-        self.module = module
-        self.client = Client(token=module.params.get("token"))
-        self.state = module.params.get("state")
+        super().__init__(module)
         self.name = module.params.get("name")
         self.dns_names = module.params.get("dns_names")
         self.private_key = module.params.get("private_key")
@@ -180,7 +158,7 @@ class Certificate:
             obj=self.client.certificates,
             meth="list",
             key="certificates",
-            exc=HttpResponseError,
+            exc=DigitalOceanCommonModule.HttpResponseError,
         )
         for certificate in certificates:
             if self.name == certificate.get("name"):
@@ -217,7 +195,7 @@ class Certificate:
                 self.module.fail_json(
                     changed=False, msg=f"Certificate {self.name} not created"
                 )
-            except HttpResponseError as err:
+            except DigitalOceanCommonModule.HttpResponseError as err:
                 error_message = None
                 if hasattr("err.error", "message"):
                     error_message = err.error.message
@@ -245,7 +223,7 @@ class Certificate:
                 self.module.fail_json(
                     changed=False, msg=f"Certificate {self.name} not created"
                 )
-            except HttpResponseError as err:
+            except DigitalOceanCommonModule.HttpResponseError as err:
                 error_message = None
                 if hasattr("err.error", "message"):
                     error_message = err.error.message
@@ -293,7 +271,7 @@ class Certificate:
                 msg=f"Certificate {self.name} deleted",
                 certificate=found_certificate,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error_message = None
             if hasattr("err.error", "message"):
                 error_message = err.error.message
@@ -306,7 +284,6 @@ class Certificate:
 
 
 def main():
-    """The main function."""
     argument_spec = DigitalOceanOptions.argument_spec()
     argument_spec.update(
         name=dict(type="str", required=True),
@@ -328,17 +305,6 @@ def main():
             "private_key": "leaf_certificate",
         },
     )
-    if not HAS_AZURE_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("azure.core.exceptions"),
-            exception=AZURE_LIBRARY_IMPORT_ERROR,
-        )
-    if not HAS_PYDO_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("pydo"),
-            exception=PYDO_LIBRARY_IMPORT_ERROR,
-        )
-
     Certificate(module)
 
 

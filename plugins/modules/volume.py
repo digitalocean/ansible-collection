@@ -83,7 +83,6 @@ options:
   region:
     description:
       - The slug identifier for the region where the resource will initially be available.
-    choices: ["ams1", "ams2", "ams3", "blr1", "fra1", "lon1", "nyc1", "nyc2", "nyc3", "sfo1", "sfo2", "sfo3", "sgp1", "tor1"]
     type: str
     required: true
   filesystem_label:
@@ -167,38 +166,17 @@ msg:
     - Deleted volume test-vol in nyc3
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
+    DigitalOceanCommonModule,
     DigitalOceanOptions,
     DigitalOceanFunctions,
 )
 
-import traceback
 
-HAS_AZURE_LIBRARY = False
-AZURE_LIBRARY_IMPORT_ERROR = None
-try:
-    from azure.core.exceptions import HttpResponseError
-except ImportError:
-    AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_AZURE_LIBRARY = True
-
-HAS_PYDO_LIBRARY = False
-PYDO_LIBRARY_IMPORT_ERROR = None
-try:
-    from pydo import Client
-except ImportError:
-    PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYDO_LIBRARY = True
-
-
-class Volume:
+class Volume(DigitalOceanCommonModule):
     def __init__(self, module):
-        self.module = module
-        self.client = Client(token=module.params.get("token"))
-        self.state = module.params.get("state")
+        super().__init__(module)
         self.name = module.params.get("name")
         self.description = module.params.get("description")
         if module.params.get("size_gigabytes"):
@@ -222,7 +200,7 @@ class Volume:
             meth="list",
             key="volumes",
             params=dict(name=self.name),
-            exc=HttpResponseError,
+            exc=DigitalOceanCommonModule.HttpResponseError,
         )
         found_volumes = []
         for volume in volumes:
@@ -253,7 +231,7 @@ class Volume:
                 msg=f"Created volume {self.name} ({volume['id']}) in {self.region}",
                 volume=volume,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -273,7 +251,7 @@ class Volume:
                 msg=f"Deleted volume {volume['name']} ({volume['id']}) in {self.region}",
                 volume=volume,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -350,29 +328,9 @@ def main():
         tags=dict(type="list", elements="str", required=False),
         snapshot_id=dict(type="str", required=False),
         filesystem_type=dict(type="str", choices=["ext4", "xfs"], required=False),
-        region=dict(
-            type="str",
-            choices=[
-                "ams1",
-                "ams2",
-                "ams3",
-                "blr1",
-                "fra1",
-                "lon1",
-                "nyc1",
-                "nyc2",
-                "nyc3",
-                "sfo1",
-                "sfo2",
-                "sfo3",
-                "sgp1",
-                "tor1",
-            ],
-            required=True,
-        ),
+        region=dict(type="str", required=True),
         filesystem_label=dict(type="str", required=False),
     )
-
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
@@ -380,19 +338,6 @@ def main():
             ("state", "present", ["size_gigabytes"]),
         ],
     )
-
-    if not HAS_AZURE_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("azure.core.exceptions"),
-            exception=AZURE_LIBRARY_IMPORT_ERROR,
-        )
-
-    if not HAS_PYDO_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("pydo"),
-            exception=PYDO_LIBRARY_IMPORT_ERROR,
-        )
-
     Volume(module)
 
 

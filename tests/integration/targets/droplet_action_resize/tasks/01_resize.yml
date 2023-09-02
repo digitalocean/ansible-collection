@@ -1,0 +1,20 @@
+# code: language=ansible
+- name: 01_resize | Testing block
+  block:
+    - name: 01_resize | Resize Droplet
+      when: true
+      digitalocean.cloud.droplet_action_resize:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        size: "{{ droplet_new_size }}"
+      register: result
+
+    - name: 01_resize | Verify resize Droplet
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - |
+            result.msg == "Droplet " ~ droplet_name ~ " (" ~ result.action.resource_id ~ ") in " ~ droplet_region
+            ~ " sent action 'resize', new size is '{{ droplet_new_size }}'"

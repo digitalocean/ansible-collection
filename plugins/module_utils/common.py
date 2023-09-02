@@ -14,7 +14,7 @@ import traceback
 HAS_AZURE_LIBRARY = False
 AZURE_LIBRARY_IMPORT_ERROR = None
 try:
-    from azure.core.exceptions import HttpResponseError
+    from azure.core.exceptions import HttpResponseError  # pylint: disable=unused-import
 except ImportError:
     AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
 else:
@@ -80,7 +80,7 @@ class DigitalOceanFunctions:
             meth="list",
             key="volumes",
             params=None,
-            exc=HttpResponseError,
+            exc=DigitalOceanCommonModule.HttpResponseError,
         )
         found_volumes = []
         for volume in volumes:
@@ -97,7 +97,7 @@ class DigitalOceanFunctions:
             meth="list",
             key="droplets",
             params=None,
-            exc=HttpResponseError,
+            exc=DigitalOceanCommonModule.HttpResponseError,
         )
         found_droplets = []
         for droplet in droplets:
@@ -114,7 +114,7 @@ class DigitalOceanFunctions:
             meth="list",
             key="droplets",
             params=None,
-            exc=HttpResponseError,
+            exc=DigitalOceanCommonModule.HttpResponseError,
         )
         found_droplets = []
         for droplet in droplets:
@@ -132,7 +132,7 @@ class DigitalOceanFunctions:
             meth="list",
             key="volumes",
             params=None,
-            exc=HttpResponseError,
+            exc=DigitalOceanCommonModule.HttpResponseError,
         )
         found_volumes = []
         for volume in volumes:
@@ -166,6 +166,7 @@ class DigitalOceanOptions:
                 fallback=(
                     env_fallback,
                     [
+                        "DIGITALOCEAN_ACCESS_TOKEN",  # Parity with doctl
                         "DIGITALOCEAN_TOKEN",
                         "DO_API_TOKEN",
                         "DO_API_KEY",
@@ -177,4 +178,51 @@ class DigitalOceanOptions:
                 required=False,
                 aliases=["oauth_token", "api_token"],
             ),
+            client_override_options=dict(type="dict", required=False),
+            module_override_options=dict(type="dict", required=False),
         )
+
+
+class DigitalOceanCommonModule:
+    HAS_AZURE_LIBRARY = False
+    AZURE_LIBRARY_IMPORT_ERROR = None
+    try:
+        from azure.core.exceptions import (
+            HttpResponseError,
+        )  # pylint: disable=unused-import
+    except ImportError:
+        AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
+    else:
+        HAS_AZURE_LIBRARY = True
+
+    HAS_PYDO_LIBRARY = False
+    PYDO_LIBRARY_IMPORT_ERROR = None
+    try:
+        from pydo import Client  # pylint: disable=unused-import
+    except ImportError:
+        PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
+    else:
+        HAS_PYDO_LIBRARY = True
+
+    def __init__(self, module):
+        self.module = module
+        self.module_override_options = module.params.get("module_override_options")
+        self.client_options = {"token": module.params.get("token")}
+        self.client_override_options = module.params.get("client_override_options")
+        if self.client_override_options:
+            self.client_options.update(**self.client_override_options)
+        self.client = Client(**self.client_options)
+        self.state = module.params.get("state")
+
+
+class DigitalOceanLogfile:
+    def __init__(self, filename: str = "/tmp/ansible.log") -> None:
+        self.filename = filename
+        self.fh = open(self.filename, "w")
+
+    def write(self, line) -> None:
+        self.fh.write(line + "\n")
+        self.fh.flush()
+
+    def __del__(self) -> None:
+        self.fh.close()

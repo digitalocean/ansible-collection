@@ -178,38 +178,17 @@ msg:
     - redis database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) would be deleted
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
+    DigitalOceanCommonModule,
     DigitalOceanOptions,
     DigitalOceanFunctions,
 )
 
-import traceback
 
-HAS_AZURE_LIBRARY = False
-AZURE_LIBRARY_IMPORT_ERROR = None
-try:
-    from azure.core.exceptions import HttpResponseError
-except ImportError:
-    AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_AZURE_LIBRARY = True
-
-HAS_PYDO_LIBRARY = False
-PYDO_LIBRARY_IMPORT_ERROR = None
-try:
-    from pydo import Client
-except ImportError:
-    PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYDO_LIBRARY = True
-
-
-class MonitoringAlertPolicy:
+class MonitoringAlertPolicy(DigitalOceanCommonModule):
     def __init__(self, module):
-        self.module = module
-        self.client = Client(token=module.params.get("token"))
-        self.state = module.params.get("state")
+        super().__init__(module)
         self.alerts = module.params.get("alerts")
         self.compare = module.params.get("compare")
         self.description = module.params.get("description")
@@ -219,7 +198,6 @@ class MonitoringAlertPolicy:
         self.type = module.params.get("type")
         self.value = module.params.get("value")
         self.window = module.params.get("window")
-
         if self.state == "present":
             self.present()
         elif self.state == "absent":
@@ -232,9 +210,8 @@ class MonitoringAlertPolicy:
                 obj=self.client.monitoring,
                 meth="list_alert_policy",
                 key="policies",
-                exc=HttpResponseError,
+                exc=DigitalOceanCommonModule.HttpResponseError,
             )
-            # raise RuntimeError(monitoring_alert_policies)
             found_monitoring_alert_policies = []
             for monitoring_alert_policy in monitoring_alert_policies:
                 if (
@@ -251,7 +228,7 @@ class MonitoringAlertPolicy:
                 ):
                     found_monitoring_alert_policies.append(monitoring_alert_policy)
             return found_monitoring_alert_policies
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -263,25 +240,6 @@ class MonitoringAlertPolicy:
                 error=error,
                 policy=[],
             )
-
-    # def get_kubernetes_cluster_by_id(self, id):
-    #     try:
-    #         kubernetes_cluster = self.client.kubernetes.get_cluster(cluster_id=id)[
-    #             "kubernetes_cluster"
-    #         ]
-    #         return kubernetes_cluster
-    #     except HttpResponseError as err:
-    #         error = {
-    #             "Message": err.error.message,
-    #             "Status Code": err.status_code,
-    #             "Reason": err.reason,
-    #         }
-    #         self.module.fail_json(
-    #             changed=False,
-    #             msg=error.get("Message"),
-    #             error=error,
-    #             kubernetes_cluster=[],
-    #         )
 
     def create_monitoring_alert_policy(self):
         try:
@@ -302,7 +260,7 @@ class MonitoringAlertPolicy:
                 msg=f"Created monitoring alert policy {self.description} ({policy['uuid']})",
                 policy=policy,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -323,7 +281,7 @@ class MonitoringAlertPolicy:
                 msg=f"Deleted monitoring alert policy {self.description} ({policy['uuid']})",
                 policy=policy,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -431,24 +389,10 @@ def main():
         value=dict(type="float", required=True),
         window=dict(type="str", choices=["5m", "10m", "30m", "1h"], required=True),
     )
-
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
     )
-
-    if not HAS_AZURE_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("azure.core.exceptions"),
-            exception=AZURE_LIBRARY_IMPORT_ERROR,
-        )
-
-    if not HAS_PYDO_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("pydo"),
-            exception=PYDO_LIBRARY_IMPORT_ERROR,
-        )
-
     MonitoringAlertPolicy(module)
 
 

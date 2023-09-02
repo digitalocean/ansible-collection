@@ -1,12 +1,10 @@
 # code: language=ansible
-- name: Testing block
+- name: 99_teardown | Testing block
   block:
-    - name: Create Droplet
+    - name: 99_teardown | Delete Droplet
       digitalocean.cloud.droplet:
+        state: absent
         token: "{{ digitalocean_token }}"
-        state: present
         name: "{{ droplet_name }}"
         region: "{{ droplet_region }}"
-        size: "{{ droplet_size }}"
-        image: "{{ droplet_image }}"
         unique_name: true

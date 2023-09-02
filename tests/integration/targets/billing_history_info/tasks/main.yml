@@ -1,6 +1,7 @@
 # code: language=ansible
 ---
-- block:
+- name: Test block
+  block:
 
     - name: Verify API token
       ansible.builtin.assert:
@@ -13,23 +14,24 @@
       digitalocean.cloud.billing_history_info:
         token: "{{ digitalocean_token }}"
       register: result
-      ignore_errors: true  # NOTE: Might not have any billing history (free account)
 
-    - name: Assert result message
-      ansible.builtin.assert:
-        that: result.msg is string
+    - name: Debug
+      ansible.builtin.debug:
+        var: result
 
-    - name: Verify billing history information
-      when: result.msg == "Current billing history"
-      ansible.builtin.assert:
-        that:
-          - not result.changed
-          - result.msg is string
-          - result.billing_history is list
+    - name: No billing history block
+      when: result.msg == "No billing history information"
+      block:
+        - name: Verify no billing history information
+          ansible.builtin.assert:
+            that:
+              - not result.changed
 
-    - name: Verify billing history information
-      when: result.msg == "Current billing history not found"
-      ansible.builtin.assert:
-        that:
-          - not result.changed
-          - result.msg is string
+    - name: Current billing history information block
+      when: result.msg == "Current billing history information"
+      block:
+        - name: Verify current billing history information
+          ansible.builtin.assert:
+            that:
+              - not result.changed
+              - result.billing_history is list

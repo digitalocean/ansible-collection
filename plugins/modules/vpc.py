@@ -109,37 +109,16 @@ msg:
     - VPC env.prod-vpc (5a4981aa-9653-4bd1-bef5-d6bff52042e4) would be deleted
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
+    DigitalOceanCommonModule,
     DigitalOceanOptions,
 )
 
-import traceback
 
-HAS_AZURE_LIBRARY = False
-AZURE_LIBRARY_IMPORT_ERROR = None
-try:
-    from azure.core.exceptions import HttpResponseError
-except ImportError:
-    AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_AZURE_LIBRARY = True
-
-HAS_PYDO_LIBRARY = False
-PYDO_LIBRARY_IMPORT_ERROR = None
-try:
-    from pydo import Client
-except ImportError:
-    PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYDO_LIBRARY = True
-
-
-class VPC:
+class VPC(DigitalOceanCommonModule):
     def __init__(self, module):
-        self.module = module
-        self.client = Client(token=module.params.get("token"))
-        self.state = module.params.get("state")
+        super().__init__(module)
         self.name = module.params.get("name")
         self.description = module.params.get("description")
         self.region = module.params.get("region")
@@ -158,7 +137,7 @@ class VPC:
                 if self.name == vpc["name"]:
                     found_vpcs.append(vpc)
             return found_vpcs
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -186,7 +165,7 @@ class VPC:
                 msg=f"Created VPC {self.name} ({(vpc['id'])})",
                 vpc=vpc,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -204,7 +183,7 @@ class VPC:
                 msg=f"Deleted VPC {self.name} ({vpc['id']})",
                 vpc=vpc,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -274,24 +253,10 @@ def main():
         region=dict(type="str", required=True),
         ip_range=dict(type="str", required=False),
     )
-
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
     )
-
-    if not HAS_AZURE_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("azure.core.exceptions"),
-            exception=AZURE_LIBRARY_IMPORT_ERROR,
-        )
-
-    if not HAS_PYDO_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("pydo"),
-            exception=PYDO_LIBRARY_IMPORT_ERROR,
-        )
-
     VPC(module)
 
 

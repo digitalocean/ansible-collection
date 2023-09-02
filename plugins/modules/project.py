@@ -117,37 +117,16 @@ msg:
     - Project my-website-api (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) would be deleted
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
+    DigitalOceanCommonModule,
     DigitalOceanOptions,
 )
 
-import traceback
 
-HAS_AZURE_LIBRARY = False
-AZURE_LIBRARY_IMPORT_ERROR = None
-try:
-    from azure.core.exceptions import HttpResponseError
-except ImportError:
-    AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_AZURE_LIBRARY = True
-
-HAS_PYDO_LIBRARY = False
-PYDO_LIBRARY_IMPORT_ERROR = None
-try:
-    from pydo import Client
-except ImportError:
-    PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYDO_LIBRARY = True
-
-
-class Project:
+class Project(DigitalOceanCommonModule):
     def __init__(self, module):
-        self.module = module
-        self.client = Client(token=module.params.get("token"))
-        self.state = module.params.get("state")
+        super().__init__(module)
         self.name = module.params.get("name")
         self.description = module.params.get("description")
         self.purpose = module.params.get("purpose")
@@ -166,7 +145,7 @@ class Project:
                 if self.name == project["name"]:
                     found_projects.append(project)
             return found_projects
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -194,7 +173,7 @@ class Project:
                 msg=f"Created project {self.name} ({project['id']})",
                 project=project,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -212,7 +191,7 @@ class Project:
                 msg=f"Deleted project {self.name} ({project['id']})",
                 project=project,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             # TODO: Not sure where to file this bug yet
             raise RuntimeError(err)
             # RuntimeError: Operation returned an invalid status 'Unsupported Media Type'
@@ -287,7 +266,6 @@ def main():
             type="str", choices=["Development", "Staging", "Production"], required=False
         ),
     )
-
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
@@ -295,19 +273,6 @@ def main():
             ("state", "present", ("purpose",)),
         ],
     )
-
-    if not HAS_AZURE_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("azure.core.exceptions"),
-            exception=AZURE_LIBRARY_IMPORT_ERROR,
-        )
-
-    if not HAS_PYDO_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("pydo"),
-            exception=PYDO_LIBRARY_IMPORT_ERROR,
-        )
-
     Project(module)
 
 

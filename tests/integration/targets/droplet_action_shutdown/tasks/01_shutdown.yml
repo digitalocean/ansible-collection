@@ -1,0 +1,17 @@
+# code: language=ansible
+- name: 01_shutdown | Testing block
+  block:
+    - name: 01_shutdown | Shutdown Droplet
+      when: true
+      digitalocean.cloud.droplet_action_shutdown:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+      register: result
+
+    - name: 01_shutdown | Verify shutdown Droplet
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Droplet " ~ droplet_name ~ " (" ~ result.action.resource_id ~ ") in " ~ droplet_region ~ " sent action 'shutdown'"

@@ -1,7 +1,7 @@
 # code: language=ansible
-- name: Testing block
+- name: 99_teardown | Testing block
   block:
-    - name: Teardown | Delete Droplet
+    - name: 99_teardown | Delete Droplet
       digitalocean.cloud.droplet:
         state: absent
         token: "{{ digitalocean_token }}"

@@ -149,43 +149,21 @@ msg:
     - Firewall test-firewall (e23647ff-4b57-4da0-8f31-72616d932c0d) would be deleted
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
+    DigitalOceanCommonModule,
     DigitalOceanOptions,
 )
 
-import traceback
 
-HAS_AZURE_LIBRARY = False
-AZURE_LIBRARY_IMPORT_ERROR = None
-try:
-    from azure.core.exceptions import HttpResponseError
-except ImportError:
-    AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_AZURE_LIBRARY = True
-
-HAS_PYDO_LIBRARY = False
-PYDO_LIBRARY_IMPORT_ERROR = None
-try:
-    from pydo import Client
-except ImportError:
-    PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYDO_LIBRARY = True
-
-
-class Firewall:
+class Firewall(DigitalOceanCommonModule):
     def __init__(self, module):
-        self.module = module
-        self.client = Client(token=module.params.get("token"))
-        self.state = module.params.get("state")
+        super().__init__(module)
         self.name = module.params.get("name")
         self.droplet_ids = module.params.get("droplet_ids")
         self.tags = module.params.get("tags")
         self.inbound_rules = module.params.get("inbound_rules")
         self.outbound_rules = module.params.get("outbound_rules")
-
         if self.state == "present":
             self.present()
         elif self.state == "absent":
@@ -199,7 +177,7 @@ class Firewall:
                 if self.name == firewall_cluster["name"]:
                     found_firewalls.append(firewall_cluster)
             return found_firewalls
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -228,7 +206,7 @@ class Firewall:
                 msg=f"Created firewall {self.name} ({firewall['id']})",
                 firewall=firewall,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -246,7 +224,7 @@ class Firewall:
                 msg=f"Deleted firewall {self.name} ({firewall['id']})",
                 firewall=firewall,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -317,7 +295,6 @@ def main():
         inbound_rules=dict(type="list", elements="dict", required=False),
         outbound_rules=dict(type="list", elements="dict", required=False),
     )
-
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
@@ -325,19 +302,6 @@ def main():
             ("state", "present", ("inbound_rules", "outbound_rules"), True),
         ],
     )
-
-    if not HAS_AZURE_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("azure.core.exceptions"),
-            exception=AZURE_LIBRARY_IMPORT_ERROR,
-        )
-
-    if not HAS_PYDO_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("pydo"),
-            exception=PYDO_LIBRARY_IMPORT_ERROR,
-        )
-
     Firewall(module)
 
 
