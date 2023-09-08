@@ -15,10 +15,6 @@
         token: "{{ digitalocean_token }}"
       register: result
 
-    - name: Debug
-      ansible.builtin.debug:
-        var: result
-
     - name: No billing history block
       when: result.msg == "No billing history information"
       block:
