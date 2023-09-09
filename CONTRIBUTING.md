@@ -74,4 +74,10 @@ cp tests/integration/integration_config.yml.template \
 # Running the integration tests will create real resources and cost real money
 ansible-test integration --python 3.9 --verbose # To test all modules
 ansible-test integration --python 3.9 account_info --verbose # Test a single module
+
+# Set up an environment variable for the playbooks
+export DIGITALOCEAN_TOKEN='<Your DigitalOcean API token>'
+
+# Run a sample playbook
+ansible-playbook -i localhost, -c local playbooks/account_info.yml -v
 ```
