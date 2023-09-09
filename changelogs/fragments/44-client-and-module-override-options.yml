@@ -8,8 +8,5 @@ breaking_changes:
 minor_changes:
   - common - add C(client_override_options) and C(module_override_options) for experimental or future options (https://github.com/digitalocean/ansible-collection/pull/44).
   - common - remove region validation from argument_specs to facilitate API test beds (https://github.com/digitalocean/ansible-collection/pull/44).
-  - droplet_action_resize - new module for resizing Droplets (https://github.com/digitalocean/ansible-collection/pull/44).
-  - droplet_action_power_off - new module for powering off Droplets (https://github.com/digitalocean/ansible-collection/pull/44).
-  - droplet_action_power_on - new module for powering on Droplets (https://github.com/digitalocean/ansible-collection/pull/44).
-  - droplet_action_shutdown - new module for powering on Droplets (https://github.com/digitalocean/ansible-collection/pull/44).
+  - droplet_action_power - new module for changing power states on Droplets (https://github.com/digitalocean/ansible-collection/pull/44).
   - droplet_action_snapshot - new module for taking Droplet snapshots (https://github.com/digitalocean/ansible-collection/pull/44).

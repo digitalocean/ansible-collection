@@ -10,14 +10,26 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: droplet_action_power_on
+module: droplet_action_power
 
-short_description: Power on a Droplet
+short_description: Set power states of a Droplet
 
 version_added: 0.3.0
 
 description:
-  - Power on a Droplet.
+  - Set power states of a Droplet.
+  - State power_on powers on a Droplet.
+  - |
+    State power_off is a hard shutdown and should only be used if the shutdown
+    action is not successful. It is similar to cutting the power on a server and
+    could lead to complications.
+  - |
+    State shutdown is an attempt to shutdown the Droplet in a graceful way,
+    similar to using the shutdown command from the console. Since a shutdown
+    command can fail, this action guarantees that the command is issued, not that
+    it succeeds. The preferred way to turn off a Droplet is to attempt a shutdown,
+    with a reasonable timeout, followed by a power_off state to ensure the
+    Droplet is off.
   - View the API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#tag/Droplet-Actions).
 
 author: Mark Mercado (@mamercad)
@@ -45,6 +57,12 @@ options:
       - Required with C(name).
     type: str
     required: false
+  state:
+    description:
+      - The power state transition.
+    type: str
+    choices: [power_off, power_on, shutdown]
+    default: power_on
 
 extends_documentation_fragment:
   - digitalocean.cloud.common.documentation
@@ -52,10 +70,22 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Power on a Droplet
-  digitalocean.cloud.droplet_action_power_on:
+- name: Power off a Droplet
+  digitalocean.cloud.droplet_action_power:
     token: "{{ token }}"
-    state: present
+    state: power_off
+    id: 1122334455
+
+- name: Power on a Droplet
+  digitalocean.cloud.droplet_action_power:
+    token: "{{ token }}"
+    state: power_on
+    id: 1122334455
+
+- name: Shut down a Droplet
+  digitalocean.cloud.droplet_action_power:
+    token: "{{ token }}"
+    state: shutdown
     id: 1122334455
 """
 
@@ -105,10 +135,18 @@ msg:
   sample:
     - No Droplet with ID 336851565
     - No Droplet with name test-droplet-1 in nyc3
+    - Droplet test-droplet-1 (336851565) in nyc3 sent action 'power_off'
+    - Droplet test-droplet-1 (336851565) in nyc3 would be sent action 'power_off', it is 'off'
+    - Droplet test-droplet-1 (336851565) in nyc3 would not be sent action 'power_off', it is 'active'
+    - Droplet test-droplet-1 (336851565) in nyc3 not sent action 'power_off', it is 'off'
     - Droplet test-droplet-1 (336851565) in nyc3 sent action 'power_on'
-    - Droplet test-droplet-1 (336851565) in nyc3 would be sent action 'power_on', it is 'off'
-    - Droplet test-droplet-1 (336851565) in nyc3 would not be sent action 'power_on', it is 'active'
+    - Droplet test-droplet-1 (336851565) in nyc3 would be sent action 'power_on', it is 'active'
+    - Droplet test-droplet-1 (336851565) in nyc3 would not be sent action 'power_on', it is 'off'
     - Droplet test-droplet-1 (336851565) in nyc3 not sent action 'power_on', it is 'active'
+    - Droplet test-droplet-1 (336851565) in nyc3 sent action 'shutdown'
+    - Droplet test-droplet-1 (336851565) in nyc3 would be sent action 'shutdown', it is 'active'
+    - Droplet test-droplet-1 (336851565) in nyc3 would not be sent action 'shutdown', it is 'off'
+    - Droplet test-droplet-1 (336851565) in nyc3 not sent action 'shutdown', it is 'off'
 """
 
 import time
@@ -121,17 +159,21 @@ from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
 )
 
 
-class DropletActionPowerOn(DigitalOceanCommonModule):
+class DropletActionPower(DigitalOceanCommonModule):
     def __init__(self, module):
         super().__init__(module)
-        self.type = "power_on"
         self.timeout = module.params.get("timeout")
         self.droplet_id = module.params.get("droplet_id")
         self.name = module.params.get("name")
         self.region = module.params.get("region")
         self.droplet = self.find_droplet()
-        if self.state == "present":
-            self.present()
+        self.type = self.state
+        if self.type == "power_off":
+            self.power_off()
+        elif self.type == "power_on":
+            self.power_on()
+        elif self.type == "shutdown":
+            self.shutdown()
 
     def find_droplet(self):
         if self.droplet_id:
@@ -196,7 +238,7 @@ class DropletActionPowerOn(DigitalOceanCommonModule):
                 changed=False, msg=error.get("Message"), error=error, action=[]
             )
 
-    def power_on(self):
+    def set_power_off(self):
         try:
             body = {
                 "type": self.type,
@@ -226,7 +268,96 @@ class DropletActionPowerOn(DigitalOceanCommonModule):
                 changed=False, msg=error.get("Message"), error=error, action=[]
             )
 
-    def present(self):
+    def set_power_on(self):
+        try:
+            body = {
+                "type": self.type,
+            }
+            action = self.client.droplet_actions.post(
+                droplet_id=self.droplet["id"], body=body
+            )["action"]
+
+            status = action["status"]
+            end_time = time.monotonic() + self.timeout
+            while time.monotonic() < end_time and status != "completed":
+                time.sleep(DigitalOceanConstants.SLEEP)
+                status = self.get_action_by_id(action_id=action["id"])["status"]
+
+            self.module.exit_json(
+                changed=True,
+                msg=f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']} sent action '{self.type}'",
+                action=action,
+            )
+        except DigitalOceanCommonModule.HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            self.module.fail_json(
+                changed=False, msg=error.get("Message"), error=error, action=[]
+            )
+
+    def set_shutdown(self):
+        try:
+            body = {
+                "type": self.type,
+            }
+            action = self.client.droplet_actions.post(
+                droplet_id=self.droplet["id"], body=body
+            )["action"]
+
+            status = action["status"]
+            end_time = time.monotonic() + self.timeout
+            while time.monotonic() < end_time and status != "completed":
+                time.sleep(DigitalOceanConstants.SLEEP)
+                status = self.get_action_by_id(action_id=action["id"])["status"]
+
+            self.module.exit_json(
+                changed=True,
+                msg=f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']} sent action '{self.type}'",
+                action=action,
+            )
+        except DigitalOceanCommonModule.HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            self.module.fail_json(
+                changed=False, msg=error.get("Message"), error=error, action=[]
+            )
+
+    def power_off(self):
+        if self.module.check_mode:
+            if self.droplet["status"] != "off":
+                self.module.exit_json(
+                    changed=True,
+                    msg=(
+                        f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']} "
+                        f"would be sent action '{self.type}', it is '{self.droplet['status']}'"
+                    ),
+                )
+            self.module.exit_json(
+                changed=False,
+                msg=(
+                    f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']} "
+                    f"would not be sent action '{self.type}', it is '{self.droplet['status']}'"
+                ),
+            )
+
+        if self.droplet["status"] == "off":
+            self.module.exit_json(
+                changed=False,
+                msg=(
+                    f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']} "
+                    f"not sent action '{self.type}', it is '{self.droplet['status']}'"
+                ),
+            )
+
+        self.set_power_off()
+
+    def power_on(self):
         if self.module.check_mode:
             if self.droplet["status"] == "off":
                 self.module.exit_json(
@@ -253,7 +384,36 @@ class DropletActionPowerOn(DigitalOceanCommonModule):
                 ),
             )
 
-        self.power_on()
+        self.set_power_on()
+
+    def shutdown(self):
+        if self.module.check_mode:
+            if self.droplet["status"] != "off":
+                self.module.exit_json(
+                    changed=True,
+                    msg=(
+                        f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']} "
+                        f"would be sent action '{self.type}', it is '{self.droplet['status']}'"
+                    ),
+                )
+            self.module.exit_json(
+                changed=False,
+                msg=(
+                    f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']} "
+                    f"would not be sent action '{self.type}', it is '{self.droplet['status']}'"
+                ),
+            )
+
+        if self.droplet["status"] == "off":
+            self.module.exit_json(
+                changed=False,
+                msg=(
+                    f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']} "
+                    f"not sent action '{self.type}', it is '{self.droplet['status']}'"
+                ),
+            )
+
+        self.set_shutdown()
 
 
 def main():
@@ -262,6 +422,11 @@ def main():
         droplet_id=dict(type="int", required=False),
         name=dict(type="str", required=False),
         region=dict(type="str", required=False),
+        state=dict(
+            type="str",
+            choices=["power_off", "power_on", "shutdown"],
+            default="power_on",
+        ),
     )
 
     module = AnsibleModule(
@@ -271,7 +436,7 @@ def main():
         mutually_exclusive=[("droplet_id", "name")],
         required_together=[("name", "region")],
     )
-    DropletActionPowerOn(module)
+    DropletActionPower(module)
 
 
 if __name__ == "__main__":

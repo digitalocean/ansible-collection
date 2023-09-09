@@ -17,6 +17,14 @@
       ansible.builtin.include_tasks:
         file: 01_power_off.yml
 
+    - name: Power on
+      ansible.builtin.include_tasks:
+        file: 02_power_on.yml
+
+    - name: Shut down
+      ansible.builtin.include_tasks:
+        file: 03_shutdown.yml
+
     - name: Teardown
       ansible.builtin.include_tasks:
         file: 99_teardown.yml

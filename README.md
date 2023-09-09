@@ -107,10 +107,8 @@ There is a [pyproject.toml](./pyproject.toml) is the root of this repository as 
 | `digitalocean.cloud.domain_records_info`            | Get domain records                           |
 | `digitalocean.cloud.domains_info`                   | Get domains                                  |
 | `digitalocean.cloud.droplet`                        | Create and delete Droplets                   |
-| `digitalocean.cloud.droplet_action_power_off`       | Power off Droplets                           |
-| `digitalocean.cloud.droplet_action_power_on`        | Power on Droplets                            |
+| `digitalocean.cloud.droplet_action_power`           | Change power states on Droplets              |
 | `digitalocean.cloud.droplet_action_resize`          | Resize Droplets                              |
-| `digitalocean.cloud.droplet_action_shutdown`        | Shutdown Droplets                            |
 | `digitalocean.cloud.droplet_action_snapshot`        | Snapshot Droplets                            |
 | `digitalocean.cloud.droplets_info`                  | Get Droplets                                 |
 | `digitalocean.cloud.firewall`                       | Create and delete firewalls                  |

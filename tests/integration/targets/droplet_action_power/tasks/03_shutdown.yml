@@ -1,0 +1,32 @@
+# code: language=ansible
+- name: 03_shutdown | Testing block
+  block:
+    - name: 03_shutdown | Shut down Droplet
+      when: true
+      digitalocean.cloud.droplet_action_power:
+        token: "{{ digitalocean_token }}"
+        state: shutdown
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+      register: result
+
+    - name: 03_shutdown | Verify shut down Droplet
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Droplet " ~ droplet_name ~ " (" ~ droplet.droplet.id ~ ") in " ~ droplet_region ~ " sent action 'shutdown'"
+
+    - name: 03_shutdown  | Shut down Droplet again
+      when: true
+      digitalocean.cloud.droplet_action_power:
+        token: "{{ digitalocean_token }}"
+        state: shutdown
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+      register: result
+
+    - name: 03_shutdown | Verify shut down Droplet idemopotency
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == "Droplet " ~ droplet_name ~ " (" ~ droplet.droplet.id ~ ") in " ~ droplet_region ~ " not sent action 'shutdown', it is 'off'"
