@@ -22,6 +22,9 @@
 		"ghcr.io/devcontainers-contrib/features/zsh-plugins:0": {
 			"plugins": "ansible gh git poetry",
 			"omzPlugins":"https://github.com/zsh-users/zsh-syntax-highlighting.git"
+		},
+		"ghcr.io/devcontainers-contrib/features/apt-packages:1": {
+			"packages": "shellcheck,vim"
 		}
 	},
 
@@ -36,7 +39,10 @@
             "extensions": [
 				"ms-python.python",
                 "redhat.ansible",
-                "yzhang.markdown-all-in-one"
+                "yzhang.markdown-all-in-one",
+				"tamasfe.even-better-toml",
+				"github.vscode-github-actions",
+				"ms-vscode.makefile-tools"
             ]
         }
     }
