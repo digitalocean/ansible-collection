@@ -1,0 +1,2 @@
+trivial:
+  - ci - add additional make commands to run local tests (https://github.com/digitalocean/ansible-collection/pull/53).
