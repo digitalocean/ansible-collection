@@ -399,6 +399,7 @@ class Droplet(DigitalOceanCommonModule):
             while time.monotonic() < end_time and status != "active":
                 time.sleep(DigitalOceanConstants.SLEEP)
                 status = self.get_droplet_by_id(droplet["id"])["status"]
+                droplet["status"] = status
 
             self.module.exit_json(
                 changed=True,
