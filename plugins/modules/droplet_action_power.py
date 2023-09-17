@@ -63,6 +63,12 @@ options:
     type: str
     choices: [power_off, power_on, shutdown]
     default: power_on
+  force_power_off:
+    description:
+      - Force power off if C(shutdown) fails.
+    type: bool
+    required: false
+    default: false
 
 extends_documentation_fragment:
   - digitalocean.cloud.common.documentation
@@ -86,6 +92,13 @@ EXAMPLES = r"""
   digitalocean.cloud.droplet_action_power:
     token: "{{ token }}"
     state: shutdown
+    id: 1122334455
+
+- name: Shut down a Droplet (force if unsuccessful)
+  digitalocean.cloud.droplet_action_power:
+    token: "{{ token }}"
+    state: shutdown
+    force_power_off: true
     id: 1122334455
 """
 
@@ -136,14 +149,20 @@ msg:
     - No Droplet with ID 336851565
     - No Droplet with name test-droplet-1 in nyc3
     - Droplet test-droplet-1 (336851565) in nyc3 sent action 'power_off'
+    - Droplet test-droplet-1 (336851565) in nyc3 sent action 'power_off' and it has not completed, status is 'in-progress'
+    - Droplet test-droplet-1 (336851565) in nyc3 sent action 'power_off' and it has not completed, status is 'errored'
     - Droplet test-droplet-1 (336851565) in nyc3 would be sent action 'power_off', it is 'off'
     - Droplet test-droplet-1 (336851565) in nyc3 would not be sent action 'power_off', it is 'active'
     - Droplet test-droplet-1 (336851565) in nyc3 not sent action 'power_off', it is 'off'
     - Droplet test-droplet-1 (336851565) in nyc3 sent action 'power_on'
+    - Droplet test-droplet-1 (336851565) in nyc3 sent action 'power_on' and it has not completed, status is 'in-progress'
+    - Droplet test-droplet-1 (336851565) in nyc3 sent action 'power_on' and it has not completed, status is 'errored'
     - Droplet test-droplet-1 (336851565) in nyc3 would be sent action 'power_on', it is 'active'
     - Droplet test-droplet-1 (336851565) in nyc3 would not be sent action 'power_on', it is 'off'
     - Droplet test-droplet-1 (336851565) in nyc3 not sent action 'power_on', it is 'active'
     - Droplet test-droplet-1 (336851565) in nyc3 sent action 'shutdown'
+    - Droplet test-droplet-1 (336851565) in nyc3 sent action 'shutdown' and it has not completed, status is 'in-progress'
+    - Droplet test-droplet-1 (336851565) in nyc3 sent action 'shutdown' and it has not completed, status is 'errored'
     - Droplet test-droplet-1 (336851565) in nyc3 would be sent action 'shutdown', it is 'active'
     - Droplet test-droplet-1 (336851565) in nyc3 would not be sent action 'shutdown', it is 'off'
     - Droplet test-droplet-1 (336851565) in nyc3 not sent action 'shutdown', it is 'off'
@@ -168,6 +187,7 @@ class DropletActionPower(DigitalOceanCommonModule):
         self.region = module.params.get("region")
         self.droplet = self.find_droplet()
         self.type = self.state
+        self.force_power_off = module.params.get("force_power_off")
         if self.type == "power_off":
             self.power_off()
         elif self.type == "power_on":
@@ -247,11 +267,20 @@ class DropletActionPower(DigitalOceanCommonModule):
                 droplet_id=self.droplet["id"], body=body
             )["action"]
 
-            status = action["status"]
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and status != "completed":
+            while time.monotonic() < end_time and action["status"] != "completed":
                 time.sleep(DigitalOceanConstants.SLEEP)
-                status = self.get_action_by_id(action_id=action["id"])["status"]
+                action = self.get_action_by_id(action_id=action["id"])
+
+            if action["status"] != "completed":
+                self.module.fail_json(
+                    changed=True,
+                    msg=(
+                        f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']}"
+                        f" sent action '{self.type}' and it has not completed, status is '{action['status']}'"
+                    ),
+                    action=action,
+                )
 
             self.module.exit_json(
                 changed=True,
@@ -277,11 +306,20 @@ class DropletActionPower(DigitalOceanCommonModule):
                 droplet_id=self.droplet["id"], body=body
             )["action"]
 
-            status = action["status"]
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and status != "completed":
+            while time.monotonic() < end_time and action["status"] != "completed":
                 time.sleep(DigitalOceanConstants.SLEEP)
-                status = self.get_action_by_id(action_id=action["id"])["status"]
+                action = self.get_action_by_id(action_id=action["id"])
+
+            if action["status"] != "completed":
+                self.module.fail_json(
+                    changed=True,
+                    msg=(
+                        f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']}"
+                        f" sent action '{self.type}' and it has not completed, status is '{action['status']}'"
+                    ),
+                    action=action,
+                )
 
             self.module.exit_json(
                 changed=True,
@@ -307,11 +345,23 @@ class DropletActionPower(DigitalOceanCommonModule):
                 droplet_id=self.droplet["id"], body=body
             )["action"]
 
-            status = action["status"]
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and status != "completed":
+            while time.monotonic() < end_time and action["status"] != "completed":
                 time.sleep(DigitalOceanConstants.SLEEP)
-                status = self.get_action_by_id(action_id=action["id"])["status"]
+                action = self.get_action_by_id(action_id=action["id"])
+
+            if action["status"] != "completed":
+                if self.force_power_off:
+                    self.power_off()
+
+                self.module.fail_json(
+                    changed=True,
+                    msg=(
+                        f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']}"
+                        f" sent action '{self.type}' and it has not completed, status is '{action['status']}'"
+                    ),
+                    action=action,
+                )
 
             self.module.exit_json(
                 changed=True,
@@ -427,6 +477,7 @@ def main():
             choices=["power_off", "power_on", "shutdown"],
             default="power_on",
         ),
+        force_power_off=dict(type="bool", required=False, default=False),
     )
 
     module = AnsibleModule(
@@ -435,6 +486,7 @@ def main():
         required_one_of=[("droplet_id", "name")],
         mutually_exclusive=[("droplet_id", "name")],
         required_together=[("name", "region")],
+        required_if=[("state", "shutdown", ["force_power_off"])],
     )
     DropletActionPower(module)
 
