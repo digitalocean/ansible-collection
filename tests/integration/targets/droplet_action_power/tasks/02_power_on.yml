@@ -1,3 +1,4 @@
+---
 # code: language=ansible
 - name: 02_power_on | Testing block
   block:

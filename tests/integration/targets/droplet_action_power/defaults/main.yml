@@ -1,3 +1,5 @@
+---
+# code: language=ansible
 droplet_name: "ansible-gh-ci-droplet-6-{{ pr_number }}"
 droplet_region: nyc3
 droplet_size: s-1vcpu-2gb

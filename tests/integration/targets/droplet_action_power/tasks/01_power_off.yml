@@ -1,3 +1,4 @@
+---
 # code: language=ansible
 - name: 01_power_off | Testing block
   block:

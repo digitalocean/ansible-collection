@@ -1,3 +1,4 @@
+---
 # code: language=ansible
 - name: 00_setup | Testing block
   block:
