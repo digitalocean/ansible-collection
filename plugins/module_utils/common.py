@@ -218,7 +218,7 @@ class DigitalOceanCommonModule:
 class DigitalOceanLogfile:
     def __init__(self, filename: str = "/tmp/ansible.log") -> None:
         self.filename = filename
-        self.fh = open(self.filename, "w")
+        self.fh = open(self.filename, mode="a+", encoding="utf-8")
 
     def write(self, line) -> None:
         self.fh.write(line + "\n")
