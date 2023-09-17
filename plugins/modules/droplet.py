@@ -289,7 +289,9 @@ msg:
   type: str
   sample:
     - Created Droplet example.com (11223344) in nyc3
+    - Created Droplet example.com (11223344) in nyc3 is not 'active', it is 'new'
     - Deleted Droplet example.com (11223344) in nyc3
+    - Deleting Droplet example.com (11223344) in nyc3 has failed
     - Droplet example.com in nyc3 would be created
     - Droplet example.com (11223344) in nyc3 exists
     - 'There are currently 2 Droplets named example.com in nyc3: 11223344, 55667788'
@@ -356,10 +358,13 @@ class Droplet(DigitalOceanCommonModule):
                         found_droplets.append(droplet)
         return found_droplets
 
-    def get_droplet_by_id(self, id):
+    def get_droplet_by_id(self, droplet_id):
         try:
-            droplet = self.client.droplets.get(droplet_id=id)["droplet"]
-            return droplet
+            droplet_get = self.client.droplets.get(droplet_id=droplet_id)
+            droplet = droplet_get.get("droplet")
+            if droplet:
+                return droplet
+            return None
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
@@ -394,12 +399,20 @@ class Droplet(DigitalOceanCommonModule):
 
             droplet = self.client.droplets.create(body=body)["droplet"]
 
-            status = droplet["status"]
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and status != "active":
+            while time.monotonic() < end_time and droplet["status"] != "active":
                 time.sleep(DigitalOceanConstants.SLEEP)
-                status = self.get_droplet_by_id(droplet["id"])["status"]
-                droplet["status"] = status
+                droplet["status"] = self.get_droplet_by_id(droplet["id"])["status"]
+
+            if droplet["status"] != "active":
+                self.module.fail_json(
+                    changed=True,
+                    msg=(
+                        f"Created Droplet {droplet['name']} ({droplet['id']}) in {droplet['region']['slug']}"
+                        f" is not 'active', it is '{droplet['status']}'"
+                    ),
+                    droplet=droplet,
+                )
 
             self.module.exit_json(
                 changed=True,
@@ -418,10 +431,30 @@ class Droplet(DigitalOceanCommonModule):
 
     def delete_droplet(self, droplet):
         try:
-            self.client.droplets.destroy(droplet_id=droplet["id"])
+            droplet_id = droplet["id"]
+            droplet_name = droplet["name"]
+            droplet_region = droplet["region"]["slug"]
+            self.client.droplets.destroy(droplet_id=droplet_id)
+
+            # Ensure Droplet is deleted:
+            # A successful request will receive a 204 status code with no body in response.
+            # This indicates that the request was processed successfully.
+            droplet_still_exists = self.get_droplet_by_id(droplet_id)
+            end_time = time.monotonic() + self.timeout
+            while time.monotonic() < end_time and droplet_still_exists:
+                time.sleep(DigitalOceanConstants.SLEEP)
+                droplet_still_exists = self.get_droplet_by_id(droplet_id)
+
+            if droplet_still_exists:
+                self.module.fail_json(
+                    changed=False,
+                    msg=f"Deleting Droplet {droplet_name} ({droplet_id}) in {droplet_region} has failed",
+                    droplet=droplet,
+                )
+
             self.module.exit_json(
                 changed=True,
-                msg=f"Deleted Droplet {droplet['name']} ({droplet['id']}) in {droplet['region']['slug']}",
+                msg=f"Deleted Droplet {droplet_name} ({droplet_id}) in {droplet_region}",
                 droplet=droplet,
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
@@ -479,7 +512,7 @@ class Droplet(DigitalOceanCommonModule):
                         droplet=[],
                     )
                 else:
-                    self.module.fail_json(
+                    self.module.exit_json(
                         changed=False,
                         msg=f"Droplet {self.name} in {self.region} not found",
                         droplet=[],
@@ -510,7 +543,7 @@ class Droplet(DigitalOceanCommonModule):
 
         droplet = self.get_droplet_by_id()
         if not droplet:
-            self.module.fail_json(
+            self.module.exit_json(
                 changed=False,
                 msg=f"Droplet with ID {self.droplet_id} not found",
                 droplet=[],
