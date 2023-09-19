@@ -63,7 +63,6 @@ EXAMPLES = r"""
     state: present
     name: my-droplet
     region: nyc3
-    type: snapshot
     snapshot_name: my-droplet-snapshot
 """
 

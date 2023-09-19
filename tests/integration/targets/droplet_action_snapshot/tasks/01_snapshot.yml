@@ -3,12 +3,11 @@
   block:
     - name: 01_snapshot | Create Droplet snapshot
       when: true
-      digitalocean.cloud.droplet_action:
+      digitalocean.cloud.droplet_action_snapshot:
         token: "{{ digitalocean_token }}"
         state: present
         name: "{{ droplet_name }}"
         region: "{{ droplet_region }}"
-        type: snapshot
         snapshot_name: "{{ snapshot_name }}"
       register: result
 
