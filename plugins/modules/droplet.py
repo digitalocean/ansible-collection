@@ -102,6 +102,14 @@ options:
     elements: str
     required: false
     default: []
+  user_data:
+    description:
+      - |
+        A string containing 'user data' which may be used to configure the Droplet on first boot,
+        often a 'cloud-config' file or Bash script.
+      - It must be plain text and may not exceed 64 KiB in size.
+    type: str
+    required: false
   volumes:
     description:
       - |
@@ -327,6 +335,7 @@ class Droplet(DigitalOceanCommonModule):
         self.ipv6 = module.params.get("ipv6")
         self.monitoring = module.params.get("monitoring")
         self.tags = module.params.get("tags")
+        self.user_data = module.params.get("user_data")
         self.volumes = module.params.get("volumes")
         self.vpc_uuid = module.params.get("vpc_uuid")
         self.with_droplet_agent = module.params.get("with_droplet_agent")
@@ -390,6 +399,7 @@ class Droplet(DigitalOceanCommonModule):
                 "ipv6": self.ipv6,
                 "monitoring": self.monitoring,
                 "tags": self.tags,
+                "user_data": self.user_data,
                 "volumes": self.volumes,
                 "vpc_uuid": self.vpc_uuid,
                 "with_droplet_agent": self.with_droplet_agent,
@@ -573,6 +583,7 @@ def main():
         ipv6=dict(type="bool", required=False, default=False),
         monitoring=dict(type="bool", required=False, default=False),
         tags=dict(type="list", elements="str", required=False, default=[]),
+        user_data=dict(type="str", required=False),
         volumes=dict(type="list", elements="str", required=False, default=[]),
         vpc_uuid=dict(type="str", required=False),
         with_droplet_agent=dict(type="bool", required=False, default=False),
