@@ -8,3 +8,13 @@
         name: "{{ droplet_name }}"
         region: "{{ droplet_region }}"
         unique_name: true
+
+    - name: 01_snapshot | Delete snapshot
+      when: true
+      digitalocean.cloud.snapshot:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        snapshot_name: "{{ snapshot_name }}"
+      register: result
+      # NOTE: Might be deleted already
+      ignore_errors: true  # noqa ignore-errors

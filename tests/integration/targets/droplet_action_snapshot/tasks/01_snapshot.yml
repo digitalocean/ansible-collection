@@ -9,6 +9,7 @@
         name: "{{ droplet_name }}"
         region: "{{ droplet_region }}"
         snapshot_name: "{{ snapshot_name }}"
+        timeout: 600
       register: result
 
     - name: 01_snapshot | Verify create Droplet snapshot
