@@ -9,12 +9,13 @@
         name: "{{ droplet_name }}"
         region: "{{ droplet_region }}"
         size: "{{ droplet_new_size }}"
+        disk: true
+        timeout: 600
       register: result
 
     - name: 01_resize | Verify resize Droplet
       ansible.builtin.assert:
         that:
           - result.changed
-          - |
-            result.msg == "Droplet " ~ droplet_name ~ " (" ~ result.action.resource_id ~ ") in " ~ droplet_region
-            ~ " sent action 'resize', new size is '{{ droplet_new_size }}'"
+          - result.msg == "Droplet " ~ droplet_name ~ " (" ~ result.action.resource_id ~ ") in "
+            ~ droplet_region ~ " sent action 'resize', new size is '{{ droplet_new_size }}'"

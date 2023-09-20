@@ -17,6 +17,7 @@
       ansible.builtin.include_tasks:
         file: 01_resize.yml
 
+  always:
     - name: Teardown
       ansible.builtin.include_tasks:
         file: 99_teardown.yml
