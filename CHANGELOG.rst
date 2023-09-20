@@ -5,6 +5,36 @@ DigitalOcean Collection Release Notes
 .. contents:: Topics
 
 
+v0.3.0
+======
+
+Minor Changes
+-------------
+
+- common - add C(client_override_options) and C(module_override_options) for experimental or future options (https://github.com/digitalocean/ansible-collection/pull/44).
+- common - remove region validation from argument_specs to facilitate API test beds (https://github.com/digitalocean/ansible-collection/pull/44).
+- droplet - add missing C(user_data) parameter (https://github.com/digitalocean/ansible-collection/pull/44).
+- droplet_action_power - new module for changing power states on Droplets (https://github.com/digitalocean/ansible-collection/pull/44).
+- droplet_action_resize - new module for resizing Droplets (https://github.com/digitalocean/ansible-collection/pull/44).
+- droplet_action_snapshot - new module for taking Droplet snapshots (https://github.com/digitalocean/ansible-collection/pull/44).
+
+Breaking Changes / Porting Guide
+--------------------------------
+
+- droplet_action - removed and will be split into individual actions (https://github.com/digitalocean/ansible-collection/pull/44).
+
+Bugfixes
+--------
+
+- integration - do not ignore errors for C(billing_history_information) test (https://github.com/digitalocean/ansible-collection/issues/44).
+
+New Modules
+-----------
+
+- droplet_action_power - Set power states of a Droplet
+- droplet_action_resize - Resize a Droplet
+- droplet_action_snapshot - Take a snapshot of a Droplet
+
 v0.2.0
 ======
 
@@ -44,10 +74,7 @@ New Modules
 - domain_records_info - Retrieve a listing of all of the domain records for a domain
 - domains_info - Retrieve a list of all of the domains in your account
 - droplet - Create or delete Droplets
-- droplet_action_power_off - Power off a Droplet
-- droplet_action_power_on - Power on a Droplet
-- droplet_action_resize - Resize a Droplet
-- droplet_action_snapshot - Take a snapshot of a Droplet
+- droplet_action - Perform Droplet actions
 - droplets_info - List all Droplets in your account
 - firewall - Create or delete firewalls
 - firewalls_info - List all firewalls on your account

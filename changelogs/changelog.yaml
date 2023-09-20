@@ -184,3 +184,37 @@ releases:
       name: vpcs_info
       namespace: ''
     release_date: '2023-08-04'
+  0.3.0:
+    changes:
+      breaking_changes:
+      - droplet_action - removed and will be split into individual actions (https://github.com/digitalocean/ansible-collection/pull/44).
+      bugfixes:
+      - integration - do not ignore errors for C(billing_history_information) test
+        (https://github.com/digitalocean/ansible-collection/issues/44).
+      minor_changes:
+      - common - add C(client_override_options) and C(module_override_options) for
+        experimental or future options (https://github.com/digitalocean/ansible-collection/pull/44).
+      - common - remove region validation from argument_specs to facilitate API test
+        beds (https://github.com/digitalocean/ansible-collection/pull/44).
+      - droplet - add missing C(user_data) parameter (https://github.com/digitalocean/ansible-collection/pull/44).
+      - droplet_action_power - new module for changing power states on Droplets (https://github.com/digitalocean/ansible-collection/pull/44).
+      - droplet_action_resize - new module for resizing Droplets (https://github.com/digitalocean/ansible-collection/pull/44).
+      - droplet_action_snapshot - new module for taking Droplet snapshots (https://github.com/digitalocean/ansible-collection/pull/44).
+    fragments:
+    - 27-releasing-instructions.yml
+    - 36-run-integration-on-fork-prs.yaml
+    - 42-pr-integration-on-deps.yml
+    - 44-client-and-module-override-options.yml
+    - 53-add-makefile-test-commands.yaml
+    - 57-dependabot-bumps.yml
+    modules:
+    - description: Set power states of a Droplet
+      name: droplet_action_power
+      namespace: ''
+    - description: Resize a Droplet
+      name: droplet_action_resize
+      namespace: ''
+    - description: Take a snapshot of a Droplet
+      name: droplet_action_snapshot
+      namespace: ''
+    release_date: '2023-09-20'

@@ -1,2 +1,0 @@
-trivial:
-  - ci - trigger pull request integration tests when Python dependencies change (https://github.com/digitalocean/ansible-collection/issues/42).
