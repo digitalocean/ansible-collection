@@ -122,6 +122,7 @@ msg:
     - Droplet test-droplet-1 (336851565) in nyc3 would not be sent action 'resize', requested size is 's-1vcpu-2gb' and current size is 's-1vcpu-2gb'
     - Droplet test-droplet-1 (336851565) in nyc3 not sent action 'resize', requested size is 's-2vcpu-4gb' and current size is 's-1vcpu-2gb'
     - Droplet test-droplet-1 (336851565) in nyc3 sent action 'resize', new size is 's-2vcpu-4gb'
+    - Droplet test-droplet-1 (336851565) in nyc3 sent action 'resize' and it has not completed, status is 'in-progress'
 """
 
 import time
@@ -244,7 +245,7 @@ class DropletActionResize(DigitalOceanCommonModule):
                 changed=True,
                 msg=(
                     f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']} sent "
-                    f"action '{self.type}', new size is '{self.size}'",
+                    f"action '{self.type}', new size is '{self.size}'"
                 ),
                 action=action,
             )
@@ -266,7 +267,7 @@ class DropletActionResize(DigitalOceanCommonModule):
                     msg=(
                         f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']} "
                         f"would be sent action '{self.type}', requested size is '{self.size}' and current size is "
-                        f"'{self.droplet['size']['slug']}'",
+                        f"'{self.droplet['size']['slug']}'"
                     ),
                 )
             self.module.exit_json(
@@ -274,7 +275,7 @@ class DropletActionResize(DigitalOceanCommonModule):
                 msg=(
                     f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']} would "
                     f"not be sent action '{self.type}', requested size is '{self.size}' and current size is "
-                    f"'{self.droplet['size']['slug']}'",
+                    f"'{self.droplet['size']['slug']}'"
                 ),
             )
 
