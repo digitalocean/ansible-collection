@@ -22,6 +22,7 @@ pylint = "^2.17.4"
 pytest = "^7.3.1"
 antsibull-changelog = "^0.23.0"
 antsibull-docs = "^2.3.1"
+autopep8 = "^2.0.4"
 
 [build-system]
 requires = ["poetry-core"]

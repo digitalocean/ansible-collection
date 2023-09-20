@@ -149,39 +149,17 @@ msg:
     - No Droplets
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
+    DigitalOceanCommonModule,
     DigitalOceanOptions,
     DigitalOceanFunctions,
 )
 
-import traceback
 
-HAS_AZURE_LIBRARY = False
-AZURE_LIBRARY_IMPORT_ERROR = None
-try:
-    from azure.core.exceptions import HttpResponseError
-except ImportError:
-    AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_AZURE_LIBRARY = True
-
-HAS_PYDO_LIBRARY = False
-PYDO_LIBRARY_IMPORT_ERROR = None
-try:
-    from pydo import Client
-except ImportError:
-    PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYDO_LIBRARY = True
-
-
-class DropletsInformation:
+class DropletsInformation(DigitalOceanCommonModule):
     def __init__(self, module):
-        """Class constructor."""
-        self.module = module
-        self.client = Client(token=module.params.get("token"))
-        self.state = module.params.get("state")
+        super().__init__(module)
         self.tag_name = module.params.get("tag_name")
         self.name = module.params.get("name")
         self.params = None
@@ -199,7 +177,7 @@ class DropletsInformation:
             meth="list",
             key="droplets",
             params=self.params,
-            exc=HttpResponseError,
+            exc=DigitalOceanCommonModule.HttpResponseError,
         )
         if droplets:
             self.module.exit_json(
@@ -221,17 +199,6 @@ def main():
         supports_check_mode=True,
         mutually_exclusive=[("tag_name", "name")],
     )
-    if not HAS_AZURE_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("azure.core.exceptions"),
-            exception=AZURE_LIBRARY_IMPORT_ERROR,
-        )
-    if not HAS_PYDO_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("pydo"),
-            exception=PYDO_LIBRARY_IMPORT_ERROR,
-        )
-
     DropletsInformation(module)
 
 

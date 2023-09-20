@@ -1,0 +1,14 @@
+bugfixes:
+  - integration - do not ignore errors for C(billing_history_information) test (https://github.com/digitalocean/ansible-collection/issues/44).
+trivial:
+  - modules - add C(DIGITALOCEAN_ACCESS_TOKEN) as an additional API token environment variable (https://github.com/digitalocean/ansible-collection/pull/44).
+  - modules - refactor module boilerplate into C(DigitalOceanCommonModule) (https://github.com/digitalocean/ansible-collection/pull/44).
+breaking_changes:
+  - droplet_action - removed and will be split into individual actions (https://github.com/digitalocean/ansible-collection/pull/44).
+minor_changes:
+  - common - add C(client_override_options) and C(module_override_options) for experimental or future options (https://github.com/digitalocean/ansible-collection/pull/44).
+  - common - remove region validation from argument_specs to facilitate API test beds (https://github.com/digitalocean/ansible-collection/pull/44).
+  - droplet - add missing C(user_data) parameter (https://github.com/digitalocean/ansible-collection/pull/44).
+  - droplet_action_power - new module for changing power states on Droplets (https://github.com/digitalocean/ansible-collection/pull/44).
+  - droplet_action_resize - new module for resizing Droplets (https://github.com/digitalocean/ansible-collection/pull/44).
+  - droplet_action_snapshot - new module for taking Droplet snapshots (https://github.com/digitalocean/ansible-collection/pull/44).

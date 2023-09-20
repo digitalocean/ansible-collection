@@ -102,6 +102,14 @@ options:
     elements: str
     required: false
     default: []
+  user_data:
+    description:
+      - |
+        A string containing 'user data' which may be used to configure the Droplet on first boot,
+        often a 'cloud-config' file or Bash script.
+      - It must be plain text and may not exceed 64 KiB in size.
+    type: str
+    required: false
   volumes:
     description:
       - |
@@ -289,7 +297,9 @@ msg:
   type: str
   sample:
     - Created Droplet example.com (11223344) in nyc3
+    - Created Droplet example.com (11223344) in nyc3 is not 'active', it is 'new'
     - Deleted Droplet example.com (11223344) in nyc3
+    - Deleting Droplet example.com (11223344) in nyc3 has failed
     - Droplet example.com in nyc3 would be created
     - Droplet example.com (11223344) in nyc3 exists
     - 'There are currently 2 Droplets named example.com in nyc3: 11223344, 55667788'
@@ -302,39 +312,18 @@ msg:
 """
 
 import time
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
+    DigitalOceanCommonModule,
     DigitalOceanOptions,
     DigitalOceanFunctions,
     DigitalOceanConstants,
 )
 
-import traceback
 
-HAS_AZURE_LIBRARY = False
-AZURE_LIBRARY_IMPORT_ERROR = None
-try:
-    from azure.core.exceptions import HttpResponseError
-except ImportError:
-    AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_AZURE_LIBRARY = True
-
-HAS_PYDO_LIBRARY = False
-PYDO_LIBRARY_IMPORT_ERROR = None
-try:
-    from pydo import Client
-except ImportError:
-    PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYDO_LIBRARY = True
-
-
-class Droplet:
+class Droplet(DigitalOceanCommonModule):
     def __init__(self, module):
-        self.module = module
-        self.client = Client(token=module.params.get("token"))
-        self.state = module.params.get("state")
+        super().__init__(module)
         self.timeout = module.params.get("timeout")
         self.name = module.params.get("name")
         self.droplet_id = module.params.get("droplet_id")
@@ -346,10 +335,12 @@ class Droplet:
         self.ipv6 = module.params.get("ipv6")
         self.monitoring = module.params.get("monitoring")
         self.tags = module.params.get("tags")
+        self.user_data = module.params.get("user_data")
         self.volumes = module.params.get("volumes")
         self.vpc_uuid = module.params.get("vpc_uuid")
         self.with_droplet_agent = module.params.get("with_droplet_agent")
         self.unique_name = module.params.get("unique_name")
+
         if self.state == "present":
             self.present()
         elif self.state == "absent":
@@ -362,9 +353,9 @@ class Droplet:
             meth="list",
             key="droplets",
             params=dict(name=self.name),
-            exc=HttpResponseError,
+            exc=DigitalOceanCommonModule.HttpResponseError,
         )
-        # NOTE: DigitalOcean Droplet names are not unique!
+        # NOTE: DigitalOcean Droplet names are not required to be unique!
         found_droplets = []
         for droplet in droplets:
             droplet_name = droplet.get("name")
@@ -376,11 +367,14 @@ class Droplet:
                         found_droplets.append(droplet)
         return found_droplets
 
-    def get_droplet_by_id(self, id):
+    def get_droplet_by_id(self, droplet_id):
         try:
-            droplet = self.client.droplets.get(droplet_id=id)["droplet"]
-            return droplet
-        except HttpResponseError as err:
+            droplet_get = self.client.droplets.get(droplet_id=droplet_id)
+            droplet = droplet_get.get("droplet")
+            if droplet:
+                return droplet
+            return None
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -405,24 +399,37 @@ class Droplet:
                 "ipv6": self.ipv6,
                 "monitoring": self.monitoring,
                 "tags": self.tags,
+                "user_data": self.user_data,
                 "volumes": self.volumes,
                 "vpc_uuid": self.vpc_uuid,
                 "with_droplet_agent": self.with_droplet_agent,
             }
+            if self.module_override_options:
+                body.update(self.module_override_options)
+
             droplet = self.client.droplets.create(body=body)["droplet"]
 
-            status = droplet["status"]
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and status != "active":
+            while time.monotonic() < end_time and droplet["status"] != "active":
                 time.sleep(DigitalOceanConstants.SLEEP)
-                status = self.get_droplet_by_id(droplet["id"])["status"]
+                droplet["status"] = self.get_droplet_by_id(droplet["id"])["status"]
+
+            if droplet["status"] != "active":
+                self.module.fail_json(
+                    changed=True,
+                    msg=(
+                        f"Created Droplet {droplet['name']} ({droplet['id']}) in {droplet['region']['slug']}"
+                        f" is not 'active', it is '{droplet['status']}'"
+                    ),
+                    droplet=droplet,
+                )
 
             self.module.exit_json(
                 changed=True,
                 msg=f"Created Droplet {droplet['name']} ({droplet['id']}) in {droplet['region']['slug']}",
                 droplet=droplet,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -434,13 +441,33 @@ class Droplet:
 
     def delete_droplet(self, droplet):
         try:
-            self.client.droplets.destroy(droplet_id=droplet["id"])
+            droplet_id = droplet["id"]
+            droplet_name = droplet["name"]
+            droplet_region = droplet["region"]["slug"]
+            self.client.droplets.destroy(droplet_id=droplet_id)
+
+            # Ensure Droplet is deleted:
+            # A successful request will receive a 204 status code with no body in response.
+            # This indicates that the request was processed successfully.
+            droplet_still_exists = self.get_droplet_by_id(droplet_id)
+            end_time = time.monotonic() + self.timeout
+            while time.monotonic() < end_time and droplet_still_exists:
+                time.sleep(DigitalOceanConstants.SLEEP)
+                droplet_still_exists = self.get_droplet_by_id(droplet_id)
+
+            if droplet_still_exists:
+                self.module.fail_json(
+                    changed=False,
+                    msg=f"Deleting Droplet {droplet_name} ({droplet_id}) in {droplet_region} has failed",
+                    droplet=droplet,
+                )
+
             self.module.exit_json(
                 changed=True,
-                msg=f"Deleted Droplet {droplet['name']} ({droplet['id']}) in {droplet['region']['slug']}",
+                msg=f"Deleted Droplet {droplet_name} ({droplet_id}) in {droplet_region}",
                 droplet=droplet,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -495,7 +522,7 @@ class Droplet:
                         droplet=[],
                     )
                 else:
-                    self.module.fail_json(
+                    self.module.exit_json(
                         changed=False,
                         msg=f"Droplet {self.name} in {self.region} not found",
                         droplet=[],
@@ -526,7 +553,7 @@ class Droplet:
 
         droplet = self.get_droplet_by_id()
         if not droplet:
-            self.module.fail_json(
+            self.module.exit_json(
                 changed=False,
                 msg=f"Droplet with ID {self.droplet_id} not found",
                 droplet=[],
@@ -556,12 +583,12 @@ def main():
         ipv6=dict(type="bool", required=False, default=False),
         monitoring=dict(type="bool", required=False, default=False),
         tags=dict(type="list", elements="str", required=False, default=[]),
+        user_data=dict(type="str", required=False),
         volumes=dict(type="list", elements="str", required=False, default=[]),
         vpc_uuid=dict(type="str", required=False),
         with_droplet_agent=dict(type="bool", required=False, default=False),
         unique_name=dict(type="bool", required=False, default=False),
     )
-
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
@@ -572,19 +599,6 @@ def main():
             "unique_name": "region",
         },
     )
-
-    if not HAS_AZURE_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("azure.core.exceptions"),
-            exception=AZURE_LIBRARY_IMPORT_ERROR,
-        )
-
-    if not HAS_PYDO_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("pydo"),
-            exception=PYDO_LIBRARY_IMPORT_ERROR,
-        )
-
     Droplet(module)
 
 

@@ -10,16 +10,14 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: droplet_action
+module: droplet_action_snapshot
 
-short_description: Perform Droplet actions
+short_description: Take a snapshot of a Droplet
 
-version_added: 0.2.0
+version_added: 0.3.0
 
 description:
-  - Perform Droplet actions.
-  - Droplet actions are tasks that can be executed on a Droplet.
-  - These can be things like rebooting, resizing, snapshotting, etc.
+  - Take a snapshot of a Droplet.
   - View the API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#tag/Droplet-Actions).
 
 author: Mark Mercado (@mamercad)
@@ -47,29 +45,6 @@ options:
       - Required with C(name).
     type: str
     required: false
-    choices: ["ams1", "ams2", "ams3", "blr1", "fra1", "lon1", "nyc1", "nyc2", "nyc3", "sfo1", "sfo2", "sfo3", "sgp1", "tor1"]
-  type:
-    description:
-      - The action that will be taken on the Droplet.
-      - Some actions will require additional attributes to be set as well.
-    type: str
-    required: true
-    choices:
-    #   - enable_backups
-    #   - disable_backups
-    #   - reboot
-    #   - power_cycle
-    #   - shutdown
-    #   - power_off
-    #   - power_on
-    #   - restore
-    #   - password_reset
-    #   - resize
-    #   - rebuild
-    #   - rename
-    #   - change_kernel
-    #   - enable_ipv6
-      - snapshot
   snapshot_name:
     description:
       - The name to give the new snapshot of the Droplet.
@@ -83,19 +58,18 @@ extends_documentation_fragment:
 
 EXAMPLES = r"""
 - name: Snapshot a Droplet
-  digitalocean.cloud.droplet_action:
+  digitalocean.cloud.droplet_action_snapshot:
     token: "{{ token }}"
     state: present
     name: my-droplet
     region: nyc3
-    type: snapshot
     snapshot_name: my-droplet-snapshot
 """
 
 
 RETURN = r"""
 action:
-  description: DigitalOcean action information.
+  description: DigitalOcean snapshot action information.
   returned: always
   type: dict
   sample:
@@ -151,51 +125,29 @@ msg:
     - No Droplet with name test-droplet-1 in nyc3
     - Droplet test-droplet-1 (336851565) in nyc3 would be sent action 'snapshot'
     - Droplet test-droplet-1 (336851565) in nyc3 sent action 'snapshot'
+    - Droplet test-droplet-1 (336851565) in nyc3 sent action 'snapshot' and it has not completed, status is 'in-progress'
 """
 
 import time
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
+    DigitalOceanCommonModule,
     DigitalOceanOptions,
     DigitalOceanFunctions,
     DigitalOceanConstants,
 )
 
-import traceback
 
-HAS_AZURE_LIBRARY = False
-AZURE_LIBRARY_IMPORT_ERROR = None
-try:
-    from azure.core.exceptions import HttpResponseError
-except ImportError:
-    AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_AZURE_LIBRARY = True
-
-HAS_PYDO_LIBRARY = False
-PYDO_LIBRARY_IMPORT_ERROR = None
-try:
-    from pydo import Client
-except ImportError:
-    PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYDO_LIBRARY = True
-
-
-class DropletAction:
+class DropletActionSnapshot(DigitalOceanCommonModule):
     def __init__(self, module):
-        self.module = module
-        self.client = Client(token=module.params.get("token"))
-        self.state = module.params.get("state")
+        super().__init__(module)
         self.timeout = module.params.get("timeout")
         self.droplet_id = module.params.get("droplet_id")
         self.name = module.params.get("name")
         self.region = module.params.get("region")
-        self.type = module.params.get("type")
+        self.type = "snapshot"
         self.snapshot_name = module.params.get("snapshot_name")
-
         self.droplet = self.find_droplet()
-
         if self.state == "present":
             self.present()
 
@@ -212,7 +164,7 @@ class DropletAction:
                     msg=f"No Droplet with ID {self.droplet_id}",
                     action=[],
                 )
-            except HttpResponseError as err:
+            except DigitalOceanCommonModule.HttpResponseError as err:
                 error = {
                     "Message": err.error.message,
                     "Status Code": err.status_code,
@@ -252,7 +204,7 @@ class DropletAction:
         try:
             action = self.client.actions.get(action_id=action_id)["action"]
             return action
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -272,18 +224,27 @@ class DropletAction:
                 droplet_id=self.droplet["id"], body=body
             )["action"]
 
-            status = action["status"]
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and status != "completed":
+            while time.monotonic() < end_time and action["status"] != "completed":
                 time.sleep(DigitalOceanConstants.SLEEP)
-                status = self.get_action_by_id(action_id=action["id"])
+                action = self.get_action_by_id(action_id=action["id"])
+
+            if action["status"] != "completed":
+                self.module.fail_json(
+                    changed=True,
+                    msg=(
+                        f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']}"
+                        f" sent action '{self.type}' and it has not completed, status is '{action['status']}'"
+                    ),
+                    action=action,
+                )
 
             self.module.exit_json(
                 changed=True,
                 msg=f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']} sent action '{self.type}'",
                 action=action,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -300,10 +261,7 @@ class DropletAction:
                 msg=f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']} would be sent action '{self.type}'",
             )
 
-        if self.type == "snapshot":
-            self.snapshot()
-
-        self.module.fail_json(changed=False, msg="Should not get here")
+        self.snapshot()
 
 
 def main():
@@ -311,50 +269,9 @@ def main():
     argument_spec.update(
         droplet_id=dict(type="int", required=False),
         name=dict(type="str", required=False),
-        region=dict(
-            type="str",
-            choices=[
-                "ams1",
-                "ams2",
-                "ams3",
-                "blr1",
-                "fra1",
-                "lon1",
-                "nyc1",
-                "nyc2",
-                "nyc3",
-                "sfo1",
-                "sfo2",
-                "sfo3",
-                "sgp1",
-                "tor1",
-            ],
-            required=False,
-        ),
-        type=dict(
-            type="str",
-            choices=[
-                # "enable_backups",
-                # "disable_backups",
-                # "reboot",
-                # "power_cycle",
-                # "shutdown",
-                # "power_off",
-                # "power_on",
-                # "restore",
-                # "password_reset",
-                # "resize",
-                # "rebuild",
-                # "rename",
-                # "change_kernel",
-                # "enable_ipv6",
-                "snapshot",
-            ],
-            required=True,
-        ),
+        region=dict(type="str", required=False),
         snapshot_name=dict(type="str", required=False),
     )
-
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
@@ -362,20 +279,7 @@ def main():
         mutually_exclusive=[("droplet_id", "name")],
         required_together=[("name", "region")],
     )
-
-    if not HAS_AZURE_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("azure.core.exceptions"),
-            exception=AZURE_LIBRARY_IMPORT_ERROR,
-        )
-
-    if not HAS_PYDO_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("pydo"),
-            exception=PYDO_LIBRARY_IMPORT_ERROR,
-        )
-
-    DropletAction(module)
+    DropletActionSnapshot(module)
 
 
 if __name__ == "__main__":

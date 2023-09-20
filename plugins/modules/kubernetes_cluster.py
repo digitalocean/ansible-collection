@@ -206,38 +206,17 @@ msg:
 """
 
 import time
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
+    DigitalOceanCommonModule,
     DigitalOceanConstants,
     DigitalOceanOptions,
 )
 
-import traceback
 
-HAS_AZURE_LIBRARY = False
-AZURE_LIBRARY_IMPORT_ERROR = None
-try:
-    from azure.core.exceptions import HttpResponseError
-except ImportError:
-    AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_AZURE_LIBRARY = True
-
-HAS_PYDO_LIBRARY = False
-PYDO_LIBRARY_IMPORT_ERROR = None
-try:
-    from pydo import Client
-except ImportError:
-    PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYDO_LIBRARY = True
-
-
-class KubernetesCluster:
+class KubernetesCluster(DigitalOceanCommonModule):
     def __init__(self, module):
-        self.module = module
-        self.client = Client(token=module.params.get("token"))
-        self.state = module.params.get("state")
+        super().__init__(module)
         self.timeout = module.params.get("timeout")
         self.name = module.params.get("name")
         self.region = module.params.get("region")
@@ -266,7 +245,7 @@ class KubernetesCluster:
                     if self.region == kubernetes_cluster["region"]:
                         found_kubernetes_clusters.append(kubernetes_cluster)
             return found_kubernetes_clusters
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -285,7 +264,7 @@ class KubernetesCluster:
                 "kubernetes_cluster"
             ]
             return kubernetes_cluster
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -329,7 +308,7 @@ class KubernetesCluster:
                 msg=f"Created Kubernetes cluster {self.name} ({kubernetes_cluster['id']}) in {self.region}",
                 kubernetes_cluster=kubernetes_cluster,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -350,7 +329,7 @@ class KubernetesCluster:
                 msg=f"Deleted Kubernetes cluster {self.name} ({kubernetes_cluster['id']}) in {self.region}",
                 kubernetes_cluster=kubernetes_cluster,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -428,25 +407,11 @@ def main():
         surge_upgrade=dict(type="bool", required=False, default=False),
         ha=dict(type="bool", required=False, default=False),
     )
-
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
         required_if=[("state", "present", ("version", "node_pools"))],
     )
-
-    if not HAS_AZURE_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("azure.core.exceptions"),
-            exception=AZURE_LIBRARY_IMPORT_ERROR,
-        )
-
-    if not HAS_PYDO_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("pydo"),
-            exception=PYDO_LIBRARY_IMPORT_ERROR,
-        )
-
     KubernetesCluster(module)
 
 

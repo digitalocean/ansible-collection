@@ -97,41 +97,19 @@ msg:
     - Snapshot test-snapshot-1 not found
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
+    DigitalOceanCommonModule,
     DigitalOceanOptions,
     DigitalOceanFunctions,
 )
 
-import traceback
 
-HAS_AZURE_LIBRARY = False
-AZURE_LIBRARY_IMPORT_ERROR = None
-try:
-    from azure.core.exceptions import HttpResponseError
-except ImportError:
-    AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_AZURE_LIBRARY = True
-
-HAS_PYDO_LIBRARY = False
-PYDO_LIBRARY_IMPORT_ERROR = None
-try:
-    from pydo import Client
-except ImportError:
-    PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYDO_LIBRARY = True
-
-
-class Snapshot:
+class Snapshot(DigitalOceanCommonModule):
     def __init__(self, module):
-        self.module = module
-        self.client = Client(token=module.params.get("token"))
-        self.state = module.params.get("state")
+        super().__init__(module)
         self.snapshot_id = module.params.get("snapshot_id")
         self.snapshot_name = module.params.get("snapshot_name")
-
         if self.state == "absent":
             self.absent()
 
@@ -143,7 +121,7 @@ class Snapshot:
                 msg=f"Deleted snapshot {snapshot['id']}",
                 snapshot=snapshot,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -163,7 +141,7 @@ class Snapshot:
             meth="list",
             key="snapshots",
             params=None,
-            exc=HttpResponseError,
+            exc=DigitalOceanCommonModule.HttpResponseError,
         )
         for snapshot in snapshots:
             if snapshot["id"] == snapshot_id:
@@ -177,7 +155,7 @@ class Snapshot:
             meth="list",
             key="snapshots",
             params=None,
-            exc=HttpResponseError,
+            exc=DigitalOceanCommonModule.HttpResponseError,
         )
         found_snapshots = []
         for snapshot in snapshots:
@@ -242,26 +220,12 @@ def main():
         snapshot_id=dict(type="str", required=False),
         snapshot_name=dict(type="str", required=False),
     )
-
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
         required_one_of=[("snapshot_id", "snapshot_name")],
         mutually_exclusive=[("snapshot_id", "snapshot_name")],
     )
-
-    if not HAS_AZURE_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("azure.core.exceptions"),
-            exception=AZURE_LIBRARY_IMPORT_ERROR,
-        )
-
-    if not HAS_PYDO_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("pydo"),
-            exception=PYDO_LIBRARY_IMPORT_ERROR,
-        )
-
     Snapshot(module)
 
 

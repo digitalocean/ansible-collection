@@ -100,38 +100,17 @@ msg:
     - Volume snapshot big-data-snapshot1475261774 (8fa70202-873f-11e6-8b68-000f533176b1) of volume 82a48a18-873f-11e6-96bf-000f53315a41 would be deleted
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
+    DigitalOceanCommonModule,
     DigitalOceanOptions,
     DigitalOceanFunctions,
 )
 
-import traceback
 
-HAS_AZURE_LIBRARY = False
-AZURE_LIBRARY_IMPORT_ERROR = None
-try:
-    from azure.core.exceptions import HttpResponseError
-except ImportError:
-    AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_AZURE_LIBRARY = True
-
-HAS_PYDO_LIBRARY = False
-PYDO_LIBRARY_IMPORT_ERROR = None
-try:
-    from pydo import Client
-except ImportError:
-    PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYDO_LIBRARY = True
-
-
-class VolumeSnapshot:
+class VolumeSnapshot(DigitalOceanCommonModule):
     def __init__(self, module):
-        self.module = module
-        self.client = Client(token=module.params.get("token"))
-        self.state = module.params.get("state")
+        super().__init__(module)
         self.volume_id = module.params.get("volume_id")
         self.name = module.params.get("name")
         self.tags = module.params.get("tags")
@@ -147,7 +126,7 @@ class VolumeSnapshot:
             obj=self.client.volume_snapshots,
             meth="list",
             key="snapshots",
-            exc=HttpResponseError,
+            exc=DigitalOceanCommonModule.HttpResponseError,
             volume_id=self.volume_id,
         )
         found_volume_snapshots = []
@@ -171,7 +150,7 @@ class VolumeSnapshot:
                 msg=f"Created volume snapshot {self.name} ({snapshot['id']}) of volume {self.volume_id}",
                 snapshot=snapshot,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -189,7 +168,7 @@ class VolumeSnapshot:
                 msg=f"Deleted volume snapshot {self.name} ({snapshot['id']}) of volume {self.volume_id}",
                 snapshot=snapshot,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -266,19 +245,6 @@ def main():
         #     ("state", "present", ("purpose",)),
         # ],
     )
-
-    if not HAS_AZURE_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("azure.core.exceptions"),
-            exception=AZURE_LIBRARY_IMPORT_ERROR,
-        )
-
-    if not HAS_PYDO_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("pydo"),
-            exception=PYDO_LIBRARY_IMPORT_ERROR,
-        )
-
     VolumeSnapshot(module)
 
 

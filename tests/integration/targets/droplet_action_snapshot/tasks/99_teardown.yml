@@ -1,0 +1,20 @@
+# code: language=ansible
+- name: 99_teardown | Testing block
+  block:
+    - name: 99_teardown | Delete Droplet
+      digitalocean.cloud.droplet:
+        state: absent
+        token: "{{ digitalocean_token }}"
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        unique_name: true
+
+    - name: 01_snapshot | Delete snapshot
+      when: true
+      digitalocean.cloud.snapshot:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        snapshot_name: "{{ snapshot_name }}"
+      register: result
+      # NOTE: Might be deleted already
+      ignore_errors: true  # noqa ignore-errors

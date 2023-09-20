@@ -98,38 +98,16 @@ msg:
     - CDN endpoint ansible-gh-ci-space-0.nyc3.digitaloceanspaces.com not updated
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
+    DigitalOceanCommonModule,
     DigitalOceanOptions,
 )
 
-import traceback
 
-HAS_AZURE_LIBRARY = False
-AZURE_LIBRARY_IMPORT_ERROR = None
-try:
-    from azure.core.exceptions import HttpResponseError
-except ImportError:
-    AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_AZURE_LIBRARY = True
-
-HAS_PYDO_LIBRARY = False
-PYDO_LIBRARY_IMPORT_ERROR = None
-try:
-    from pydo import Client
-except ImportError:
-    PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYDO_LIBRARY = True
-
-
-class CDNEndpoints:
+class CDNEndpoints(DigitalOceanCommonModule):
     def __init__(self, module):
-        """Class constructor."""
-        self.module = module
-        self.client = Client(token=module.params.get("token"))
-        self.state = module.params.get("state")
+        super().__init__(module)
         self.origin = module.params.get("origin")
         self.ttl = module.params.get("ttl")
         self.certificate_id = module.params.get("certificate_id")
@@ -151,7 +129,7 @@ class CDNEndpoints:
                 if origin == self.origin:
                     return cdn
             return None
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -196,7 +174,7 @@ class CDNEndpoints:
                 self.module.fail_json(
                     changed=False, msg=f"CDN endpoint {self.origin} not updated"
                 )
-            except HttpResponseError as err:
+            except DigitalOceanCommonModule.HttpResponseError as err:
                 error = {
                     "Message": err.error.message,
                     "Status Code": err.status_code,
@@ -235,7 +213,7 @@ class CDNEndpoints:
                 msg=f"CDN endpoint {self.origin} not created",
                 endpoint=[],
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -280,7 +258,7 @@ class CDNEndpoints:
                 msg=f"CDN endpoint {self.origin} deleted",
                 endpoint=found_cdn,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error_message = None
             if hasattr("err.error", "message"):
                 error_message = err.error.message
@@ -295,7 +273,6 @@ class CDNEndpoints:
 
 
 def main():
-    """The main function."""
     argument_spec = DigitalOceanOptions.argument_spec()
     argument_spec.update(
         origin=dict(type="str", required=True),
@@ -309,17 +286,6 @@ def main():
         custom_domain=dict(type="str", required=False),
     )
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
-    if not HAS_AZURE_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("azure.core.exceptions"),
-            exception=AZURE_LIBRARY_IMPORT_ERROR,
-        )
-    if not HAS_PYDO_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("pydo"),
-            exception=PYDO_LIBRARY_IMPORT_ERROR,
-        )
-
     CDNEndpoints(module)
 
 

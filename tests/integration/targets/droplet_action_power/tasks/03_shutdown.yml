@@ -1,0 +1,56 @@
+---
+# code: language=ansible
+- name: 03_shutdown | Outer testing block
+  block:
+    - name: 03_shutdown | Inner testing block
+      block:
+        - name: 03_shutdown | Shut down Droplet
+          when: true
+          digitalocean.cloud.droplet_action_power:
+            token: "{{ digitalocean_token }}"
+            state: shutdown
+            force_power_off: false
+            name: "{{ droplet_name }}"
+            region: "{{ droplet_region }}"
+          register: result
+
+        - name: 03_shutdown | Verify shut down Droplet
+          ansible.builtin.assert:
+            that:
+              - result.changed
+              - result.msg == "Droplet " ~ droplet_name ~ " (" ~ droplet.droplet.id ~ ") in " ~ droplet_region ~ " sent action 'shutdown'"
+
+        - name: 03_shutdown | Shut down Droplet again
+          when: true
+          digitalocean.cloud.droplet_action_power:
+            token: "{{ digitalocean_token }}"
+            state: shutdown
+            force_power_off: false
+            name: "{{ droplet_name }}"
+            region: "{{ droplet_region }}"
+          register: result
+
+        - name: 03_shutdown | Verify shut down Droplet idemopotency
+          ansible.builtin.assert:
+            that:
+              - not result.changed
+              - result.msg == "Droplet " ~ droplet_name ~ " (" ~ droplet.droplet.id ~ ") in " ~ droplet_region ~ " not sent action 'shutdown', it is 'off'"
+
+      rescue:
+        - name: 03_shutdown | Inner testing block rescue block
+          block:
+            - name: 03_shutdown | Shut down failed - forcing
+              when: true
+              digitalocean.cloud.droplet_action_power:
+                token: "{{ digitalocean_token }}"
+                state: shutdown
+                force_power_off: true
+                name: "{{ droplet_name }}"
+                region: "{{ droplet_region }}"
+              register: result
+
+            - name: 03_shutdown | Verify shut down Droplet force power off
+              ansible.builtin.assert:
+                that:
+                  - result.changed
+                  - result.msg == "Droplet " ~ droplet_name ~ " (" ~ droplet.droplet.id ~ ") in " ~ droplet_region ~ " sent action 'shutdown'"

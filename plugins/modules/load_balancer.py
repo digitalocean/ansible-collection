@@ -37,7 +37,6 @@ options:
   region:
     description:
       - The slug identifier for the region where the resource will initially be available.
-    choices: ["ams1", "ams2", "ams3", "blr1", "fra1", "lon1", "nyc1", "nyc2", "nyc3", "sfo1", "sfo2", "sfo3", "sgp1", "tor1"]
     type: str
     required: true
   name:
@@ -205,38 +204,17 @@ msg:
 """
 
 import time
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
+    DigitalOceanCommonModule,
     DigitalOceanOptions,
     DigitalOceanConstants,
 )
 
-import traceback
 
-HAS_AZURE_LIBRARY = False
-AZURE_LIBRARY_IMPORT_ERROR = None
-try:
-    from azure.core.exceptions import HttpResponseError
-except ImportError:
-    AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_AZURE_LIBRARY = True
-
-HAS_PYDO_LIBRARY = False
-PYDO_LIBRARY_IMPORT_ERROR = None
-try:
-    from pydo import Client
-except ImportError:
-    PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYDO_LIBRARY = True
-
-
-class LoadBalancer:
+class LoadBalancer(DigitalOceanCommonModule):
     def __init__(self, module):
-        self.module = module
-        self.client = Client(token=module.params.get("token"))
-        self.state = module.params.get("state")
+        super().__init__(module)
         self.timeout = module.params.get("timeout")
         self.droplet_ids = module.params.get("droplet_ids")
         self.region = module.params.get("region")
@@ -256,7 +234,6 @@ class LoadBalancer:
             "disable_lets_encrypt_dns_records"
         )
         self.firewall = module.params.get("firewall")
-
         if self.state == "present":
             self.present()
         elif self.state == "absent":
@@ -271,7 +248,7 @@ class LoadBalancer:
                     if self.region == load_balancer["region"]["slug"]:
                         found_load_balancers.append(load_balancer)
             return found_load_balancers
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -288,7 +265,7 @@ class LoadBalancer:
         try:
             load_balancer = self.client.load_balancers.get(lb_id=id)["load_balancer"]
             return load_balancer
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -342,7 +319,7 @@ class LoadBalancer:
                 msg=f"Created load balancer {self.name} ({load_balancer['id']})",
                 load_balancer=load_balancer,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -360,7 +337,7 @@ class LoadBalancer:
                 msg=f"Deleted load balancer {self.name} ({load_balancer['id']})",
                 load_balancer=load_balancer,
             )
-        except HttpResponseError as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -428,22 +405,6 @@ def main():
         droplet_ids=dict(type="list", elements="int", required=False),
         region=dict(
             type="str",
-            choices=[
-                "ams1",
-                "ams2",
-                "ams3",
-                "blr1",
-                "fra1",
-                "lon1",
-                "nyc1",
-                "nyc2",
-                "nyc3",
-                "sfo1",
-                "sfo2",
-                "sfo3",
-                "sgp1",
-                "tor1",
-            ],
             required=True,
         ),
         name=dict(type="str", required=False),
@@ -468,7 +429,6 @@ def main():
         ),
         firewall=dict(type="dict", required=False),
     )
-
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
@@ -476,19 +436,6 @@ def main():
             ("state", "present", ("droplet_ids", "forwarding_rules")),
         ],
     )
-
-    if not HAS_AZURE_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("azure.core.exceptions"),
-            exception=AZURE_LIBRARY_IMPORT_ERROR,
-        )
-
-    if not HAS_PYDO_LIBRARY:
-        module.fail_json(
-            msg=missing_required_lib("pydo"),
-            exception=PYDO_LIBRARY_IMPORT_ERROR,
-        )
-
     LoadBalancer(module)
 
 

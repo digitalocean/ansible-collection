@@ -25,8 +25,22 @@ options:
     description:
       - DigitalOcean API token.
       - There are several environment variables which can be used to provide this value.
-      - C(DIGITALOCEAN_TOKEN), C(DO_API_TOKEN), C(DO_API_KEY), C(DO_OAUTH_TOKEN) and C(OAUTH_TOKEN)
+      - C(DIGITALOCEAN_ACCESS_TOKEN), C(DIGITALOCEAN_TOKEN), C(DO_API_TOKEN), C(DO_API_KEY), C(DO_OAUTH_TOKEN) and C(OAUTH_TOKEN)
     type: str
     aliases: [ oauth_token, api_token ]
+    required: false
+  client_override_options:
+    description:
+      - Client override options (developer use).
+      - For example, can be used to override the DigitalOcean API endpoint for an internal test suite.
+      - If provided, these options will knock out existing options.
+    type: dict
+    required: false
+  module_override_options:
+    description:
+      - Module override options (developer use).
+      - Can be used to override module options to support experimental or future options.
+      - If provided, these options will knock out existing options.
+    type: dict
     required: false
 """

@@ -1,5 +1,6 @@
 /tests/output/
 /changelogs/.plugin-cache.yaml
+tests/integration/inventory
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -134,3 +135,6 @@ dmypy.json
 # IDEs
 .vscode
 .idea
+
+# Internal only files
+*internal*

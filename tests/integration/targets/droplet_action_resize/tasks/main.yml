@@ -1,0 +1,23 @@
+# code: language=ansible
+---
+- name: Testing block
+  block:
+    - name: Verify API token
+      ansible.builtin.assert:
+        that:
+          - digitalocean_token is string
+          - digitalocean_token | length > 0
+        fail_msg: digitalocean_token should be defined in tests/integration/integration_config.yml
+
+    - name: Setup
+      ansible.builtin.include_tasks:
+        file: 00_setup.yml
+
+    - name: Resize
+      ansible.builtin.include_tasks:
+        file: 01_resize.yml
+
+  always:
+    - name: Teardown
+      ansible.builtin.include_tasks:
+        file: 99_teardown.yml
