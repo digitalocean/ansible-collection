@@ -225,11 +225,20 @@ class DropletActionResize(DigitalOceanCommonModule):
                 droplet_id=self.droplet["id"], body=body
             )["action"]
 
-            status = action["status"]
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and status != "completed":
+            while time.monotonic() < end_time and action["status"] != "completed":
                 time.sleep(DigitalOceanConstants.SLEEP)
-                status = self.get_action_by_id(action_id=action["id"])["status"]
+                action = self.get_action_by_id(action_id=action["id"])
+
+            if action["status"] != "completed":
+                self.module.fail_json(
+                    changed=True,
+                    msg=(
+                        f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']}"
+                        f" sent action '{self.type}' and it has not completed, status is '{action['status']}'"
+                    ),
+                    action=action,
+                )
 
             self.module.exit_json(
                 changed=True,
