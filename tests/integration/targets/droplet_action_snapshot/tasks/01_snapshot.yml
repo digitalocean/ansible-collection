@@ -17,10 +17,6 @@
           - result.changed
           - result.msg == "Droplet " ~ droplet_name ~ " (" ~ result.action.resource_id ~ ") in " ~ droplet_region ~ " sent action 'snapshot'"
 
-    - name: 01_snapshot | Sleep for a few seconds
-      ansible.builtin.pause:
-        seconds: 10
-
     - name: 01_snapshot | Delete snapshot
       when: true
       digitalocean.cloud.snapshot:
