@@ -12,8 +12,8 @@ This is a grounds-up rewrite of the [`community.digitalocean`](https://galaxy.an
 
 ## DigitalOcean Collection for Ansible
 
-[![Ansible Collection](https://img.shields.io/ansible/collection/2624?logo=digitalocean&label=ansible%20collection&color=%230080FF)](https://galaxy.ansible.com/digitalocean/cloud)
-[![Latest Release](https://img.shields.io/github/v/release/digitalocean/ansible-collection?include_prereleases&label=latest%20release&color=%230080FF)](https://github.com/digitalocean/ansible-collection/releases)
+[![Ansible Collection](https://img.shields.io/ansible/collection/2624?logo=digitalocean&label=Ansible%20Collection&color=%230080FF)](https://galaxy.ansible.com/digitalocean/cloud)
+[![Latest Release](https://img.shields.io/github/v/release/digitalocean/ansible-collection?include_prereleases&label=Latest%20release&color=%230080FF)](https://github.com/digitalocean/ansible-collection/releases)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/7862/badge)](https://www.bestpractices.dev/projects/7862)
 
 [![Integration tests](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-integration.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-integration.yml)
