@@ -8,16 +8,20 @@
 </p>
 
 This repository contains the `digitalocean.cloud` Ansible Collection.
+This is a grounds-up rewrite of the [`community.digitalocean`](https://galaxy.ansible.com/community/digitalocean) Ansible collection, leveraging [PyDO](https://github.com/digitalocean/pydo).
 
 ## DigitalOcean Collection for Ansible
 
-![Ansible Collection](https://img.shields.io/ansible/collection/2624?logo=digitalocean&link=https://galaxy.ansible.com/digitalocean/cloud)
+[![Ansible Collection](https://img.shields.io/ansible/collection/2624?logo=digitalocean&label=ansible%20collection&color=%230080FF)](https://galaxy.ansible.com/digitalocean/cloud)
+[![Latest Release](https://img.shields.io/github/v/release/digitalocean/ansible-collection?include_prereleases&label=latest%20release&color=%230080FF)](https://github.com/digitalocean/ansible-collection/releases)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/7862/badge)](https://www.bestpractices.dev/projects/7862)
+
 [![Integration tests](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-integration.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-integration.yml)
-[![Lint extra docsite docs and links](https://github.com/digitalocean/ansible-collection/actions/workflows/extra-docs-linting.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/extra-docs-linting.yml)
-[![Publish Collection on Galaxy](https://github.com/digitalocean/ansible-collection/actions/workflows/publish-galaxy.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/publish-galaxy.yml)
-[![Python psf/black](https://github.com/digitalocean/ansible-collection/actions/workflows/psf-black.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/psf-black.yml)
 [![Sanity tests](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-sanity.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-sanity.yml)
 [![Unit tests](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-unit.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-unit.yml)
+[![Publish Collection on Galaxy](https://github.com/digitalocean/ansible-collection/actions/workflows/publish-galaxy.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/publish-galaxy.yml)
+[![Lint extra docsite docs and links](https://github.com/digitalocean/ansible-collection/actions/workflows/extra-docs-linting.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/extra-docs-linting.yml)
+[![Python psf/black](https://github.com/digitalocean/ansible-collection/actions/workflows/psf-black.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/psf-black.yml)
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/digitalocean/ansible-collection?quickstart=1)
 
