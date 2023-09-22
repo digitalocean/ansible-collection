@@ -11,6 +11,7 @@ This repository contains the `digitalocean.cloud` Ansible Collection.
 
 ## DigitalOcean Collection for Ansible
 
+![Ansible Collection](https://img.shields.io/ansible/collection/2624?logo=digitalocean&link=https://galaxy.ansible.com/digitalocean/cloud)
 [![Integration tests](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-integration.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-integration.yml)
 [![Lint extra docsite docs and links](https://github.com/digitalocean/ansible-collection/actions/workflows/extra-docs-linting.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/extra-docs-linting.yml)
 [![Publish Collection on Galaxy](https://github.com/digitalocean/ansible-collection/actions/workflows/publish-galaxy.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/publish-galaxy.yml)
