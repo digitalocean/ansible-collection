@@ -34,7 +34,7 @@ jobs:
           - cdn_endpoints_info
           - certificate
           - certificates_info
-          - database_cluster # Failing with NoneType exception, marked disabled in aliases
+          - database_cluster
           - database_clusters_info
           - domain
           - domain_record
