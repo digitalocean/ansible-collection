@@ -288,7 +288,9 @@ class DatabaseCluster(DigitalOceanCommonModule):
             end_time = time.monotonic() + self.timeout
             while time.monotonic() < end_time and database["status"] != "online":
                 time.sleep(DigitalOceanConstants.SLEEP)
-                database["status"] = self.get_database_cluster_by_id(database["id"])["status"]
+                database["status"] = self.get_database_cluster_by_id(database["id"])[
+                    "status"
+                ]
 
             if database["status"] != "online":
                 self.module.fail_json(
