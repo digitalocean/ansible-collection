@@ -198,7 +198,7 @@ msg:
   type: str
   sample:
     - Created Kubernetes cluster prod-cluster-01 (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3
-    - Created Kubernetes cluster prod-cluster-01 (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3 is not 'running', it is 'initializing'
+    - Created Kubernetes cluster prod-cluster-01 (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3 is not 'running', it is 'provisioning'
     - Kubernetes cluster prod-cluster-01 in nyc3 would be created
     - Kubernetes cluster prod-cluster-01 (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3 exists
     - Kubernetes cluster prod-cluster-01 in nyc3 does not exist

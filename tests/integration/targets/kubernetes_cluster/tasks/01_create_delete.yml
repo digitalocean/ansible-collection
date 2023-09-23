@@ -10,6 +10,7 @@
         region: "{{ kubernetes_cluster.region }}"
         version: "{{ kubernetes_cluster.version }}"
         node_pools: "{{ kubernetes_cluster.node_pools }}"
+        timeout: 600
       register: result
 
     - name: 01_create_delete | Verify create Kubernetes cluster
