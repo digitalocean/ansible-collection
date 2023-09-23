@@ -197,12 +197,12 @@ msg:
   returned: always
   type: str
   sample:
-    - Created redis database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3
-    - Deleted redis database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3
-    - redis database cluster backend in nyc3 would be created
-    - redis database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3 exists
-    - redis database cluster backend in nyc3 does not exist
-    - redis database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) would be deleted
+    - Created Kubernetes cluster prod-cluster-01 (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3
+    - Created Kubernetes cluster prod-cluster-01 (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3 is not 'running', it is 'initializing'
+    - Kubernetes cluster prod-cluster-01 in nyc3 would be created
+    - Kubernetes cluster prod-cluster-01 (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3 exists
+    - Kubernetes cluster prod-cluster-01 in nyc3 does not exist
+    - Kubernetes cluster prod-cluster-01 (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3 would be deleted
 """
 
 import time
@@ -295,13 +295,29 @@ class KubernetesCluster(DigitalOceanCommonModule):
                 "kubernetes_cluster"
             ]
 
-            status = kubernetes_cluster["status"]
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and status != "online":
+            while (
+                time.monotonic() < end_time
+                and kubernetes_cluster["status"]["state"] != "running"
+            ):
                 time.sleep(DigitalOceanConstants.SLEEP)
-                status = self.get_kubernetes_cluster_by_id(kubernetes_cluster["id"])[
+                kubernetes_cluster["status"][
+                    "state"
+                ] = self.get_kubernetes_cluster_by_id(kubernetes_cluster["id"])[
                     "status"
+                ][
+                    "state"
                 ]
+
+            if kubernetes_cluster["status"]["state"] != "running":
+                self.module.fail_json(
+                    changed=True,
+                    msg=(
+                        f"Created Kubernetes cluster {self.name} ({kubernetes_cluster['id']}) in {self.region}"
+                        f" is not 'running', it is '{kubernetes_cluster['status']['state']}'"
+                    ),
+                    kubernetes_cluster=kubernetes_cluster,
+                )
 
             self.module.exit_json(
                 changed=True,
