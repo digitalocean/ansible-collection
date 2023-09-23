@@ -9,3 +9,4 @@
         name: "{{ database_name }}"
         region: "{{ region }}"
         engine: "{{ engine }}"
+        timeout: 600
