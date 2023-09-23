@@ -1,11 +1,11 @@
-# code: language=ansible
 ---
-- block:
-
-    - name: Create database cluster
+# code: language=ansible
+- name: 01_create_delete_redis | Testing block
+  block:
+    - name: 01_create_delete_redis | Create database cluster
       digitalocean.cloud.database_cluster:
-        token: "{{ digitalocean_token }}"
         state: present
+        token: "{{ digitalocean_token }}"
         name: "{{ database_name }}"
         region: "{{ region }}"
         engine: "{{ engine }}"
@@ -13,7 +13,7 @@
         num_nodes: "{{ num_nodes }}"
       register: result
 
-    - name: Verify create database cluster
+    - name: 01_create_delete_redis | Verify create database cluster
       ansible.builtin.assert:
         that:
           - result.changed
@@ -23,28 +23,34 @@
           - result.database.num_nodes == num_nodes
           - result.database.region == region
 
-    - name: Delete database cluster
+    - name: 01_create_delete_redis | Create database cluster again
       digitalocean.cloud.database_cluster:
+        state: present
         token: "{{ digitalocean_token }}"
-        state: absent
         name: "{{ database_name }}"
         region: "{{ region }}"
-        engine: "{{ engine}}"
+        engine: "{{ engine }}"
+        size: "{{ size }}"
+        num_nodes: "{{ num_nodes }}"
       register: result
 
-    - name: Verify delete database cluster
+    - name: 01_create_delete_redis | Verify create database cluster idempotency
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == engine ~ " database cluster " ~ database_name ~ " (" ~ result.database.id ~ ") in " ~ region ~ " exists"
+
+    - name: 01_create_delete_redis | Delete database cluster
+      digitalocean.cloud.database_cluster:
+        state: absent
+        token: "{{ digitalocean_token }}"
+        name: "{{ database_name }}"
+        region: "{{ region }}"
+        engine: "{{ engine }}"
+      register: result
+
+    - name: 01_create_delete_redis | Verify delete database cluster
       ansible.builtin.assert:
         that:
           - result.changed
           - result.msg == "Deleted " ~ engine ~ " database cluster " ~ database_name ~ " (" ~ result.database.id ~ ") in " ~ region
-
-  always:
-
-    - name: Cleanup database cluster | Leftover from unexpected failure
-      digitalocean.cloud.database_cluster:
-        token: "{{ digitalocean_token }}"
-        state: absent
-        name: "{{ database_name }}"
-        region: "{{ region }}"
-        engine: "{{ engine}}"
-      ignore_errors: true

@@ -188,6 +188,7 @@ msg:
   type: str
   sample:
     - Created redis database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3
+    - Created redis database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3 is not 'online', it is 'creating'
     - Deleted redis database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3
     - redis database cluster backend in nyc3 would be created
     - redis database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3 exists
@@ -227,7 +228,7 @@ class DatabaseCluster(DigitalOceanCommonModule):
 
     def get_database_clusters_by_name_and_region(self):
         try:
-            databases = self.client.databases.list_clusters()["databases"]
+            databases = self.client.databases.list_clusters()["databases"] or []
             found_databases = []
             for database_cluster in databases:
                 if self.name == database_cluster["name"]:
@@ -284,11 +285,20 @@ class DatabaseCluster(DigitalOceanCommonModule):
             }
             database = self.client.databases.create_cluster(body=body)["database"]
 
-            status = database["status"]
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and status != "online":
+            while time.monotonic() < end_time and database["status"] != "online":
                 time.sleep(DigitalOceanConstants.SLEEP)
-                status = self.get_database_cluster_by_id(database["id"])["status"]
+                database["status"] = self.get_database_cluster_by_id(database["id"])["status"]
+
+            if database["status"] != "online":
+                self.module.fail_json(
+                    changed=True,
+                    msg=(
+                        f"Created database cluster {database['name']} ({database['id']}) in {database['region']}"
+                        f" is not 'online', it is '{database['status']}'"
+                    ),
+                    database=database,
+                )
 
             self.module.exit_json(
                 changed=True,

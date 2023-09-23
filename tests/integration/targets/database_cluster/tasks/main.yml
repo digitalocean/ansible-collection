@@ -1,6 +1,7 @@
-# code: language=ansible
 ---
-- block:
+# code: language=ansible
+- name: Testing block
+  block:
 
     - name: Verify API token
       ansible.builtin.assert:
@@ -12,3 +13,8 @@
     - name: Test database | Create and delete redis
       ansible.builtin.include_tasks:
         file: 01_create_delete_redis.yml
+
+  always:
+    - name: Teardown
+      ansible.builtin.include_tasks:
+        file: 99_teardown.yml
