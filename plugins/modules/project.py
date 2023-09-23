@@ -118,6 +118,7 @@ msg:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import fetch_url
 
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanFunctions,
@@ -209,7 +210,7 @@ class Project(DigitalOceanCommonModule):
                     if url:
                         api_url = url
 
-                status_code, body = DigitalOceanFunctions.fetch_url(
+                resp, info = fetch_url(
                     self.module,
                     url=f"{api_url}/v2/projects/{project['id']}",
                     headers={
@@ -218,6 +219,8 @@ class Project(DigitalOceanCommonModule):
                     },
                     method="DELETE",
                 )
+                status_code = info["status"]
+                body = resp.read()
 
                 # A successful request will receive a 204 status code with no body in response.
                 # This indicates that the request was processed successfully.
