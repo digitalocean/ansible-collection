@@ -58,7 +58,7 @@ jobs:
           - monitoring_alert_policies_info
           - monitoring_alert_policy
           - one_clicks_info
-          # - project # Delete yields RuntimeError: Operation returned an invalid status 'Unsupported Media Type'
+          - project
           - projects_info
           - regions_info
           - reserved_ip

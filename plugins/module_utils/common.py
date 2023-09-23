@@ -8,6 +8,7 @@ __metaclass__ = type
 
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.six.moves.urllib.parse import urlparse, parse_qs
+from ansible.module_utils.urls import fetch_url as module_utils_urls_fetch_url
 
 import traceback
 
@@ -141,6 +142,22 @@ class DigitalOceanFunctions:
                 if name == volume["name"]:
                     found_volumes.append(volume)
         return found_volumes
+
+    @staticmethod
+    def fetch_url(
+        module, url: str, data: dict = None, headers: dict = None, method: str = "GET"
+    ) -> [int, str]:
+        data = {}
+        resp, info = module_utils_urls_fetch_url(
+            module,
+            url=url,
+            data=module.jsonify(data),
+            headers=headers,
+            method=method,
+        )
+        status_code = info["status"]
+        body = resp.read()
+        return status_code, body
 
 
 class DigitalOceanConstants:
