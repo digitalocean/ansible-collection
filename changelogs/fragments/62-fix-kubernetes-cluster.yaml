@@ -1,0 +1,2 @@
+bugfixes:
+  - kubernetes_cluster - fix C(kubernetes_cluster) module polling and refactor integration test (https://github.com/digitalocean/ansible-collection/issues/62).
