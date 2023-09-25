@@ -138,3 +138,6 @@ dmypy.json
 
 # Internal only files
 *internal*
+
+# macOS metadata
+.DS_Store

@@ -1,0 +1,65 @@
+---
+# code: language=ansible
+- name: 01_create_delete | Testing block
+  block:
+    - name: 01_create_delete | Create project
+      digitalocean.cloud.project:
+        state: present
+        token: "{{ digitalocean_token }}"
+        name: "{{ project_name }}"
+        description: "{{ project_description }}"
+        purpose: "{{ project_purpose }}"
+        environment: "{{ project_environment }}"
+      register: result
+
+    - name: 01_create_delete | Verify create Project
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created project " ~ project_name ~ " (" ~ result.project.id ~ ")"
+
+    - name: 01_create_delete | Create project again
+      digitalocean.cloud.project:
+        state: present
+        token: "{{ digitalocean_token }}"
+        name: "{{ project_name }}"
+        description: "{{ project_description }}"
+        purpose: "{{ project_purpose }}"
+        environment: "{{ project_environment }}"
+      register: result
+
+    - name: 01_create_delete | Verify create Project idempotency
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == "Project " ~ project_name ~ " (" ~ result.project.id ~ ") exists"
+
+    - name: 01_create_delete | Sleep for a few seconds
+      ansible.builtin.pause:
+        seconds: 20
+
+    - name: 01_create_delete | Delete project
+      digitalocean.cloud.project:
+        state: absent
+        token: "{{ digitalocean_token }}"
+        name: "{{ project_name }}"
+      register: result
+
+    - name: 01_create_delete | Verify delete Project
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Deleted project " ~ project_name ~ " (" ~ result.project.id ~ ")"
+
+    - name: 01_create_delete | Delete project again
+      digitalocean.cloud.project:
+        state: absent
+        token: "{{ digitalocean_token }}"
+        name: "{{ project_name }}"
+      register: result
+
+    - name: 01_create_delete | Verify delete Project idempotency
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == "Project " ~ project_name ~ " does not exist"
