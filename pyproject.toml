@@ -11,7 +11,7 @@ python = "~3.9"
 ansible-core = "^2.15.3"
 azure-core = "^1.29.3"
 pydo = "^0.1.4"
-boto3 = "^1.28.51"
+boto3 = "^1.28.53"
 jmespath = "^1.0.1"
 setuptools = "68.0.0"
 
