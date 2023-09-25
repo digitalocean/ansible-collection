@@ -1,2 +1,0 @@
-bugfixes:
-  - project - fix C(project) module with API workaround and add integration test (https://github.com/digitalocean/ansible-collection/pull/61).

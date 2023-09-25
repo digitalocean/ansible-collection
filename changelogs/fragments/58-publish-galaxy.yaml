@@ -1,2 +1,0 @@
-trivial:
-  - ci - publish to Galaxy based when GitHub Release is published (https://github.com/digitalocean/ansible-collection/pull/58).

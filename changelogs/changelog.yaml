@@ -218,3 +218,26 @@ releases:
       name: droplet_action_snapshot
       namespace: ''
     release_date: '2023-09-20'
+  0.4.0:
+    changes:
+      bugfixes:
+      - database_cluster - fix C(database_cluster) module and reenable integration
+        test (https://github.com/digitalocean/ansible-collection/pull/60).
+      - kubernetes_cluster - fix C(kubernetes_cluster) module polling and refactor
+        integration test (https://github.com/digitalocean/ansible-collection/issues/62).
+      - project - fix C(project) module with API workaround and add integration test
+        (https://github.com/digitalocean/ansible-collection/pull/61).
+    fragments:
+    - 58-publish-galaxy.yaml
+    - 59-readme-badges.yaml
+    - 60-fix-database-cluster.yaml
+    - 61-fix-project.yaml
+    - 62-fix-kubernetes-cluster.yaml
+    - 66-database-cluster-timeout.yaml
+    - 71-dependabot-bumps.yaml
+    plugins:
+      inventory:
+      - description: Droplets dynamic inventory plugin
+        name: droplets
+        namespace: null
+    release_date: '2023-09-25'
