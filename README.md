@@ -144,6 +144,10 @@ There is a [pyproject.toml](./pyproject.toml) is the root of this repository as 
 | `digitalocean.cloud.vpc`                            | Create and delete VPCs                       |
 | `digitalocean.cloud.vpcs_info`                      | Get VPCs                                     |
 
+| Inventory Plugin              | Description                       |
+| ----------------------------- | --------------------------------- |
+| `digitalocean.cloud.droplets` | Droplets dynamic inventory plugin |
+
 ## Using this collection
 
 There are sample playbooks in the [playbooks](./playbooks) directory.
@@ -198,6 +202,129 @@ ok: [localhost] => changed=false
 
 PLAY RECAP *******************************************************************************************************
 localhost                  : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
+[This](./inventory/digitalocean.yml) is a sample inventory plugin file which returns the Droplets in your account:
+
+Output should look similar to the following:
+
+```shell
+❯ ansible-inventory -i inventory/digitalocean.yml --graph
+@all:
+  |--@ungrouped:
+  |--@ubuntu:
+  |  |--ansible-gh-ci-droplet-1-0
+  |--@region_slug_nyc3:
+  |  |--ansible-gh-ci-droplet-1-0
+  |--@status_active:
+  |  |--ansible-gh-ci-droplet-1-0
+  |--@vpc_30f86d25_414e_434f_852d_993ed8d6815e:
+  |  |--ansible-gh-ci-droplet-1-0
+  |--@basic:
+  |  |--ansible-gh-ci-droplet-1-0
+  |--@image_ubuntu_22_04_x64:
+  |  |--ansible-gh-ci-droplet-1-0
+  |--@tag_delete:
+  |  |--ansible-gh-ci-droplet-1-0
+  |--@tag_ci:
+  |  |--ansible-gh-ci-droplet-1-0
+```
+
+```shell
+❯ ansible-inventory -i inventory/digitalocean.yml --host ansible-gh-ci-droplet-1-0
+{
+    "ansible_host": "1.2.3.4",
+    "backup_ids": [],
+    "class": "basic",
+    "created_at": "2023-09-23T22:19:10Z",
+    "disk": 50,
+    "distribution": "ubuntu",
+    "features": [
+        "private_networking"
+    ],
+    "id": 376180902,
+    "image": {
+        "created_at": "2023-03-22T19:17:23Z",
+        "description": "Ubuntu 22.04 (LTS) x64",
+        "distribution": "Ubuntu",
+        "id": 129211873,
+        "min_disk_size": 7,
+        "name": "22.04 (LTS) x64",
+        "public": true,
+        "regions": [
+            "nyc3",
+            <many more>
+        ],
+        "size_gigabytes": 0.72,
+        "slug": "ubuntu-22-04-x64",
+        "status": "available",
+        "tags": [],
+        "type": "base"
+    },
+    "kernel": null,
+    "locked": false,
+    "memory": 2048,
+    "networks": {
+        "v4": [
+            {
+                "gateway": "10.108.0.1",
+                "ip_address": "10.108.0.5",
+                "netmask": "255.255.240.0",
+                "type": "private"
+            },
+            {
+                "gateway": "1.2.3.1",
+                "ip_address": "1.2.3.4",
+                "netmask": "255.255.240.0",
+                "type": "public"
+            }
+        ],
+        "v6": []
+    },
+    "next_backup_window": null,
+    "region": {
+        "available": true,
+        "features": [
+            "backups",
+            "ipv6",
+            "metadata",
+            "install_agent",
+            "storage",
+            "image_transfer"
+        ],
+        "name": "New York 3",
+        "sizes": [
+            "s-1vcpu-1gb",
+            <many more>
+        ],
+        "slug": "nyc3"
+    },
+    "size": {
+        "available": true,
+        "description": "Basic",
+        "disk": 50,
+        "memory": 2048,
+        "price_hourly": 0.01786,
+        "price_monthly": 12.0,
+        "regions": [
+            "ams3",
+            <many more>
+        ],
+        "slug": "s-1vcpu-2gb",
+        "transfer": 2.0,
+        "vcpus": 1
+    },
+    "size_slug": "s-1vcpu-2gb",
+    "snapshot_ids": [],
+    "status": "active",
+    "tags": [
+        "delete",
+        "ci"
+    ],
+    "vcpus": 1,
+    "volume_ids": [],
+    "vpc_uuid": "30f86d25-414e-434f-852d-993ed8d6815e"
+}
 ```
 
 ### Installing the Collection from Ansible Galaxy
