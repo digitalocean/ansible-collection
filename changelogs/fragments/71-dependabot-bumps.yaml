@@ -1,0 +1,2 @@
+trivial:
+  - dependabot - bump C(setuptools), C(boto3), and C(pylint) (https://github.com/digitalocean/ansible-collection/issues/71).
