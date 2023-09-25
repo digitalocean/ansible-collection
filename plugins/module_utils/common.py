@@ -69,7 +69,11 @@ class DigitalOceanFunctions:
                     "Status Code": err.status_code,
                     "Reason": err.reason,
                 }
-                module.fail_json(changed=False, msg=error.get("Message"), error=error)
+                if module:
+                    module.fail_json(
+                        changed=False, msg=error.get("Message"), error=error
+                    )
+                raise RuntimeError(error.get("Message"))
         return results
 
     @staticmethod
@@ -183,7 +187,7 @@ class DigitalOceanOptions:
         )
 
 
-class DigitalOceanCommonModule:
+class DigitalOceanReqs:
     HAS_AZURE_LIBRARY = False
     AZURE_LIBRARY_IMPORT_ERROR = None
     try:
@@ -204,6 +208,8 @@ class DigitalOceanCommonModule:
     else:
         HAS_PYDO_LIBRARY = True
 
+
+class DigitalOceanCommonModule(DigitalOceanReqs):
     def __init__(self, module):
         self.module = module
         self.module_override_options = module.params.get("module_override_options")
@@ -213,6 +219,18 @@ class DigitalOceanCommonModule:
             self.client_options.update(**self.client_override_options)
         self.client = Client(**self.client_options)
         self.state = module.params.get("state")
+
+
+class DigitalOceanCommonInventory(DigitalOceanReqs):
+    def __init__(self, config):
+        token = (
+            config.get("token") or config.get("oauth_token") or config.get("api_token")
+        )
+        self.client_options = {"token": token}
+        self.client_override_options = config.get("client_override_options")
+        if self.client_override_options:
+            self.client_options.update(**self.client_override_options)
+        self.client = Client(**self.client_options)
 
 
 class DigitalOceanLogfile:

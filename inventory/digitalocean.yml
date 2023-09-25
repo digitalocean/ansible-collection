@@ -1,0 +1,48 @@
+plugin: digitalocean.cloud.droplets
+cache: true
+cache_plugin: ansible.builtin.jsonfile
+cache_connection: /tmp/digitalocean_droplets_inventory
+cache_timeout: 300
+attributes:
+  - id
+  - memory
+  - vcpus
+  - disk
+  - locked
+  - status
+  - kernel
+  - created_at
+  - features
+  - backup_ids
+  - next_backup_window
+  - snapshot_ids
+  - image
+  - volume_ids
+  - size
+  - size_slug
+  - networks
+  - region
+  - tags
+  - vpc_uuid
+compose:
+  ansible_host: networks.v4 | selectattr("type", "eq", "public") | map(attribute="ip_address") | first
+  class: size.description | lower
+  distribution: image.distribution | lower
+keyed_groups:
+  - key: image.slug | default("null", true)
+    prefix: image
+    separator: "_"
+  - key: tags
+    prefix: tag
+    separator: "_"
+  - key: region.slug
+    prefix: region_slug
+    separator: "_"
+  - key: status
+    prefix: status
+    separator: "_"
+  - key: vpc_uuid
+    prefix: vpc
+groups:
+  basic: "'basic' in class"
+  ubuntu: "'ubuntu' in distribution"
