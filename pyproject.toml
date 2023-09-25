@@ -13,7 +13,7 @@ azure-core = "^1.29.3"
 pydo = "^0.1.4"
 boto3 = "^1.28.51"
 jmespath = "^1.0.1"
-setuptools = "68.0.0"
+setuptools = "68.2.2"
 
 [tool.poetry.group.dev.dependencies]
 ansible-lint = { version = "^6.16.2", markers = "platform_system != 'Windows'" }
