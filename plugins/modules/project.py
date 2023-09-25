@@ -69,7 +69,7 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Create a project
+- name: Create project
   digitalocean.cloud.project:
     token: "{{ token }}"
     state: present
@@ -118,6 +118,8 @@ msg:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import fetch_url
+
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonModule,
     DigitalOceanOptions,
@@ -139,7 +141,7 @@ class Project(DigitalOceanCommonModule):
 
     def get_projects(self):
         try:
-            projects = self.client.projects.list()["projects"]
+            projects = self.client.projects.list()["projects"] or []
             found_projects = []
             for project in projects:
                 if self.name == project["name"]:
@@ -189,23 +191,68 @@ class Project(DigitalOceanCommonModule):
             self.module.exit_json(
                 changed=True,
                 msg=f"Deleted project {self.name} ({project['id']})",
-                project=project,
+                project=[],
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
-            # TODO: Not sure where to file this bug yet
-            raise RuntimeError(err)
-            # RuntimeError: Operation returned an invalid status 'Unsupported Media Type'
-            # error = {
-            #     "Message": err.error.message,
-            #     "Status Code": err.status_code,
-            #     "Reason": err.reason,
-            # }
-            # self.module.fail_json(
-            #     changed=False,
-            #     msg=error.get("Message"),
-            #     error=error,
-            #     project=[],
-            # )
+            # TODO: https://github.com/digitalocean/pydo/issues/158
+            if (
+                str(err)
+                == "Operation returned an invalid status 'Unsupported Media Type'"
+            ):
+                api_url = "https://api.digitalocean.com"
+
+                module_override_options = self.module.params.get(
+                    "module_override_options"
+                )
+                if module_override_options:
+                    url = module_override_options.get("url")
+                    if url:
+                        api_url = url
+
+                resp, info = fetch_url(
+                    self.module,
+                    url=f"{api_url}/v2/projects/{project['id']}",
+                    headers={
+                        "Authorization": f"Bearer {self.module.params.get('token')}",
+                        "Content-type": "application/json",
+                    },
+                    method="DELETE",
+                )
+                status_code = info["status"]
+                body = resp.read()
+
+                # A successful request will receive a 204 status code with no body in response.
+                # This indicates that the request was processed successfully.
+                if status_code == 204 and not body:
+                    self.module.exit_json(
+                        changed=True,
+                        msg=f"Deleted project {self.name} ({project['id']})",
+                        project=project,
+                    )
+                else:
+                    error = {
+                        "Message": body,
+                        "Status Code": status_code,
+                        "Reason": "Reason is Message",
+                    }
+                    self.module.fail_json(
+                        changed=False,
+                        msg=body,
+                        error=error,
+                        project=project,
+                    )
+            else:
+                error = {
+                    "Message": err.error.message,
+                    "Status Code": err.status_code,
+                    "Reason": err.reason,
+                }
+                self.module.fail_json(
+                    changed=False,
+                    msg=error.get("Message"),
+                    error=error,
+                    project=[],
+                )
 
     def present(self):
         projects = self.get_projects()

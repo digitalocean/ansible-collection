@@ -1,0 +1,4 @@
+project_name: ansible-gh-ci-project-{{ pr_number | default(0, true) }}
+project_description: My Website API
+project_purpose: Service or API
+project_environment: Production

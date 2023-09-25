@@ -1,5 +1,5 @@
 kubernetes_cluster:
-  name: ansible-gh-ci-k8s-0
+  name: "ansible-gh-ci-k8s-{{ pr_number | default(0, true) }}"
   region: nyc3
   version: "1.25.14-do.0"
   node_pools:

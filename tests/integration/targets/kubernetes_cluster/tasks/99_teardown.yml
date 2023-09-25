@@ -1,0 +1,11 @@
+---
+# code: language=ansible
+- name: 99_teardown | Testing block
+  block:
+    - name: 99_teardown | Cleanup Kubernetes cluster | Leftover from unexpected failure
+      digitalocean.cloud.kubernetes_cluster:
+        state: absent
+        token: "{{ digitalocean_token }}"
+        name: "{{ kubernetes_cluster.name }}"
+        region: "{{ kubernetes_cluster.region }}"
+      ignore_errors: true  # noqa ignore-errors
