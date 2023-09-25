@@ -11,6 +11,7 @@
         engine: "{{ engine }}"
         size: "{{ size }}"
         num_nodes: "{{ num_nodes }}"
+        timeout: 600
       register: result
 
     - name: 01_create_delete_redis | Verify create database cluster

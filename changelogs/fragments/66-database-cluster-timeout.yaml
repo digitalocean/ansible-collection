@@ -1,0 +1,2 @@
+trivial:
+  - database_cluster - double C(database_cluster) integration testing timeout (https://github.com/digitalocean/ansible-collection/issues/66).
