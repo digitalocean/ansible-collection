@@ -5,6 +5,24 @@ DigitalOcean Collection Release Notes
 .. contents:: Topics
 
 
+v0.4.0
+======
+
+Bugfixes
+--------
+
+- database_cluster - fix C(database_cluster) module and reenable integration test (https://github.com/digitalocean/ansible-collection/pull/60).
+- kubernetes_cluster - fix C(kubernetes_cluster) module polling and refactor integration test (https://github.com/digitalocean/ansible-collection/issues/62).
+- project - fix C(project) module with API workaround and add integration test (https://github.com/digitalocean/ansible-collection/pull/61).
+
+New Plugins
+-----------
+
+Inventory
+~~~~~~~~~
+
+- droplets - Droplets dynamic inventory plugin
+
 v0.3.0
 ======
 

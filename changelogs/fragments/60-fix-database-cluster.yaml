@@ -1,2 +1,0 @@
-bugfixes:
-  - database_cluster - fix C(database_cluster) module and reenable integration test (https://github.com/digitalocean/ansible-collection/pull/60).
