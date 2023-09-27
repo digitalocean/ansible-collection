@@ -1,0 +1,37 @@
+# code: language=ansible
+---
+- name: 01_get | Testing block
+  block:
+    - name: 01_get | Get Spaces
+      digitalocean.cloud.spaces_info:
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        region: "{{ spaces_region }}"
+      register: result
+
+    - name: 01_get | Verify get Spaces
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg is string
+
+    - name: 01_get | Verify Spaces result when Spaces
+      when: "'Current Spaces in' in result.msg"
+      ansible.builtin.assert:
+        that:
+          - result.msg == "Current Spaces in " ~ spaces_region
+          - result.spaces is iterable
+          - result.spaces | length > 0
+          - result.spaces[0] is mapping
+          - result.spaces[0].endpoint_url | length > 0
+          - result.spaces[0].name | length > 0
+          - result.spaces[0].region | length > 0
+          - result.spaces[0].space_url | length > 0
+
+    - name: 01_get | Verify Spaces result when no Spaces
+      when: "'No Spaces in' in result.msg"
+      ansible.builtin.assert:
+        that:
+          - result.msg == "No Spaces in " ~ spaces_region
+          - result.spaces is iterable
+          - result.spaces | length == 0
