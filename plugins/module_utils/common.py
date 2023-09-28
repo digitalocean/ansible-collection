@@ -7,27 +7,10 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 from ansible.module_utils.basic import env_fallback
+from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.six.moves.urllib.parse import urlparse, parse_qs
 
 import traceback
-
-HAS_AZURE_LIBRARY = False
-AZURE_LIBRARY_IMPORT_ERROR = None
-try:
-    from azure.core.exceptions import HttpResponseError  # pylint: disable=unused-import
-except ImportError:
-    AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_AZURE_LIBRARY = True
-
-HAS_PYDO_LIBRARY = False
-PYDO_LIBRARY_IMPORT_ERROR = None
-try:
-    from pydo import Client  # pylint: disable=unused-import
-except ImportError:
-    PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYDO_LIBRARY = True
 
 
 class DigitalOceanFunctions:
@@ -208,16 +191,35 @@ class DigitalOceanReqs:
     else:
         HAS_PYDO_LIBRARY = True
 
+    HAS_BOTO3_LIBRARY = False
+    BOTO3_LIBRARY_IMPORT_ERROR = None
+    try:
+        import boto3  # pylint: disable=unused-import
+
+        HAS_BOTO3_LIBRARY = True
+    except ImportError:
+        BOTO3_LIBRARY_IMPORT_ERROR = traceback.format_exc()
+
 
 class DigitalOceanCommonModule(DigitalOceanReqs):
     def __init__(self, module):
         self.module = module
+
+        if DigitalOceanReqs.AZURE_LIBRARY_IMPORT_ERROR:
+            module.fail_json(msg=missing_required_lib("azure.core.exceptions"))
+
+        if DigitalOceanReqs.PYDO_LIBRARY_IMPORT_ERROR:
+            module.fail_json(msg=missing_required_lib("pydo"))
+
+        if DigitalOceanReqs.BOTO3_LIBRARY_IMPORT_ERROR:
+            module.fail_json(msg=missing_required_lib("boto3"))
+
         self.module_override_options = module.params.get("module_override_options")
         self.client_options = {"token": module.params.get("token")}
         self.client_override_options = module.params.get("client_override_options")
         if self.client_override_options:
             self.client_options.update(**self.client_override_options)
-        self.client = Client(**self.client_options)
+        self.client = DigitalOceanReqs.Client(**self.client_options)
         self.state = module.params.get("state")
 
 
@@ -230,7 +232,7 @@ class DigitalOceanCommonInventory(DigitalOceanReqs):
         self.client_override_options = config.get("client_override_options")
         if self.client_override_options:
             self.client_options.update(**self.client_override_options)
-        self.client = Client(**self.client_options)
+        self.client = DigitalOceanReqs.Client(**self.client_options)
 
 
 class DigitalOceanLogfile:

@@ -1,0 +1,18 @@
+# code: language=ansible
+---
+- name: Testing block
+  block:
+    - name: Setup
+      ansible.builtin.include_tasks:
+        file: 00_setup.yml
+
+    - name: Get
+      ansible.builtin.include_tasks:
+        file: 01_get.yml
+      vars:
+        spaces_region: "{{ item }}"
+      # NOTE: The hope is that one has Spaces and one does not
+      # TODO: Improve this
+      loop:
+        - nyc3
+        - sfo3
