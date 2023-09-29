@@ -1,0 +1,37 @@
+---
+# code: language=ansible
+- name: 02_get_one | Testing block
+  block:
+    - name: 02_get_one | Get existing Space
+      digitalocean.cloud.spaces_info:
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        name: "{{ space_exists.name }}"
+        region: "{{ space_exists.region }}"
+      register: result
+
+    - name: 02_get_one | Verify get existing Space
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == "Existing Space named {{ space_exists.name }} in {{ space_exists.region }}"
+          - result.spaces | length == 1
+          - result.spaces[0].endpoint_url == "https://{{ space_exists.region }}.{{ spaces_tld }}"
+          - result.spaces[0].name == space_exists.name
+          - result.spaces[0].region == space_exists.region
+          - result.spaces[0].space_url == "https://{{ space_exists.name }}.{{ space_exists.region }}.{{ spaces_tld }}"
+
+    - name: 02_get_one | Get non-existent Space
+      digitalocean.cloud.spaces_info:
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        name: "{{ space_not_exists.name }}"
+        region: "{{ space_not_exists.region }}"
+      register: result
+
+    - name: 02_get_one | Verify get non-existent Space
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == "No Space named {{ space_not_exists.name }} in {{ space_not_exists.region }}"
+          - result.spaces | length == 0

@@ -133,6 +133,7 @@ There is a [pyproject.toml](./pyproject.toml) is the root of this repository as 
 | `digitalocean.cloud.sizes_info`                     | Get sizes                                    |
 | `digitalocean.cloud.snapshot`                       | Create and delete snapshots                  |
 | `digitalocean.cloud.snapshots_info`                 | Get snapshots                                |
+| `digitalocean.cloud.space`                          | Create and delete Spaces                     |
 | `digitalocean.cloud.spaces_info`                    | Get Spaces                                   |
 | `digitalocean.cloud.ssh_key`                        | Create and delete SSH keys                   |
 | `digitalocean.cloud.ssh_keys_info`                  | Get SSH keys                                 |

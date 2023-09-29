@@ -1,0 +1,5 @@
+spaces_tld: digitaloceanspaces.com
+
+space:
+  name: ansible-gh-ci-space-0-{{ pr_number | default(0, true) }}
+  region: nyc3

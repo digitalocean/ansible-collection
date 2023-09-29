@@ -1,18 +1,19 @@
-# code: language=ansible
 ---
+# code: language=ansible
 - name: Testing block
   block:
     - name: Setup
       ansible.builtin.include_tasks:
         file: 00_setup.yml
 
-    - name: Get
+    - name: Get all
       ansible.builtin.include_tasks:
-        file: 01_get.yml
+        file: 01_get_all.yml
       vars:
         spaces_region: "{{ item }}"
-      # NOTE: The hope is that one has Spaces and one does not
-      # TODO: Improve this
-      loop:
-        - nyc3
-        - sfo3
+      # TODO: Improve this: hoping one will have Spaces one will not
+      loop: "{{ spaces_regions }}"
+
+    - name: Get one
+      ansible.builtin.include_tasks:
+        file: 02_get_one.yml
