@@ -85,13 +85,14 @@ Every voice is important. If you have something on your mind, create an issue or
 
 ```text
 azure-core==1.26.1
+boto3==1.28.53 # For the Spaces modules
 pydo==0.1.4
 ```
 
 The following should install the requirements for your account:
 
 ```shell
-pip3 install --user azure-core==1.26.1 pydo==0.1.4
+pip3 install --user azure-core==1.26.1 boto3==1.28.53 pydo==0.1.4
 ```
 
 There is a [pyproject.toml](./pyproject.toml) is the root of this repository as well if you use [Poetry](https://python-poetry.org/) or similar.
