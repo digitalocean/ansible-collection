@@ -125,6 +125,7 @@ There is a [pyproject.toml](./pyproject.toml) is the root of this repository as 
 | `digitalocean.cloud.load_balancer_info`             | Get load balancers                           |
 | `digitalocean.cloud.monitoring_alert_policies_info` | Get monitoring alert policies                |
 | `digitalocean.cloud.monitoring_alert_policy`        | Create and deelete monitoring alert policies |
+| `digitalocean.cloud.one_click`                      | Install Kubernetes 1-Click applications      |
 | `digitalocean.cloud.one_clicks_info`                | Get 1-Clicks                                 |
 | `digitalocean.cloud.projects_info`                  | Get projects                                 |
 | `digitalocean.cloud.regions_info`                   | Get regions                                  |

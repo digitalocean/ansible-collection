@@ -57,6 +57,7 @@ jobs:
           - load_balancers_info
           - monitoring_alert_policies_info
           - monitoring_alert_policy
+          - one_click
           - one_clicks_info
           - project
           - projects_info

@@ -1,0 +1,11 @@
+---
+# code: language=ansible
+addon_slugs:
+ - kube-state-metrics
+ - loki
+# NOTE: It's a bit expensive to fire up K8s just for this module, so, we'll
+# just test check mode and failure (with an unknown cluster UUID). The DO
+# API doesn't give us very much here likely because testing K8s testing
+# applications is so complex and variable. If we get a 200 back from the API
+# we should also have a message "Successfully kicked off addon job."
+cluster_uuid: this-cluster-uuid-does-not-exist
