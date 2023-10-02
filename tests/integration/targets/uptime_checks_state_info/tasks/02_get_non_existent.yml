@@ -1,0 +1,31 @@
+---
+# code: language=ansible
+- name: 02_get_non_existent | Testing block
+  block:
+    - name: 02_get_non_existent | Get Uptime check state by ID
+      digitalocean.cloud.uptime_checks_state_info:
+        state: present
+        token: "{{ digitalocean_token }}"
+        check_id: this-should-not-exist
+      register: result
+
+    - name: 02_get_non_existent | Verify get Uptime check state by ID
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == "No Uptime check this-should-not-exist"
+          - result.state == []
+
+    - name: 02_get_non_existent | Get Uptime check state by name
+      digitalocean.cloud.uptime_checks_state_info:
+        state: present
+        token: "{{ digitalocean_token }}"
+        name: this-should-not-exist
+      register: result
+
+    - name: 02_get_non_existent | Verify get Uptime check state by name
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == "No Uptime check named this-should-not-exist"
+          - result.state == []

@@ -1,0 +1,44 @@
+---
+# code: language=ansible
+- name: 01_create_delete_not_unique_name | Testing block
+  block:
+    - name: 01_create_delete_not_unique_name | Create Uptime check
+      digitalocean.cloud.uptime_check:
+        state: present
+        token: "{{ digitalocean_token }}"
+        name: "{{ check.name }}"
+        type: "{{ check.type }}"
+        target: "{{ check.target }}"
+        regions: "{{ check.regions }}"
+        enabled: "{{ check.enabled }}"
+      register: create_result
+
+    - name: 01_create_delete_not_unique_name | Verify create Uptime check
+      ansible.builtin.assert:
+        that:
+          - create_result.changed
+          - create_result.msg == "Created Uptime check named " ~ check.name ~ " (" ~ create_result.check.id ~ ")"
+          - create_result.check.id | length
+          - create_result.check.name == check.name
+          - create_result.check.type == check.type
+          - create_result.check.target == check.target
+          - create_result.check.regions == check.regions
+          - create_result.check.enabled == check.enabled
+
+    - name: 01_create_delete_not_unique_name | Sleep for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: 01_create_delete_not_unique_name | Delete Uptime check
+      digitalocean.cloud.uptime_check:
+        state: absent
+        token: "{{ digitalocean_token }}"
+        check_id: "{{ create_result.check.id }}"
+      register: delete_result
+
+    - name: 01_create_delete_not_unique_name | Verify delete Uptime check
+      ansible.builtin.assert:
+        that:
+          - delete_result.changed
+          - delete_result.msg == "Deleted Uptime check " ~ create_result.check.id
+          - delete_result.check == []

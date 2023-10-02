@@ -1,0 +1,78 @@
+---
+# code: language=ansible
+- name: 02_create_delete_unique_name | Testing block
+  block:
+    - name: 02_create_delete_unique_name | Create Uptime check
+      digitalocean.cloud.uptime_check:
+        state: present
+        token: "{{ digitalocean_token }}"
+        name: "{{ check.name }}"
+        unique_name: true
+        type: "{{ check.type }}"
+        target: "{{ check.target }}"
+        regions: "{{ check.regions }}"
+        enabled: "{{ check.enabled }}"
+      register: create_result
+
+    - name: 02_create_delete_unique_name | Verify create Uptime check
+      ansible.builtin.assert:
+        that:
+          - create_result.changed
+          - create_result.msg == "Created Uptime check named " ~ check.name ~ " (" ~ create_result.check.id ~ ")"
+          - create_result.check.id | length
+          - create_result.check.name == check.name
+          - create_result.check.type == check.type
+          - create_result.check.target == check.target
+          - create_result.check.regions == check.regions
+          - create_result.check.enabled == check.enabled
+
+    - name: 02_create_delete_unique_name | Create Uptime check again
+      digitalocean.cloud.uptime_check:
+        state: present
+        token: "{{ digitalocean_token }}"
+        name: "{{ check.name }}"
+        unique_name: true
+        type: "{{ check.type }}"
+        target: "{{ check.target }}"
+        regions: "{{ check.regions }}"
+        enabled: "{{ check.enabled }}"
+      register: create_result_again
+
+    - name: 02_create_delete_unique_name | Verify create Uptime check idempotency
+      ansible.builtin.assert:
+        that:
+          - not create_result_again.changed
+          - create_result_again.msg == "Uptime check named " ~ check.name ~ " (" ~ create_result.check.id ~ ") exists"
+
+    - name: 02_create_delete_unique_name | Sleep for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: 02_create_delete_unique_name | Delete Uptime check
+      digitalocean.cloud.uptime_check:
+        state: absent
+        token: "{{ digitalocean_token }}"
+        name: "{{ check.name }}"
+        unique_name: true
+      register: delete_result
+
+    - name: 02_create_delete_unique_name | Verify delete Uptime check
+      ansible.builtin.assert:
+        that:
+          - delete_result.changed
+          - delete_result.msg == "Deleted Uptime check " ~ create_result.check.id
+          - delete_result.check == []
+
+    - name: 02_create_delete_unique_name | Delete Uptime check again
+      digitalocean.cloud.uptime_check:
+        state: absent
+        token: "{{ digitalocean_token }}"
+        name: "{{ check.name }}"
+        unique_name: true
+      register: delete_result_again
+
+    - name: 02_create_delete_unique_name | Verify delete Uptime check idempotency
+      ansible.builtin.assert:
+        that:
+          - not delete_result_again.changed
+          - delete_result_again.msg == "No Uptime check named " ~ check.name

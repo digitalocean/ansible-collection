@@ -138,6 +138,9 @@ There is a [pyproject.toml](./pyproject.toml) is the root of this repository as 
 | `digitalocean.cloud.ssh_keys_info`                  | Get SSH keys                                 |
 | `digitalocean.cloud.tag`                            | Create and delete tags                       |
 | `digitalocean.cloud.tags_info`                      | Get tags                                     |
+| `digitalocean.cloud.uptime_check`                   | Create and delete Uptime checks              |
+| `digitalocean.cloud.uptime_checks_info`             | Get Uptime checks                            |
+| `digitalocean.cloud.uptime_checks_state_info`       | Get Uptime checks state                      |
 | `digitalocean.cloud.volume`                         | Create and delete volumes                    |
 | `digitalocean.cloud.volume_action`                  | Create and delete volume actions             |
 | `digitalocean.cloud.volume_snapshot`                | Create and delete volume snapshots           |

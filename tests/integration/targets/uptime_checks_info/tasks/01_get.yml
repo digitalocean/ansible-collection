@@ -1,0 +1,37 @@
+---
+# code: language=ansible
+- name: 01_get | Testing block
+  block:
+    - name: 01_get | Get Uptime checks
+      digitalocean.cloud.uptime_checks_info:
+        state: present
+        token: "{{ digitalocean_token }}"
+      register: result
+
+    - name: 01_get | Verify get Uptime checks
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.checks is iterable
+
+    - name: 01_get | Verify get Uptime checks structure when not exists
+      when: not (result.checks | length)
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.checks == []
+          - result.msg == "No Uptime checks"
+
+    - name: 01_get | Verify get Uptime checks structure when exists
+      when: result.checks | length
+      ansible.builtin.assert:
+        that:
+          - check.enabled is boolean
+          - check.id is string and check.id | length
+          - check.name is string and check.name | length
+          - check.regions is iterable
+          - check.target is string and check.target | length
+          - check.type is string and check.type in ["ping", "http", "https"]
+      loop: "{{ result.checks }}"
+      loop_control:
+        loop_var: check

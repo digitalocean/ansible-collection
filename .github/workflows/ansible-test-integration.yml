@@ -68,6 +68,9 @@ jobs:
           - ssh_keys_info
           - tag
           - tags_info
+          - uptime_check
+          - uptime_checks_info
+          - uptime_checks_state_info
           - volume
           - volume_action
           - volume_snapshot
