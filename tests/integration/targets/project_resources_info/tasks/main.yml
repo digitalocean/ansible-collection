@@ -1,0 +1,18 @@
+---
+# code: language=ansible
+- name: Testing block
+  block:
+    - name: Setup
+      ansible.builtin.include_tasks:
+        file: 00_setup.yml
+
+    - name: Get default project resources
+      ansible.builtin.include_tasks:
+        file: 01_get_default.yml
+
+    - name: Get specific project resources
+      ansible.builtin.include_tasks:
+        file: 02_get_one.yml
+      loop: "{{ project_ids }}"
+      loop_control:
+        loop_var: project_id

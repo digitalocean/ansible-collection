@@ -126,7 +126,9 @@ There is a [pyproject.toml](./pyproject.toml) is the root of this repository as 
 | `digitalocean.cloud.monitoring_alert_policies_info` | Get monitoring alert policies                |
 | `digitalocean.cloud.monitoring_alert_policy`        | Create and deelete monitoring alert policies |
 | `digitalocean.cloud.one_clicks_info`                | Get 1-Clicks                                 |
+| `digitalocean.cloud.project`                        | Create and delete projects                   |
 | `digitalocean.cloud.projects_info`                  | Get projects                                 |
+| `digitalocean.cloud.projects_resources_info`        | Get projects resources                       |
 | `digitalocean.cloud.regions_info`                   | Get regions                                  |
 | `digitalocean.cloud.reserved_ip`                    | Create and delete reserved IP                |
 | `digitalocean.cloud.reserved_ips_info`              | Get reserved IPs                             |
