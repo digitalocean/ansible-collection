@@ -34,6 +34,7 @@ jobs:
           - cdn_endpoints_info
           - certificate
           - certificates_info
+          - container_registry_info
           - database_cluster
           - database_clusters_info
           - domain
@@ -54,15 +55,18 @@ jobs:
           - load_balancers_info
           - monitoring_alert_policies_info
           - monitoring_alert_policy
+          - one_click
           - one_clicks_info
           - project
           - projects_info
+          - project_resources_info
           - regions_info
           - reserved_ip
           - reserved_ips_info
           - sizes_info
           - snapshot
           - snapshots_info
+          - space
           - spaces_info
           - ssh_key
           - ssh_keys_info

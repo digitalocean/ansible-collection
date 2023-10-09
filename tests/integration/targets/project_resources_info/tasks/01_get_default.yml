@@ -1,0 +1,28 @@
+---
+# code: language=ansible
+- name: 01_get_default | Testing block
+  block:
+    - name: 01_get_default | Get project resources
+      digitalocean.cloud.project_resources_info:
+        token: "{{ digitalocean_token }}"
+      register: result
+
+    - name: 01_get_default | Verify project resources structure when no resources
+      when: result.project_resources | length == 0
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == "No project resources"
+          - result.project_resources == []
+
+    - name: 01_get_default | Verify project resources structure when resources
+      when: result.project_resources | length > 0
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == "Current project resources"
+          - result.project_resources[0] is mapping
+          - result.project_resources[0].assigned_at is string
+          - result.project_resources[0].links is mapping
+          - result.project_resources[0].status is string
+          - result.project_resources[0].urn is string

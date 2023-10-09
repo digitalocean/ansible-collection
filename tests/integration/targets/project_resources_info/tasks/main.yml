@@ -6,14 +6,13 @@
       ansible.builtin.include_tasks:
         file: 00_setup.yml
 
-    - name: Get all
+    - name: Get default project resources
       ansible.builtin.include_tasks:
-        file: 01_get_all.yml
-      vars:
-        spaces_region: "{{ item }}"
-      # TODO: Improve this: hoping one will have Spaces one will not
-      loop: "{{ spaces_regions }}"
+        file: 01_get_default.yml
 
-    - name: Get one
+    - name: Get specific project resources
       ansible.builtin.include_tasks:
         file: 02_get_one.yml
+      loop: "{{ project_ids }}"
+      loop_control:
+        loop_var: project_id

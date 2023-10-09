@@ -29,7 +29,8 @@ class DigitalOceanFunctions:
                     **kwargs,
                 )
                 if key:
-                    results.extend(resp.get(key))
+                    if resp.get(key):
+                        results.extend(resp.get(key))
                 else:
                     results.extend(resp)
                 links = resp.get("links")

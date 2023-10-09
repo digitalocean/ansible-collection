@@ -1,0 +1,29 @@
+---
+# code: language=ansible
+- name: 01_get | Testing block
+  block:
+    - name: 01_get | Get Container Registry
+      when: true
+      digitalocean.cloud.container_registry_info:
+        token: "{{ digitalocean_token }}"
+      register: result
+
+    - name: 01_get | Verify get Container Registry structure when exists
+      when: result.msg == "Current container registry"
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.registry is mapping
+          - result.registry.created_at is string
+          - result.registry.name is string
+          - result.registry.read_only is boolean
+          - result.registry.region is string
+          - result.registry.storage_usage_bytes is number
+          - result.registry.storage_usage_updated_at is string
+
+    - name: 01_get | Verify get Container Registry structure when not exists
+      when: result.msg == "No container registry"
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.registry == {}

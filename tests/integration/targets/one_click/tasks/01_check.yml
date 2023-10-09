@@ -1,0 +1,18 @@
+---
+# code: language=ansible
+- name: 01_check | Testing block
+  block:
+    - name: 01_check | Test check mode
+      digitalocean.cloud.one_click:
+        state: present
+        token: "{{ digitalocean_token }}"
+        addon_slugs: "{{ addon_slugs }}"
+        cluster_uuid: "{{ cluster_uuid }}"
+      check_mode: true
+      register: result
+
+    - name: 01_check | Verify check mode
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Would install {{ addon_slugs | join(', ') }} into Kubernetes cluster {{ cluster_uuid }}"

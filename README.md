@@ -85,13 +85,14 @@ Every voice is important. If you have something on your mind, create an issue or
 
 ```text
 azure-core==1.26.1
+boto3==1.28.53 # For the Spaces modules
 pydo==0.1.4
 ```
 
 The following should install the requirements for your account:
 
 ```shell
-pip3 install --user azure-core==1.26.1 pydo==0.1.4
+pip3 install --user azure-core==1.26.1 boto3==1.28.53 pydo==0.1.4
 ```
 
 There is a [pyproject.toml](./pyproject.toml) is the root of this repository as well if you use [Poetry](https://python-poetry.org/) or similar.
@@ -106,6 +107,7 @@ There is a [pyproject.toml](./pyproject.toml) is the root of this repository as 
 | `digitalocean.cloud.cdn_endpoints_info`             | Get CDN endpoints                            |
 | `digitalocean.cloud.certificate`                    | Create and delete certificates               |
 | `digitalocean.cloud.certificate_info`               | Get certificates                             |
+| `digitalocean.cloud.container_registry_info`        | Get container registry                       |
 | `digitalocean.cloud.database_cluster_info`          | Get databases                                |
 | `digitalocean.cloud.domain`                         | Create and delete domains                    |
 | `digitalocean.cloud.domain_record`                  | Create and delete domain records             |
@@ -125,14 +127,18 @@ There is a [pyproject.toml](./pyproject.toml) is the root of this repository as 
 | `digitalocean.cloud.load_balancer_info`             | Get load balancers                           |
 | `digitalocean.cloud.monitoring_alert_policies_info` | Get monitoring alert policies                |
 | `digitalocean.cloud.monitoring_alert_policy`        | Create and deelete monitoring alert policies |
+| `digitalocean.cloud.one_click`                      | Install Kubernetes 1-Click applications      |
 | `digitalocean.cloud.one_clicks_info`                | Get 1-Clicks                                 |
+| `digitalocean.cloud.project`                        | Create and delete projects                   |
 | `digitalocean.cloud.projects_info`                  | Get projects                                 |
+| `digitalocean.cloud.projects_resources_info`        | Get projects resources                       |
 | `digitalocean.cloud.regions_info`                   | Get regions                                  |
 | `digitalocean.cloud.reserved_ip`                    | Create and delete reserved IP                |
 | `digitalocean.cloud.reserved_ips_info`              | Get reserved IPs                             |
 | `digitalocean.cloud.sizes_info`                     | Get sizes                                    |
 | `digitalocean.cloud.snapshot`                       | Create and delete snapshots                  |
 | `digitalocean.cloud.snapshots_info`                 | Get snapshots                                |
+| `digitalocean.cloud.space`                          | Create and delete Spaces                     |
 | `digitalocean.cloud.spaces_info`                    | Get Spaces                                   |
 | `digitalocean.cloud.ssh_key`                        | Create and delete SSH keys                   |
 | `digitalocean.cloud.ssh_keys_info`                  | Get SSH keys                                 |
