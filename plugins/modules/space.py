@@ -10,14 +10,14 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: spaces_info
+module: space
 
-short_description: List all of the Spaces in your account
+short_description: Manage Spaces
 
 version_added: 0.5.0
 
 description:
-  - List all of the Spaces in your account.
+  - Manage Spaces.
   - View the documentation at U(https://www.digitalocean.com/products/spaces).
 
 author: Mark Mercado (@mamercad)
@@ -30,18 +30,17 @@ requirements:
 options:
   name:
     description:
-      - The short name of the Space to list.
-      - If not provided all the Spaces in C(region) will be returned.
+      - The short name of the Space to create or delete.
       - |
         For example, given C(name=my-do-space) and C(region=nyc3), the managed
         Space will be U(https://my-do-space.nyc3.digitaloceanspace.com).
-    required: false
+    required: true
     type: str
   region:
     description:
-      - The region in which to list Spaces.
+      - The region in which to create or delete the Space.
       - The C(SPACES_REGION) environment variable will be used.
-    required: false
+    required: true
     type: str
   aws_access_key_id:
     description:
@@ -62,18 +61,13 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Get all Spaces in nyc3
-  digitalocean.cloud.spaces_info:
+- name: Create Space my-do-space in nyc3
+  digitalocean.cloud.space:
+    state: present
+    name: my-do-space
+    region: nyc3
     aws_access_key_id: "{{ aws_access_key_id}}"
     aws_secret_access_key: "{{ aws_secret_access_key}}"
-    region: "nyc3"
-
-- name: Get Space my-do-space in nyc3
-  digitalocean.cloud.spaces_info:
-    aws_access_key_id: "{{ aws_access_key_id}}"
-    aws_secret_access_key: "{{ aws_secret_access_key}}"
-    name: "my-do-space"
-    region: "nyc3"
 """
 
 
@@ -81,7 +75,7 @@ RETURN = r"""
 spaces:
   description: Current spaces.
   returned: always
-  type: list
+  type: dict
   elements: dict
   sample:
     endpoint_url: https://nyc3.digitaloceanspaces.com
@@ -99,14 +93,17 @@ error:
     HTTPHeaders: Header metadata key/values
     RetryAttempts': 0
 msg:
-  description: Spaces result information.
+  description: Space result information.
   returned: always
   type: str
   sample:
-    - Current Spaces in nyc3
-    - Existing Space named my-do-space in nyc3
-    - No Spaces in sfo3
-    - No Space named my-do-space in nyc3
+    - Created Space named my-do-space in nyc3
+    - Failed to create Space named my-do-space in nyc3
+    - No Spaces named my-do-space in nyc3, would create
+    - Existing Space named my-do-space in nyc3, would create
+    - Deleted Space named my-do-space in nyc3
+    - Failed to delete Space named my-do-space in nyc3
+    - Existing Space named my-do-space in nyc3, would delete
     - Failed to list Spaces in nyc3
 """
 
@@ -119,7 +116,7 @@ from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
 from ansible_collections.digitalocean.cloud.plugins.module_utils.spaces import Spaces
 
 
-class SpacesInformation(DigitalOceanCommonModule):
+class Space(DigitalOceanCommonModule):
     def __init__(self, module):
         super().__init__(module)
         self.name = module.params.get("name")
@@ -129,38 +126,83 @@ class SpacesInformation(DigitalOceanCommonModule):
         self.spaces = Spaces(module)
         if self.state == "present":
             self.present()
+        elif self.state == "absent":
+            self.absent()
+
+    def create(self):
+        spaces = self.spaces.create()
+
+        self.module.exit_json(
+            changed=True,
+            msg=f"Created Space named {self.name} in {self.region}",
+            spaces=spaces,
+        )
+
+    def delete(self):
+        self.spaces.delete()
+
+        self.module.exit_json(
+            changed=True,
+            msg=f"Deleted Space named {self.name } in {self.region}",
+            spaces=[],
+        )
 
     def present(self):
         spaces = self.spaces.get()
-        if spaces:
-            if self.name:
-                self.module.exit_json(
-                    changed=False,
-                    msg=f"Existing Space named {self.name} in {self.region}",
-                    spaces=spaces,
-                )
-            self.module.exit_json(
-                changed=False, msg=f"Current Spaces in {self.region}", spaces=spaces
-            )
 
-        if self.name:
+        if len(spaces) == 0:
+            if self.module.check_mode:
+                self.module.exit_json(
+                    changed=True,
+                    msg=f"No Spaces named {self.name} in {self.region}, would create",
+                    spaces=[],
+                )
+            self.create()
+
+        elif len(spaces) == 1:
             self.module.exit_json(
                 changed=False,
-                msg=f"No Space named {self.name} in {self.region}",
+                msg=f"Existing Space named {self.name} in {self.region}",
                 spaces=spaces,
             )
-        self.module.exit_json(
-            changed=False, msg=f"No Spaces in {self.region}", spaces=spaces
+
+        self.module.fail_json(
+            changed=False,
+            msg=f"There are {len(spaces)} Spaces named {self.name} in {self.region}, this should not happen",
+            spaces=spaces,
+        )
+
+    def absent(self):
+        spaces = self.spaces.get()
+
+        if len(spaces) == 0:
+            self.module.exit_json(
+                changed=False,
+                msg=f"No Spaces named {self.name} in {self.region}",
+                spaces=[],
+            )
+
+        elif len(spaces) == 1:
+            if self.module.check_mode:
+                self.module.exit_json(
+                    changed=True,
+                    msg=f"Existing Space named {self.name} in {self.region}, would delete",
+                    spaces=spaces[0],
+                )
+            self.delete()
+
+        self.module.fail_json(
+            changed=False,
+            msg=f"There are {len(spaces)} Spaces named {self.name} in {self.region}, this should not happen",
+            spaces=spaces,
         )
 
 
 def main():
     argument_spec = DigitalOceanOptions.argument_spec()
     argument_spec.update(
-        name=dict(type="str", required=False),
-        region=dict(
-            type="str", fallback=(env_fallback, ["SPACES_REGION"]), required=False
-        ),
+        name=dict(type="str", required=True),
+        region=dict(type="str", required=True),
         aws_access_key_id=dict(
             type="str",
             fallback=(
@@ -186,7 +228,7 @@ def main():
         module_override_options=dict(type="dict", required=False),
     )
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
-    SpacesInformation(module)
+    Space(module)
 
 
 if __name__ == "__main__":
