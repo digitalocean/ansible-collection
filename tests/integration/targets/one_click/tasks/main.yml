@@ -1,0 +1,15 @@
+---
+# code: language=ansible
+- name: Testing block
+  block:
+    - name: Setup
+      ansible.builtin.include_tasks:
+        file: 00_setup.yml
+
+    - name: Check
+      ansible.builtin.include_tasks:
+        file: 01_check.yml
+
+    - name: Fail
+      ansible.builtin.include_tasks:
+        file: 02_fail.yml
