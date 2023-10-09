@@ -107,6 +107,7 @@ There is a [pyproject.toml](./pyproject.toml) is the root of this repository as 
 | `digitalocean.cloud.cdn_endpoints_info`             | Get CDN endpoints                            |
 | `digitalocean.cloud.certificate`                    | Create and delete certificates               |
 | `digitalocean.cloud.certificate_info`               | Get certificates                             |
+| `digitalocean.cloud.container_registry_info`        | Get container registry                       |
 | `digitalocean.cloud.database_cluster_info`          | Get databases                                |
 | `digitalocean.cloud.domain`                         | Create and delete domains                    |
 | `digitalocean.cloud.domain_record`                  | Create and delete domain records             |
