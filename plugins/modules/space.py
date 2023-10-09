@@ -25,7 +25,7 @@ author: Mark Mercado (@mamercad)
 requirements:
   - pydo >= 0.1.3
   - azure-core >= 1.26.1
-  - boto3 >= 1.28.53
+  - boto3 >= 1.28.57
 
 options:
   name:
