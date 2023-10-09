@@ -292,19 +292,19 @@ typing = ["mypy", "pyre-check (>=0.9.17)", "types-aiofiles", "types-pyyaml"]
 
 [[package]]
 name = "antsibull-docs"
-version = "2.3.1"
+version = "2.5.0"
 description = "Tools for building Ansible documentation"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "antsibull_docs-2.3.1-py3-none-any.whl", hash = "sha256:d37b102a2bf4d8fa821f85c6502c0c22024f65d61b66004d323c2b359534d58a"},
-    {file = "antsibull_docs-2.3.1.tar.gz", hash = "sha256:02bf622bcb4bb95611d5b78ffecc0a30da5aa1e1d2b7c3737f3497e288f20326"},
+    {file = "antsibull_docs-2.5.0-py3-none-any.whl", hash = "sha256:fcdec9bea3d92352ea26999ed8ed5f081b5d7c8af115cb25152924b2aaa47e70"},
+    {file = "antsibull_docs-2.5.0.tar.gz", hash = "sha256:2b315bc52cb489d1accca076ca922e5c7c0b562795ab7cd29354370f40e1155d"},
 ]
 
 [package.dependencies]
 aiohttp = ">=3.0.0"
 ansible-pygments = "*"
-antsibull-core = ">=2.0.0,<3.0.0"
+antsibull-core = ">=2.1.0,<3.0.0"
 antsibull-docs-parser = ">=1.0.0,<2.0.0"
 asyncio-pool = "*"
 docutils = "*"
@@ -2736,4 +2736,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9"
-content-hash = "1398d49338958e3948aa68912cad6ad6b8d4916c46ad89577b8661056abb5c91"
+content-hash = "d63b06fc3ab9a34383224578b21c672f1d849d261433c2155718da733a2774aa"
