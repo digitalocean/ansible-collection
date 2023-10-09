@@ -1,0 +1,4 @@
+---
+# code: language=ansible
+check_name: ansible-gh-ci-check-0
+check_id: 9b71ecc1-289c-4f95-902e-3427a36c2918

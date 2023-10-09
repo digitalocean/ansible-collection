@@ -1,0 +1,6 @@
+check:
+  name: "ansible-gh-ci-check-{{ pr_number | default(0, true) }}"
+  type: ping
+  target: api.digitalocean.com
+  regions: [us_east]
+  enabled: true

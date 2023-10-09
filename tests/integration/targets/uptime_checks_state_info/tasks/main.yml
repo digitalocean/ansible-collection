@@ -1,0 +1,15 @@
+---
+# code: language=ansible
+- name: Testing block
+  block:
+    - name: Setup
+      ansible.builtin.include_tasks:
+        file: 00_setup.yml
+
+    - name: Get existing check state
+      ansible.builtin.include_tasks:
+        file: 01_get_existing.yml
+
+    - name: Get non-existent check state
+      ansible.builtin.include_tasks:
+        file: 02_get_non_existent.yml
