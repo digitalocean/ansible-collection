@@ -349,15 +349,13 @@ def main():
         required_if=[
             ("state", "present", ["name", "type", "target", "regions", "enabled"]),
             ("state", "absent", ["name", "check_id"], True),
+            ("unique_name", "true", ["name"], True),
         ],
         required_one_of=[
             ("name", "check_id"),
         ],
         mutually_exclusive=[
             ("name", "check_id"),
-        ],
-        required_together=[
-            ("unique_name", "name"),
         ],
     )
     UptimeCheck(module)
