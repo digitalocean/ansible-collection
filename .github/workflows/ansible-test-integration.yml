@@ -64,6 +64,7 @@ jobs:
           - sizes_info
           - snapshot
           - snapshots_info
+          - space
           - spaces_info
           - ssh_key
           - ssh_keys_info

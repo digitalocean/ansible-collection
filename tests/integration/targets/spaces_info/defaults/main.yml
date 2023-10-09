@@ -1,0 +1,17 @@
+---
+# code: language=ansible
+spaces_tld: digitaloceanspaces.com
+
+spaces_regions:
+  - nyc3
+  - sfo3
+
+# NOTE: Expected that this exists
+space_exists:
+  name: ansible-gh-ci-space-0
+  region: nyc3
+
+# NOTE: Expected that this does not exist
+space_not_exists:
+  name: ansible-gh-ci-space-0-no-way-this-exists
+  region: nyc3

@@ -1,0 +1,79 @@
+---
+# code: language=ansible
+- name: 01_create_delete | Testing block
+  block:
+    - name: 01_create_delete | Create Space
+      digitalocean.cloud.space:
+        state: present
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        name: "{{ space.name }}"
+        region: "{{ space.region }}"
+      register: result
+
+    - name: 01_create_delete | Verify create Space
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created Space named " ~ space.name ~ " in " ~ space.region
+          - result.spaces | length == 1
+          - result.spaces[0].endpoint_url == "https://{{ space.region }}.{{ spaces_tld }}"
+          - result.spaces[0].name == space.name
+          - result.spaces[0].region == space.region
+          - result.spaces[0].space_url == "https://{{ space.name }}.{{ space.region }}.{{ spaces_tld }}"
+
+    - name: 01_create_delete | Create Space again
+      digitalocean.cloud.space:
+        state: present
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        name: "{{ space.name }}"
+        region: "{{ space.region }}"
+      register: result
+
+    - name: 01_create_delete | Verify create Space idempotency
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == "Existing Space named " ~ space.name ~ " in " ~ space.region
+          - result.spaces | length == 1
+          - result.spaces[0].endpoint_url == "https://{{ space.region }}.{{ spaces_tld }}"
+          - result.spaces[0].name == space.name
+          - result.spaces[0].region == space.region
+          - result.spaces[0].space_url == "https://{{ space.name }}.{{ space.region }}.{{ spaces_tld }}"
+
+    - name: 01_create_delete | Sleep for a minute
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: 01_create_delete | Delete Space
+      digitalocean.cloud.space:
+        state: absent
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        name: "{{ space.name }}"
+        region: "{{ space.region }}"
+      register: result
+
+    - name: 01_create_delete | Verify delete Space
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Deleted Space named " ~ space.name ~ " in " ~ space.region
+          - result.spaces | length == 0
+
+    - name: 01_create_delete | Delete Space again
+      digitalocean.cloud.space:
+        state: absent
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        name: "{{ space.name }}"
+        region: "{{ space.region }}"
+      register: result
+
+    - name: 01_create_delete | Verify delete Space idempotency
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == "No Spaces named " ~ space.name ~ " in " ~ space.region
+          - result.spaces | length == 0
