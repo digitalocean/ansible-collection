@@ -54,6 +54,7 @@ jobs:
           - load_balancers_info
           - monitoring_alert_policies_info
           - monitoring_alert_policy
+          - one_click
           - one_clicks_info
           - project
           - projects_info
@@ -64,6 +65,7 @@ jobs:
           - sizes_info
           - snapshot
           - snapshots_info
+          - space
           - spaces_info
           - ssh_key
           - ssh_keys_info
