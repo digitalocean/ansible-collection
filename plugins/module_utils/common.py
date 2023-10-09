@@ -223,6 +223,15 @@ class DigitalOceanCommonModule(DigitalOceanReqs):
         self.client = DigitalOceanReqs.Client(**self.client_options)
         self.state = module.params.get("state")
 
+    @staticmethod
+    def http_response_error(module, err: dict) -> None:
+        error = {
+            "Message": err.error.message,
+            "Status Code": err.status_code,
+            "Reason": err.reason,
+        }
+        module.fail_json(changed=False, msg=error.get("Message"), error=error, check=[])
+
 
 class DigitalOceanCommonInventory(DigitalOceanReqs):
     def __init__(self, config):

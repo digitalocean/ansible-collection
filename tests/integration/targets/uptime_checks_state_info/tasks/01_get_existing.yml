@@ -1,0 +1,37 @@
+---
+# code: language=ansible
+- name: 01_get_existing | Testing block
+  block:
+    - name: 01_get_existing | Get Uptime check state by ID
+      digitalocean.cloud.uptime_checks_state_info:
+        state: present
+        token: "{{ digitalocean_token }}"
+        check_id: "{{ check_id }}"
+      register: result
+
+    - name: 01_get_existing | Verify get Uptime check state by ID
+      when: result.state | length
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == "Current Uptime check " ~ check_id ~ " state"
+          - result.state.alert_count is number
+          - result.state.previous_outage is mapping
+          - result.state.regions is mapping
+
+    - name: 01_get_existing | Get Uptime check state by name
+      digitalocean.cloud.uptime_checks_state_info:
+        state: present
+        token: "{{ digitalocean_token }}"
+        name: "{{ check_name }}"
+      register: result
+
+    - name: 01_get_existing | Verify get Uptime check state by name
+      when: result.state | length
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == "Current Uptime check named " ~ check_name ~ " state"
+          - result.state.alert_count is number
+          - result.state.previous_outage is mapping
+          - result.state.regions is mapping

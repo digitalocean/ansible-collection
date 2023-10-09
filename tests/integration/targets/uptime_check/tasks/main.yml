@@ -1,0 +1,15 @@
+---
+# code: language=ansible
+- name: Testing block
+  block:
+    - name: Setup
+      ansible.builtin.include_tasks:
+        file: 00_setup.yml
+
+    - name: Create and delete not unique name
+      ansible.builtin.include_tasks:
+        file: 01_create_delete_not_unique_name.yml
+
+    - name: Create and delete unique name
+      ansible.builtin.include_tasks:
+        file: 02_create_delete_unique_name.yml
