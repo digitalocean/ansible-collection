@@ -248,7 +248,7 @@ localhost                  : ok=1    changed=0    unreachable=0    failed=0    s
         unique_name: true
 ```
 
-> **Note**
+> [!NOTE]
 > DigitalOcean does not require Droplet names to be unique - this functionality is enforced by the
 > `digitalocean.cloud.droplet` module in conjunction with its `unique_name` parameter.
 
