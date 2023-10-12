@@ -187,7 +187,7 @@ Please read [this](https://docs.digitalocean.com/reference/api/create-personal-a
 Output should look similar to the following:
 
 ```shell
-❯ ANSIBLE_STDOUT_CALLBACK=yaml ansible-playbook -i localhost, -c local playbooks/account_info.yml -v
+❯ ANSIBLE_STDOUT_CALLBACK=community.general.yaml ansible-playbook -i localhost, -c local playbooks/account_info.yml -v
 Using /Users/mmercado/.ansible.cfg as config file
 
 PLAY [Account info] **********************************************************************************************
@@ -213,6 +213,44 @@ ok: [localhost] => changed=false
 PLAY RECAP *******************************************************************************************************
 localhost                  : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
+
+[This](./playbooks/droplet.yml) is a sample playbook which registers an SSH key and a Droplet which uses it:
+
+```yaml
+---
+- name: Create SSH key and Droplet
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  vars:
+    digitalocean_token: "{{ lookup('ansible.builtin.env', 'DIGITALOCEAN_TOKEN') }}"
+    public_key: "{{ lookup('ansible.builtin.file', ansible_env['HOME'] ~ '/.ssh/sammy.key.pub') }}"
+
+  tasks:
+    - name: Create SSH key
+      digitalocean.cloud.ssh_key:
+        state: present
+        token: "{{ digitalocean_token }}"
+        public_key: "{{ public_key }}"
+        name: "sammy"
+      register: ssh_key
+
+    - name: Create Droplet
+      digitalocean.cloud.droplet:
+        state: present
+        token: "{{ digitalocean_token }}"
+        name: sammy-droplet
+        region: nyc3
+        size: s-1vcpu-2gb
+        image: ubuntu-22-04-x64
+        ssh_keys: ["{{ ssh_key.ssh_key.id }}"]
+        unique_name: true
+```
+
+> **Note**
+> DigitalOcean does not require Droplet names to be unique - this functionality is enforced by the
+> `digitalocean.cloud.droplet` module in conjunction with its `unique_name` parameter.
 
 [This](./inventory/digitalocean.yml) is a sample inventory plugin file which returns the Droplets in your account:
 
@@ -361,10 +399,10 @@ ansible-galaxy collection install digitalocean.cloud --upgrade
 ```
 
 You can also install a specific version of the collection, for example, if you need to downgrade when something is broken in the latest version (please report an issue in this repository).
-Use the following syntax to install version `0.2.0`:
+Use the following syntax to install version `0.5.0`:
 
 ```shell
-ansible-galaxy collection install digitalocean.cloud:==0.2.0
+ansible-galaxy collection install digitalocean.cloud:==0.5.0
 ```
 
 See [Ansible Using collections](https://docs.ansible.com/ansible/devel/user_guide/collections_using.html) for more details.
