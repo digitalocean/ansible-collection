@@ -1,2 +1,0 @@
-minor_changes:
-  - ci - configure dependabot for grouped dependency updates (https://github.com/digitalocean/ansible-collection/pull/84).

@@ -241,3 +241,37 @@ releases:
         name: droplets
         namespace: null
     release_date: '2023-09-25'
+  0.5.0:
+    changes:
+      minor_changes:
+      - ci - configure dependabot for grouped dependency updates (https://github.com/digitalocean/ansible-collection/pull/84).
+    fragments:
+    - 84-grouped-dependabot.yml
+    - 86-dependabot-bumps.yml
+    - 87-dependency-updates.yml
+    modules:
+    - description: Get information about your container registry
+      name: container_registry_info
+      namespace: ''
+    - description: Install Kubernetes 1-Click applications
+      name: one_click
+      namespace: ''
+    - description: Retrieve a list of all of the project resources in your account
+      name: project_resources_info
+      namespace: ''
+    - description: Manage Spaces
+      name: space
+      namespace: ''
+    - description: List all of the Spaces in your account
+      name: spaces_info
+      namespace: ''
+    - description: Create or delete Uptime checks
+      name: uptime_check
+      namespace: ''
+    - description: List all of the Uptime checks on your account
+      name: uptime_checks_info
+      namespace: ''
+    - description: Get the state of an Uptime check
+      name: uptime_checks_state_info
+      namespace: ''
+    release_date: '2023-10-12'

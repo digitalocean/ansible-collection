@@ -5,6 +5,26 @@ DigitalOcean Collection Release Notes
 .. contents:: Topics
 
 
+v0.5.0
+======
+
+Minor Changes
+-------------
+
+- ci - configure dependabot for grouped dependency updates (https://github.com/digitalocean/ansible-collection/pull/84).
+
+New Modules
+-----------
+
+- container_registry_info - Get information about your container registry
+- one_click - Install Kubernetes 1-Click applications
+- project_resources_info - Retrieve a list of all of the project resources in your account
+- space - Manage Spaces
+- spaces_info - List all of the Spaces in your account
+- uptime_check - Create or delete Uptime checks
+- uptime_checks_info - List all of the Uptime checks on your account
+- uptime_checks_state_info - Get the state of an Uptime check
+
 v0.4.0
 ======
 
