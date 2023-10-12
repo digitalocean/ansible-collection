@@ -23,7 +23,7 @@ description:
 author: Mark Mercado (@mamercad)
 
 requirements:
-  - pydo >= 0.1.3
+  - pydo >= 0.1.6
   - azure-core >= 1.26.1
 
 options:
