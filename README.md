@@ -7,12 +7,12 @@
      height=300>
 </p>
 
-This repository contains the [`digitalocean.cloud`](https://galaxy.ansible.com/digitalocean/cloud) Ansible Collection.
-This is a grounds-up rewrite of the [`community.digitalocean`](https://galaxy.ansible.com/community/digitalocean) Ansible collection, leveraging [PyDO](https://github.com/digitalocean/pydo).
+This repository contains the [`digitalocean.cloud`](https://galaxy.ansible.com/ui/repo/published/digitalocean/cloud/) Ansible Collection.
+This is a grounds-up rewrite of the [`community.digitalocean`](https://galaxy.ansible.com/ui/repo/published/community/digitalocean/) Ansible collection, leveraging [PyDO](https://github.com/digitalocean/pydo).
 
 ## DigitalOcean Collection for Ansible
 
-[![Ansible Collection](https://img.shields.io/ansible/collection/2624?logo=digitalocean&label=Ansible%20Collection&color=%230080FF)](https://galaxy.ansible.com/digitalocean/cloud)
+[![Ansible Collection](https://img.shields.io/badge/digitalocean.cloud-badge?logo=digitalocean&label=Ansible%20Collection&color=%230080FF)]([https://galaxy.ansible.com/digitalocean/cloud](https://galaxy.ansible.com/ui/repo/published/digitalocean/cloud/))
 [![Latest Release](https://img.shields.io/github/v/release/digitalocean/ansible-collection?include_prereleases&label=Latest%20release&color=%230080FF)](https://github.com/digitalocean/ansible-collection/releases)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/7862/badge)](https://www.bestpractices.dev/projects/7862)
 
@@ -424,7 +424,7 @@ In general, the steps are as follow:
 5. Once all tests pass and approvals are finalized, merge the pull request
 6. After tests pass after the merge into `main`, create and push the `vX.Y.Z` based off of the merge commit
 7. After the release tag is pushed, create the corresponding GitHub Release for the tag (choosing "automatically generate release notes" is fine) and set it as the latest release
-8. After [this workflow](./.github/workflows/publish-galaxy.yml) passes the new version of the collection should appear on [Ansible Galaxy](https://galaxy.ansible.com/digitalocean/cloud) (it is triggered from tags of the form `v*`)
+8. After [this workflow](./.github/workflows/publish-galaxy.yml) passes the new version of the collection should appear on [Ansible Galaxy](https://galaxy.ansible.com/ui/repo/published/community/digitalocean/) (it is triggered from tags of the form `v*`)
 
 ## Roadmap
 
