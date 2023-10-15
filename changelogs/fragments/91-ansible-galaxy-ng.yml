@@ -1,0 +1,2 @@
+trivial:
+  - docs - fix broken links due to Ansible Galaxy NG launch (https://github.com/digitalocean/ansible-collection/pull/91).
