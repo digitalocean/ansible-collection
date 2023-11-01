@@ -1,0 +1,2 @@
+trivial:
+  - tests - bump Kubernetes version in its integration test (https://github.com/digitalocean/ansible-collection/issues/100).
