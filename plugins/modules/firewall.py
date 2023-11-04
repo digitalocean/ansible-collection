@@ -65,7 +65,6 @@ extends_documentation_fragment:
   - digitalocean.cloud.common.documentation
 """
 
-
 EXAMPLES = r"""
 - name: Create firewall
   digitalocean.cloud.firewall:
@@ -83,12 +82,11 @@ EXAMPLES = r"""
         ports: 80
         destinations:
           - addresses:
-            - "0.0.0.0/0"
-            - "::/0"
+              - "0.0.0.0/0"
+              - "::/0"
     droplet_ids:
       - 8043964
 """
-
 
 RETURN = r"""
 firewall:
