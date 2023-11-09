@@ -1,0 +1,28 @@
+name: Lint Checks
+
+on:
+  pull_request:
+
+jobs:
+  lint:
+    name: "Ansible Lint"
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependency manager
+        run: pipx install poetry
+
+      - name: Set up Python 3.x
+        id: setup-python
+        uses: actions/setup-python@v4.7.1
+        with:
+          python-version-file: pyproject.toml
+          cache: 'poetry'
+
+      - name: Install packages
+        run: poetry install --no-interaction
+
+      - name: Lint
+        run: make lint

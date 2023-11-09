@@ -9,13 +9,12 @@
     public_key: "{{ lookup('ansible.builtin.file', ansible_env['HOME'] ~ '/.ssh/sammy.key.pub') }}"
 
   tasks:
-
     - name: Create SSH key
       digitalocean.cloud.ssh_key:
         state: present
         token: "{{ digitalocean_token }}"
         public_key: "{{ public_key }}"
-        name: "sammy"
+        name: sammy
       register: ssh_key
 
     - name: Create Droplet
