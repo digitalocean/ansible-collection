@@ -8,10 +8,10 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "~3.9"
-ansible-core = "^2.15.3"
+ansible-core = "^2.15.6"
 azure-core = "^1.29.5"
 pydo = "^0.1.7"
-boto3 = "^1.28.78"
+boto3 = "^1.28.84"
 jmespath = "^1.0.1"
 setuptools = "68.2.2"
 
