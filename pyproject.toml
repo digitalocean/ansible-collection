@@ -10,10 +10,10 @@ readme = "README.md"
 python = "~3.9"
 ansible-core = "^2.15.6"
 azure-core = "^1.29.5"
-pydo = "^0.1.7"
-boto3 = "^1.29.3"
+pydo = "^0.2.0"
+boto3 = "^1.33.6"
 jmespath = "^1.0.1"
-setuptools = "68.2.2"
+setuptools = "69.0.2"
 
 [tool.poetry.group.dev.dependencies]
 ansible-lint = { version = "^6.22.0", markers = "platform_system != 'Windows'" }
