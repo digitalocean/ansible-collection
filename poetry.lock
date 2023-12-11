@@ -280,13 +280,13 @@ typing = ["mypy", "pyre-check (>=0.9.17)", "types-aiofiles", "types-pyyaml"]
 
 [[package]]
 name = "antsibull-docs"
-version = "2.5.0"
+version = "2.6.0"
 description = "Tools for building Ansible documentation"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "antsibull_docs-2.5.0-py3-none-any.whl", hash = "sha256:fcdec9bea3d92352ea26999ed8ed5f081b5d7c8af115cb25152924b2aaa47e70"},
-    {file = "antsibull_docs-2.5.0.tar.gz", hash = "sha256:2b315bc52cb489d1accca076ca922e5c7c0b562795ab7cd29354370f40e1155d"},
+    {file = "antsibull_docs-2.6.0-py3-none-any.whl", hash = "sha256:4bb1fafc0b2135ad507ae6d35bbbe7ea6251ed8ee6da1436426bb1619cb6b8d6"},
+    {file = "antsibull_docs-2.6.0.tar.gz", hash = "sha256:7d639660389ae96528b740c62d3423910b366395939677b32eabdf41f4a63c2f"},
 ]
 
 [package.dependencies]
@@ -1492,13 +1492,13 @@ tests = ["pytest (>=5.4.1)", "pytest-cov (>=2.8.1)", "pytest-mypy (>=0.8.0)", "p
 
 [[package]]
 name = "pre-commit"
-version = "3.5.0"
+version = "3.6.0"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "pre_commit-3.5.0-py2.py3-none-any.whl", hash = "sha256:841dc9aef25daba9a0238cd27984041fa0467b4199fc4852e27950664919f660"},
-    {file = "pre_commit-3.5.0.tar.gz", hash = "sha256:5804465c675b659b0862f07907f96295d490822a450c4c40e747d0b1c6ebcb32"},
+    {file = "pre_commit-3.6.0-py2.py3-none-any.whl", hash = "sha256:c255039ef399049a5544b6ce13d135caba8f2c28c3b4033277a788f434308376"},
+    {file = "pre_commit-3.6.0.tar.gz", hash = "sha256:d30bad9abf165f7785c15a21a1f46da7d0677cb00ee7ff4c579fd38922efe15d"},
 ]
 
 [package.dependencies]
@@ -2610,4 +2610,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9"
-content-hash = "cca3748c6a490e4265e0e3af0df6fa49a15ebfd9dd58c6a90cc6e1bff3aefa70"
+content-hash = "cbd364fbbc7e3e35901b79d243086b7365a649da5504c1a599cbab786af39786"
