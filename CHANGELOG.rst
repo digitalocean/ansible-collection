@@ -5,6 +5,16 @@ DigitalOcean Collection Release Notes
 .. contents:: Topics
 
 
+v0.5.1
+======
+
+Trivial Changes
+---------------
+
+- docs - fix broken links due to Ansible Galaxy NG launch (https://github.com/digitalocean/ansible-collection/pull/91).
+- tests - bump Kubernetes version in its integration test (https://github.com/digitalocean/ansible-collection/issues/100).
+- lint - tweaked ansible-lint configuration so production profile is now the target for this repo (https://github.com/digitalocean/ansible-collection/pull/104).
+
 v0.5.0
 ======
 
