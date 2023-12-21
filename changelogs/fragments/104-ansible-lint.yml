@@ -1,2 +1,0 @@
-trivial:
-  - lint - tweaked ansible-lint configuration so production profile is now the target for this repo (https://github.com/digitalocean/ansible-collection/pull/104).

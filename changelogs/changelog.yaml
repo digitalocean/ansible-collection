@@ -275,3 +275,10 @@ releases:
       name: uptime_checks_state_info
       namespace: ''
     release_date: '2023-10-12'
+  0.5.1:
+    changes: {}
+    fragments:
+    - 100-bump-kubernetes-version.yml
+    - 104-ansible-lint.yml
+    - 91-ansible-galaxy-ng.yml
+    release_date: '2023-12-21'
