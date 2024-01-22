@@ -1,0 +1,2 @@
+trivial:
+  - ci - bump Kubernetes slug to `1.28.5-do.0` (https://github.com/digitalocean/ansible-collection/issues/133).
