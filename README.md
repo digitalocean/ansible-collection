@@ -76,9 +76,9 @@ Every voice is important. If you have something on your mind, create an issue or
 
 | Ansible       | Python |
 | ------------- | ------ |
-| `stable-2.13` | `3.9`  |
 | `stable-2.14` | `3.9`  |
 | `stable-2.15` | `3.10` |
+| `stable-2.16` | `3.10` |
 | `devel`       | `3.10` |
 
 ## External requirements
