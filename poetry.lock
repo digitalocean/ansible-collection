@@ -279,13 +279,13 @@ typing = ["mypy", "pyre-check (>=0.9.17)", "types-aiofiles", "types-pyyaml"]
 
 [[package]]
 name = "antsibull-docs"
-version = "2.6.1"
+version = "2.7.0"
 description = "Tools for building Ansible documentation"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "antsibull_docs-2.6.1-py3-none-any.whl", hash = "sha256:3d6bc4427e9149429bd71560e65603e252f5160c0ed3d4059a94bba1343b1b1d"},
-    {file = "antsibull_docs-2.6.1.tar.gz", hash = "sha256:7505cc9d8fbd6e8d20ab83f8bc7eefa157c0a14c032ca56e1828155f77fc46a0"},
+    {file = "antsibull_docs-2.7.0-py3-none-any.whl", hash = "sha256:ea03090176a406896c952eaa26399161a4e0d4376f0c4e2fe88db0a8a421ad95"},
+    {file = "antsibull_docs-2.7.0.tar.gz", hash = "sha256:925c41de0b4249708f331f477c73dfd424066771d2db865faef837eb64842e04"},
 ]
 
 [package.dependencies]
@@ -296,8 +296,8 @@ antsibull-docs-parser = ">=1.0.0,<2.0.0"
 asyncio-pool = "*"
 docutils = "*"
 jinja2 = ">=3.0"
-packaging = "*"
-pydantic = ">=1.0.0,<2.0.0"
+packaging = ">=20.0"
+pydantic = ">=1.0.0,<3.0.0"
 pyyaml = "*"
 rstcheck = ">=3.0.0,<7.0.0"
 semantic-version = "*"
@@ -308,7 +308,7 @@ twiggy = "*"
 codeqa = ["antsibull-changelog", "flake8 (>=3.8.0)", "pylint (>=2.17.2)", "reuse"]
 coverage = ["coverage[toml]"]
 dev = ["antsibull-docs[codeqa]", "antsibull-docs[formatters]", "antsibull-docs[test]", "antsibull-docs[typing]", "nox"]
-formatters = ["black", "isort"]
+formatters = ["black (>=24)", "isort"]
 test = ["ansible-core (>=2.14.0)", "asynctest", "cryptography", "pytest", "pytest-asyncio (>=0.12)", "pytest-cov", "pytest-error-for-skips"]
 typing = ["mypy", "pyre-check (>=0.9.17)", "types-aiofiles", "types-docutils", "types-pyyaml"]
 
@@ -2614,4 +2614,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9"
-content-hash = "12106433e16998125132a5369aa39917c57703ee0fc4648ebb5e110aadd7e37f"
+content-hash = "47e22f0e2d5d8184514f7a30c18b3826c6e8cbbc794e5f05f65e945c05e9bc0b"
