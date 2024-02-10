@@ -2,7 +2,7 @@
 
 .PHONY: install
 install:
-	poetry install --with=dev
+	poetry install --no-root --with=dev
 	poetry run pre-commit install --install-hooks
 
 .PHONY: update
