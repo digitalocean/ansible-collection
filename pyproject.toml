@@ -18,10 +18,10 @@ setuptools = "69.0.3"
 [tool.poetry.group.dev.dependencies]
 ansible-lint = { version = "^6.22.2", markers = "platform_system != 'Windows'" }
 black = "^24.1.1"
-pre-commit = "^3.6.0"
+pre-commit = "^3.6.1"
 pylint = "^3.0.3"
 pytest = "^8.0.0"
-antsibull-changelog = "^0.23.0"
+antsibull-changelog = "^0.24.0"
 antsibull-docs = "^2.7.0"
 autopep8 = "^2.0.4"
 
