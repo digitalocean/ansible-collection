@@ -1,0 +1,3 @@
+trivial:
+  - docs - add issue templates to this repo (https://github.com/digitalocean/ansible-collection/issues/144).
+  - ci - configure poetry to install with --no-root

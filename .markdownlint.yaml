@@ -1,2 +1,3 @@
-"MD013": false  # https://github.com/DavidAnson/markdownlint/blob/v0.25.1/doc/Rules.md#md013
-"MD033": false  # https://github.com/DavidAnson/markdownlint/blob/v0.25.1/doc/Rules.md#md033
+---
+MD013: false # https://github.com/DavidAnson/markdownlint/blob/v0.25.1/doc/Rules.md#md013
+MD033: false # https://github.com/DavidAnson/markdownlint/blob/v0.25.1/doc/Rules.md#md033

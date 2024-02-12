@@ -29,7 +29,7 @@
 	},
 
 	"updateContentCommand": "make install",
-	"postCreateCommand": "sudo apt update && sudo apt full-upgrade -y",
+	"postCreateCommand": "sudo apt update --fix-missing && sudo apt full-upgrade -y",
 	"postStartCommand": "git pull --prune; make install",
 
 	// Configure tool-specific properties.

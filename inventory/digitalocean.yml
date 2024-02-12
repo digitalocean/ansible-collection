@@ -1,3 +1,4 @@
+---
 plugin: digitalocean.cloud.droplets
 cache: true
 cache_plugin: ansible.builtin.jsonfile
@@ -31,16 +32,16 @@ compose:
 keyed_groups:
   - key: image.slug | default("null", true)
     prefix: image
-    separator: "_"
+    separator: _
   - key: tags
     prefix: tag
-    separator: "_"
+    separator: _
   - key: region.slug
     prefix: region_slug
-    separator: "_"
+    separator: _
   - key: status
     prefix: status
-    separator: "_"
+    separator: _
   - key: vpc_uuid
     prefix: vpc
 groups:
