@@ -221,13 +221,13 @@ pygments = ">=2.4.0"
 
 [[package]]
 name = "antsibull-changelog"
-version = "0.24.0"
-description = "Changelog tool for Ansible-base and Ansible collections"
+version = "0.25.0"
+description = "Changelog tool for Ansible-core and Ansible collections"
 optional = false
 python-versions = ">=3.9.0"
 files = [
-    {file = "antsibull_changelog-0.24.0-py3-none-any.whl", hash = "sha256:140f2b26ce76b6a3d8ce9d78baec12765bd747eab92aaba61bd676e0f8e4ed7e"},
-    {file = "antsibull_changelog-0.24.0.tar.gz", hash = "sha256:346596abe0e8a39958b1d63eb09a816bf04c6a24f7172a6d45c81a9ea5509bf9"},
+    {file = "antsibull_changelog-0.25.0-py3-none-any.whl", hash = "sha256:a74f85d07df23ed323c603204a5895aa7532cae0ffba11d5b48eccdf4e6ae80e"},
+    {file = "antsibull_changelog-0.25.0.tar.gz", hash = "sha256:dcba61fdb6721ae7afb5fd39805918289241cf45fe36d7b1d3346bdf8dcee2fa"},
 ]
 
 [package.dependencies]
@@ -1504,13 +1504,13 @@ tests = ["pytest (>=5.4.1)", "pytest-cov (>=2.8.1)", "pytest-mypy (>=0.8.0)", "p
 
 [[package]]
 name = "pre-commit"
-version = "3.6.1"
+version = "3.6.2"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "pre_commit-3.6.1-py2.py3-none-any.whl", hash = "sha256:9fe989afcf095d2c4796ce7c553cf28d4d4a9b9346de3cda079bcf40748454a4"},
-    {file = "pre_commit-3.6.1.tar.gz", hash = "sha256:c90961d8aa706f75d60935aba09469a6b0bcb8345f127c3fbee4bdc5f114cf4b"},
+    {file = "pre_commit-3.6.2-py2.py3-none-any.whl", hash = "sha256:ba637c2d7a670c10daedc059f5c49b5bd0aadbccfcd7ec15592cf9665117532c"},
+    {file = "pre_commit-3.6.2.tar.gz", hash = "sha256:c3ef34f463045c88658c5b99f38c1e297abdcc0ff13f98d3370055fbbfabc67e"},
 ]
 
 [package.dependencies]
@@ -1691,13 +1691,13 @@ tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
 
 [[package]]
 name = "pytest"
-version = "8.0.0"
+version = "8.0.1"
 description = "pytest: simple powerful testing with Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pytest-8.0.0-py3-none-any.whl", hash = "sha256:50fb9cbe836c3f20f0dfa99c565201fb75dc54c8d76373cd1bde06b06657bdb6"},
-    {file = "pytest-8.0.0.tar.gz", hash = "sha256:249b1b0864530ba251b7438274c4d251c58d868edaaec8762893ad4a0d71c36c"},
+    {file = "pytest-8.0.1-py3-none-any.whl", hash = "sha256:3e4f16fe1c0a9dc9d9389161c127c3edc5d810c38d6793042fb81d9f48a59fca"},
+    {file = "pytest-8.0.1.tar.gz", hash = "sha256:267f6563751877d772019b13aacbe4e860d73fe8f651f28112e9ac37de7513ae"},
 ]
 
 [package.dependencies]
@@ -2623,4 +2623,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9"
-content-hash = "f8cdee27a3b422875600b009a1f469d0c7e7e6b38950942bdf93165696c48f3a"
+content-hash = "1da7d0dd1e77cb347690391fe16738b60a210c0d4ce6dfb65eecd406b95b6627"
