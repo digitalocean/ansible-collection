@@ -279,18 +279,19 @@ typing = ["mypy", "pyre-check (>=0.9.17)", "types-aiofiles", "types-pyyaml"]
 
 [[package]]
 name = "antsibull-docs"
-version = "2.9.0"
+version = "2.10.0"
 description = "Tools for building Ansible documentation"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "antsibull_docs-2.9.0-py3-none-any.whl", hash = "sha256:89b3c8d32250c47f7174f224d26a60739b38022d1ae40193cfdad2912d47bd0f"},
-    {file = "antsibull_docs-2.9.0.tar.gz", hash = "sha256:d756c617114fc99b10d2b30d3a5e37ee4f6aca2e8dda1783f6d8635879c58709"},
+    {file = "antsibull_docs-2.10.0-py3-none-any.whl", hash = "sha256:b2c7bf2c771bbf34d3679b91f6196d4cc9c58a4e99fdcf0bcbebad7c50a1e646"},
+    {file = "antsibull_docs-2.10.0.tar.gz", hash = "sha256:e266dc18ee7ebe2ab2918a426c992d8ca422dfb891f2a2bb1f960c37af9af38e"},
 ]
 
 [package.dependencies]
 aiohttp = ">=3.0.0"
 ansible-pygments = "*"
+antsibull-changelog = ">=0.24.0"
 antsibull-core = ">=2.1.0,<4.0.0"
 antsibull-docs-parser = ">=1.0.0,<2.0.0"
 asyncio-pool = "*"
@@ -305,9 +306,9 @@ sphinx = "*"
 twiggy = "*"
 
 [package.extras]
-codeqa = ["antsibull-changelog", "flake8 (>=3.8.0)", "pylint (>=2.17.2)", "reuse"]
+codeqa = ["flake8 (>=3.8.0)", "pylint (>=2.17.2)", "reuse"]
 coverage = ["coverage[toml]"]
-dev = ["antsibull-docs[codeqa]", "antsibull-docs[formatters]", "antsibull-docs[test]", "antsibull-docs[typing]", "nox"]
+dev = ["ansible-core (>=2.14.0)", "asynctest", "black (>=24)", "cryptography", "flake8 (>=3.8.0)", "isort", "mypy", "nox", "pylint (>=2.17.2)", "pyre-check (>=0.9.17)", "pytest", "pytest-asyncio (>=0.12)", "pytest-cov", "pytest-error-for-skips", "reuse", "types-aiofiles", "types-docutils", "types-pyyaml"]
 formatters = ["black (>=24)", "isort"]
 test = ["ansible-core (>=2.14.0)", "asynctest", "cryptography", "pytest", "pytest-asyncio (>=0.12)", "pytest-cov", "pytest-error-for-skips"]
 typing = ["mypy", "pyre-check (>=0.9.17)", "types-aiofiles", "types-docutils", "types-pyyaml"]
@@ -2623,4 +2624,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9"
-content-hash = "a5ac50fb5e84dbe3caaa621f13e19a11db3e0b54b5b22ebaea9459b827f20c8a"
+content-hash = "c8dcf4e88768de2c9b09d23e7944e5b7e427171002a4ea970195db1e6ae84d34"
