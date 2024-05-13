@@ -279,13 +279,13 @@ typing = ["mypy", "pyre-check (>=0.9.17)", "types-aiofiles", "types-pyyaml"]
 
 [[package]]
 name = "antsibull-docs"
-version = "2.10.0"
+version = "2.11.0"
 description = "Tools for building Ansible documentation"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "antsibull_docs-2.10.0-py3-none-any.whl", hash = "sha256:b2c7bf2c771bbf34d3679b91f6196d4cc9c58a4e99fdcf0bcbebad7c50a1e646"},
-    {file = "antsibull_docs-2.10.0.tar.gz", hash = "sha256:e266dc18ee7ebe2ab2918a426c992d8ca422dfb891f2a2bb1f960c37af9af38e"},
+    {file = "antsibull_docs-2.11.0-py3-none-any.whl", hash = "sha256:110cbe8c22c8728f341e4cd914e3e200a9d37ed04412a7c059447a63e44166df"},
+    {file = "antsibull_docs-2.11.0.tar.gz", hash = "sha256:2eb252e05f33024210ac564435cb3ccd482285d21d42ac48241561db4c2240b3"},
 ]
 
 [package.dependencies]
@@ -1505,13 +1505,13 @@ tests = ["pytest (>=5.4.1)", "pytest-cov (>=2.8.1)", "pytest-mypy (>=0.8.0)", "p
 
 [[package]]
 name = "pre-commit"
-version = "3.7.0"
+version = "3.7.1"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "pre_commit-3.7.0-py2.py3-none-any.whl", hash = "sha256:5eae9e10c2b5ac51577c3452ec0a490455c45a0533f7960f993a0d01e59decab"},
-    {file = "pre_commit-3.7.0.tar.gz", hash = "sha256:e209d61b8acdcf742404408531f0c37d49d2c734fd7cff2d6076083d191cb060"},
+    {file = "pre_commit-3.7.1-py2.py3-none-any.whl", hash = "sha256:fae36fd1d7ad7d6a5a1c0b0d5adb2ed1a3bda5a21bf6c3e5372073d7a11cd4c5"},
+    {file = "pre_commit-3.7.1.tar.gz", hash = "sha256:8ca3ad567bc78a4972a3f1a477e94a79d4597e8140a6e0b651c5e33899c3654a"},
 ]
 
 [package.dependencies]
@@ -2624,4 +2624,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9"
-content-hash = "eeb92d995c37a24da3cf0d8df62bc97e67184582b245c3146f6ff36f749fe8dd"
+content-hash = "4e32804e0ef8c675a1a9df356ec168474a1dc4a432e935a09e3b071fdefb5a2b"
