@@ -221,13 +221,13 @@ pygments = ">=2.4.0"
 
 [[package]]
 name = "antsibull-changelog"
-version = "0.26.0"
+version = "0.27.0"
 description = "Changelog tool for Ansible-core and Ansible collections"
 optional = false
 python-versions = ">=3.9.0"
 files = [
-    {file = "antsibull_changelog-0.26.0-py3-none-any.whl", hash = "sha256:0a6aa5327790e89a686872fd452a9c31be288a3cb2deb9cc23eb3fc5ea7f0a19"},
-    {file = "antsibull_changelog-0.26.0.tar.gz", hash = "sha256:8060c438d9fb5a1025a1e98d4de0ce8d897be6e0c21014216151b93f4e4891ff"},
+    {file = "antsibull_changelog-0.27.0-py3-none-any.whl", hash = "sha256:f03a45d547ffcdd8fdf9cad2d8e91ee61dfaaef1ee226a35a866104a901ee5e8"},
+    {file = "antsibull_changelog-0.27.0.tar.gz", hash = "sha256:bc3ccce85f1cecc841c8493cf360453243d602f08b30823f378502b7c24031de"},
 ]
 
 [package.dependencies]
@@ -240,7 +240,7 @@ semantic-version = "*"
 [package.extras]
 codeqa = ["flake8 (>=3.8.0)", "pylint", "reuse"]
 coverage = ["coverage[toml]"]
-dev = ["antsibull-changelog[codeqa]", "antsibull-changelog[coverage]", "antsibull-changelog[formatters]", "antsibull-changelog[test]", "antsibull-changelog[typing]", "nox"]
+dev = ["black (>=24)", "coverage[toml]", "flake8 (>=3.8.0)", "isort", "mypy", "nox", "pylint", "pyre-check (>=0.9.17)", "pytest", "pytest-cov", "pytest-error-for-skips", "reuse", "types-docutils", "types-pyyaml", "types-toml"]
 formatters = ["black (>=24)", "isort"]
 test = ["pytest", "pytest-cov", "pytest-error-for-skips"]
 toml = ["tomli"]
@@ -279,13 +279,13 @@ typing = ["mypy", "pyre-check (>=0.9.17)", "types-aiofiles", "types-pyyaml"]
 
 [[package]]
 name = "antsibull-docs"
-version = "2.10.0"
+version = "2.11.0"
 description = "Tools for building Ansible documentation"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "antsibull_docs-2.10.0-py3-none-any.whl", hash = "sha256:b2c7bf2c771bbf34d3679b91f6196d4cc9c58a4e99fdcf0bcbebad7c50a1e646"},
-    {file = "antsibull_docs-2.10.0.tar.gz", hash = "sha256:e266dc18ee7ebe2ab2918a426c992d8ca422dfb891f2a2bb1f960c37af9af38e"},
+    {file = "antsibull_docs-2.11.0-py3-none-any.whl", hash = "sha256:110cbe8c22c8728f341e4cd914e3e200a9d37ed04412a7c059447a63e44166df"},
+    {file = "antsibull_docs-2.11.0.tar.gz", hash = "sha256:2eb252e05f33024210ac564435cb3ccd482285d21d42ac48241561db4c2240b3"},
 ]
 
 [package.dependencies]
@@ -334,13 +334,13 @@ typing = ["mypy", "pyre-check (>=0.9.17)"]
 
 [[package]]
 name = "astroid"
-version = "3.1.0"
+version = "3.2.2"
 description = "An abstract syntax tree for Python with inference support."
 optional = false
 python-versions = ">=3.8.0"
 files = [
-    {file = "astroid-3.1.0-py3-none-any.whl", hash = "sha256:951798f922990137ac090c53af473db7ab4e70c770e6d7fae0cec59f74411819"},
-    {file = "astroid-3.1.0.tar.gz", hash = "sha256:ac248253bfa4bd924a0de213707e7ebeeb3138abeb48d798784ead1e56d419d4"},
+    {file = "astroid-3.2.2-py3-none-any.whl", hash = "sha256:e8a0083b4bb28fcffb6207a3bfc9e5d0a68be951dd7e336d5dcf639c682388c0"},
+    {file = "astroid-3.2.2.tar.gz", hash = "sha256:8ead48e31b92b2e217b6c9733a21afafe479d52d6e164dd25fb1a770c7c3cf94"},
 ]
 
 [package.dependencies]
@@ -1505,13 +1505,13 @@ tests = ["pytest (>=5.4.1)", "pytest-cov (>=2.8.1)", "pytest-mypy (>=0.8.0)", "p
 
 [[package]]
 name = "pre-commit"
-version = "3.7.0"
+version = "3.7.1"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "pre_commit-3.7.0-py2.py3-none-any.whl", hash = "sha256:5eae9e10c2b5ac51577c3452ec0a490455c45a0533f7960f993a0d01e59decab"},
-    {file = "pre_commit-3.7.0.tar.gz", hash = "sha256:e209d61b8acdcf742404408531f0c37d49d2c734fd7cff2d6076083d191cb060"},
+    {file = "pre_commit-3.7.1-py2.py3-none-any.whl", hash = "sha256:fae36fd1d7ad7d6a5a1c0b0d5adb2ed1a3bda5a21bf6c3e5372073d7a11cd4c5"},
+    {file = "pre_commit-3.7.1.tar.gz", hash = "sha256:8ca3ad567bc78a4972a3f1a477e94a79d4597e8140a6e0b651c5e33899c3654a"},
 ]
 
 [package.dependencies]
@@ -1652,17 +1652,17 @@ tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
 
 [[package]]
 name = "pylint"
-version = "3.1.0"
+version = "3.2.2"
 description = "python code static checker"
 optional = false
 python-versions = ">=3.8.0"
 files = [
-    {file = "pylint-3.1.0-py3-none-any.whl", hash = "sha256:507a5b60953874766d8a366e8e8c7af63e058b26345cfcb5f91f89d987fd6b74"},
-    {file = "pylint-3.1.0.tar.gz", hash = "sha256:6a69beb4a6f63debebaab0a3477ecd0f559aa726af4954fc948c51f7a2549e23"},
+    {file = "pylint-3.2.2-py3-none-any.whl", hash = "sha256:3f8788ab20bb8383e06dd2233e50f8e08949cfd9574804564803441a4946eab4"},
+    {file = "pylint-3.2.2.tar.gz", hash = "sha256:d068ca1dfd735fb92a07d33cb8f288adc0f6bc1287a139ca2425366f7cbe38f8"},
 ]
 
 [package.dependencies]
-astroid = ">=3.1.0,<=3.2.0-dev0"
+astroid = ">=3.2.2,<=3.3.0-dev0"
 colorama = {version = ">=0.4.5", markers = "sys_platform == \"win32\""}
 dill = {version = ">=0.2", markers = "python_version < \"3.11\""}
 isort = ">=4.2.5,<5.13.0 || >5.13.0,<6"
@@ -1692,13 +1692,13 @@ tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
 
 [[package]]
 name = "pytest"
-version = "8.2.0"
+version = "8.2.1"
 description = "pytest: simple powerful testing with Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pytest-8.2.0-py3-none-any.whl", hash = "sha256:1733f0620f6cda4095bbf0d9ff8022486e91892245bb9e7d5542c018f612f233"},
-    {file = "pytest-8.2.0.tar.gz", hash = "sha256:d507d4482197eac0ba2bae2e9babf0672eb333017bcedaa5fb1a3d42c1174b3f"},
+    {file = "pytest-8.2.1-py3-none-any.whl", hash = "sha256:faccc5d332b8c3719f40283d0d44aa5cf101cec36f88cde9ed8f2bc0538612b1"},
+    {file = "pytest-8.2.1.tar.gz", hash = "sha256:5046e5b46d8e4cac199c373041f26be56fdb81eb4e67dc11d4e10811fc3408fd"},
 ]
 
 [package.dependencies]
@@ -2624,4 +2624,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9"
-content-hash = "eeb92d995c37a24da3cf0d8df62bc97e67184582b245c3146f6ff36f749fe8dd"
+content-hash = "299315c439a9bb95af1b1daeb78a212dc6fca3aaa89f4c5d5bacfe5ccdcb90b2"
