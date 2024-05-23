@@ -5,6 +5,14 @@ DigitalOcean Collection Release Notes
 .. contents:: Topics
 
 
+v0.6.0
+======
+
+Minor Changes
+-------------
+
+- added an action group 'digitalocean.cloud.all' for use with module defaults: https://docs.ansible.com/ansible/latest/user_guide/playbooks_module_defaults.html (https://github.com/digitalocean/ansible-collection/pull/180)
+
 v0.5.1
 ======
 

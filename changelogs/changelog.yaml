@@ -282,3 +282,16 @@ releases:
     - 104-ansible-lint.yml
     - 91-ansible-galaxy-ng.yml
     release_date: '2023-12-21'
+  0.6.0:
+    changes:
+      minor_changes:
+      - 'added an action group ''digitalocean.cloud.all'' for use with module defaults:
+        https://docs.ansible.com/ansible/latest/user_guide/playbooks_module_defaults.html
+        (https://github.com/digitalocean/ansible-collection/pull/180)'
+    fragments:
+    - 133-kubernetes-slug.yml
+    - 135-ansible-version.yml
+    - 144-issue-templates.yml
+    - 147-integration-testing-kubernetes-version.yml
+    - 180-add-action_groups.yml
+    release_date: '2024-05-23'

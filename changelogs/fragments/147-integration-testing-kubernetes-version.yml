@@ -1,2 +1,0 @@
-trivial:
-  - ci - use the API to determine a supported Kubernetes version (https://github.com/digitalocean/ansible-collection/issues/147).
