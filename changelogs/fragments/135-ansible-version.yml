@@ -1,2 +1,0 @@
-trivial:
-  - ci - bump minimum Ansible version to `2.14.0` (https://github.com/digitalocean/ansible-collection/issues/135).
