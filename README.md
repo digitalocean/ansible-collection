@@ -227,6 +227,12 @@ localhost                  : ok=1    changed=0    unreachable=0    failed=0    s
     digitalocean_token: "{{ lookup('ansible.builtin.env', 'DIGITALOCEAN_TOKEN') }}"
     public_key: "{{ lookup('ansible.builtin.file', ansible_env['HOME'] ~ '/.ssh/sammy.key.pub') }}"
 
+  # You can also default the value of a variable for every DO module using module_defaults
+  # https://docs.ansible.com/ansible/latest/user_guide/playbooks_module_defaults.html
+  # module_defaults:
+  #   group/digitalocean.cloud.all:
+  #     token: "{{ lookup('ansible.builtin.env', 'DIGITALOCEAN_TOKEN') }}"
+
   tasks:
     - name: Create SSH key
       digitalocean.cloud.ssh_key:
