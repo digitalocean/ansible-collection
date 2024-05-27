@@ -221,13 +221,13 @@ pygments = ">=2.4.0"
 
 [[package]]
 name = "antsibull-changelog"
-version = "0.27.0"
+version = "0.28.0"
 description = "Changelog tool for Ansible-core and Ansible collections"
 optional = false
 python-versions = ">=3.9.0"
 files = [
-    {file = "antsibull_changelog-0.27.0-py3-none-any.whl", hash = "sha256:f03a45d547ffcdd8fdf9cad2d8e91ee61dfaaef1ee226a35a866104a901ee5e8"},
-    {file = "antsibull_changelog-0.27.0.tar.gz", hash = "sha256:bc3ccce85f1cecc841c8493cf360453243d602f08b30823f378502b7c24031de"},
+    {file = "antsibull_changelog-0.28.0-py3-none-any.whl", hash = "sha256:a407244af6588c1eab854fe21383685c51a087a0f99618014e4557a446954ff4"},
+    {file = "antsibull_changelog-0.28.0.tar.gz", hash = "sha256:1a9f6da1a50f5fabe6351daf1ef91937c25f8356acbbacb55681a9e44b7f0858"},
 ]
 
 [package.dependencies]
@@ -2624,4 +2624,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9"
-content-hash = "f9d0b31fb2da657afd0692b5b5664972aca2050d41914ded35a0a888c9e8cb8e"
+content-hash = "06e4843927520cee83d0eb99d69a5d45100c62b0c1cd4e37111f4f73ba994c20"
