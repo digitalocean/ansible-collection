@@ -98,16 +98,20 @@ jobs:
       ${{ contains(fromJson(
           '["stable-2.14", "stable-2.15", "stable-2.16"]'
       ), matrix.ansible) && 'ubuntu-22.04' || 'ubuntu-latest' }}
-    name: Units (Ⓐ${{ matrix.ansible }})
+    name: Units (Ⓐ${{ matrix.versions.ansible }}+py${{ matrix.versions.python }})
     strategy:
       # As soon as the first unit test fails, cancel the others to free up the CI queue
       fail-fast: true
       matrix:
-        ansible:
-          - stable-2.14
-          - stable-2.15
-          - stable-2.16
-          - devel
+        versions:
+          - ansible: stable-2.14
+            python: "3.9"
+          - ansible: stable-2.15
+            python: "3.10"
+          - ansible: stable-2.16
+            python: "3.10"
+          - ansible: devel
+            python: "3.11"
 
     steps:
       - name: >-
@@ -148,16 +152,20 @@ jobs:
       ${{ contains(fromJson(
           '["stable-2.14", "stable-2.15", "stable-2.16"]'
       ), matrix.ansible) && 'ubuntu-22.04' || 'ubuntu-latest' }}
-    name: I (Ⓐ${{ matrix.ansible }}+py${{ matrix.python }})
+    name: I (Ⓐ${{ matrix.versions.ansible }}+py${{ matrix.versions.python }})
     strategy:
       fail-fast: false
       matrix:
         # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html
-        ansible:
-          - stable-2.14
-          - stable-2.15
-          - stable-2.16
-          - devel
+        versions:
+          - ansible: stable-2.14
+            python: "3.9"
+          - ansible: stable-2.15
+            python: "3.10"
+          - ansible: stable-2.16
+            python: "3.10"
+          - ansible: devel
+            python: "3.11"
         python:
           - "3.9"
           - "3.10"
