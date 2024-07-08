@@ -19,10 +19,10 @@ setuptools = "70.1.0"
 ansible-lint = { version = "^6.22.2", markers = "platform_system != 'Windows'" }
 black = "^24.4.2"
 pre-commit = "^3.7.1"
-pylint = "^3.2.3"
+pylint = "^3.2.5"
 pytest = "^8.2.2"
 antsibull-changelog = "^0.29.0"
-antsibull-docs = "^2.11.0"
+antsibull-docs = "^2.12.0"
 autopep8 = "^2.3.1"
 
 [build-system]
