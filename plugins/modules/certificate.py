@@ -73,11 +73,13 @@ EXAMPLES = r"""
       MIIJQwIBADANBgkqhkiG9w0BAQEFAASCCS0wggkpAgEAAoICAQDE39Eyyp2QJIp6
       IvXELS4L+Wa8dAM4Uk0enV3PJKm2a674Ys0WSle2dzsd1EfpRXMNTt+iPZCyZQIS
       ...
+      -----END PRIVATE KEY-----
     leaf_certificate: |
       -----BEGIN CERTIFICATE-----
       MIIF8jCCA9oCCQDHvZvzJneVuzANBgkqhkiG9w0BAQsFADCBujELMAkGA1UEBhMC
       VVMxETAPBgNVBAgMCE1pY2hpZ2FuMRQwEgYDVQQHDAtHcmFuZCBCbGFuYzETMBEG
       ...
+      -----END CERTIFICATE-----
 
 - name: Create Let's Encrypt certificate
   digitalocean.cloud.certificate:

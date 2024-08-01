@@ -34,7 +34,7 @@ options:
     required: true
   compare:
     description:
-      - Comparision.
+      - Comparison.
     type: str
     required: true
     choices: ["GreaterThan", "LessThan"]
@@ -246,7 +246,7 @@ class MonitoringAlertPolicy(DigitalOceanCommonModule):
             body = {
                 "alerts": self.alerts,
                 "compare": self.compare,
-                "desciption": self.description,
+                "description": self.description,
                 "enabled": self.enabled,
                 "entities": self.entities,
                 "tags": self.tags,

@@ -191,7 +191,7 @@ class CDNEndpoints(DigitalOceanCommonModule):
                         )
                     self.module.exit_json(changed=False, endpoint=existing_cdn)
                 self.module.fail_json(
-                    changed=False, msg=error.get("Message"), error=error, endpiont=[]
+                    changed=False, msg=error.get("Message"), error=error, endpoint=[]
                 )
 
         try:
