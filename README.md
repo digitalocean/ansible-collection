@@ -12,7 +12,7 @@ This is a grounds-up rewrite of the [`community.digitalocean`](https://galaxy.an
 
 ## DigitalOcean Collection for Ansible
 
-[![Ansible Collection](https://img.shields.io/badge/digitalocean.cloud-badge?logo=digitalocean&label=Ansible%20Collection&color=%230080FF)]([https://galaxy.ansible.com/digitalocean/cloud](https://galaxy.ansible.com/ui/repo/published/digitalocean/cloud/))
+[![Ansible Collection](https://img.shields.io/badge/digitalocean.cloud-badge?logo=digitalocean&label=Ansible%20Collection&color=%230080FF)](https://galaxy.ansible.com/ui/repo/published/digitalocean/cloud/))
 [![Latest Release](https://img.shields.io/github/v/release/digitalocean/ansible-collection?include_prereleases&label=Latest%20release&color=%230080FF)](https://github.com/digitalocean/ansible-collection/releases)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/7862/badge)](https://www.bestpractices.dev/projects/7862)
 
