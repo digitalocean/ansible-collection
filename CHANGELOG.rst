@@ -35,6 +35,13 @@ Minor Changes
 v0.5.1
 ======
 
+Minor Changes
+-------------
+
+- Bump Kubernetes version in its integration test (https://github.com/digitalocean/ansible-collection/issues/100).
+- Fix broken links due to Ansible Galaxy NG launch (https://github.com/digitalocean/ansible-collection/pull/91).
+- Lint tweaked ansible-lint configuration so production profile is now the target for this repo (https://github.com/digitalocean/ansible-collection/pull/104).
+
 v0.5.0
 ======
 
