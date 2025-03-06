@@ -301,13 +301,11 @@ class KubernetesCluster(DigitalOceanCommonModule):
                 and kubernetes_cluster["status"]["state"] != "running"
             ):
                 time.sleep(DigitalOceanConstants.SLEEP)
-                kubernetes_cluster["status"][
-                    "state"
-                ] = self.get_kubernetes_cluster_by_id(kubernetes_cluster["id"])[
-                    "status"
-                ][
-                    "state"
-                ]
+                kubernetes_cluster["status"]["state"] = (
+                    self.get_kubernetes_cluster_by_id(kubernetes_cluster["id"])[
+                        "status"
+                    ]["state"]
+                )
 
             if kubernetes_cluster["status"]["state"] != "running":
                 self.module.fail_json(
