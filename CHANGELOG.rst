@@ -4,6 +4,25 @@ DigitalOcean Collection Release Notes
 
 .. contents:: Topics
 
+v1.0.0
+======
+
+Release Summary
+---------------
+
+Bump Python, project-wide, to 3.11.11. Fix ``state: absent`` bug in the Droplet module. Disable integration testing for the ``monitoring_alert_policy`` and ``one_click`` modules since they are broken (https://github.com/digitalocean/ansible-collection/pull/234).
+
+Minor Changes
+-------------
+
+- Bump Python to 3.11.11 and Poetry to 1.8.5 (https://github.com/digitalocean/ansible-collection/issues/229).
+- monitoring_alert_policy - mark integration test as ``disabled`` since it is broken (https://github.com/digitalocean/ansible-collection/issues/229)."
+- one_click - mark this integration test as ``disabled`` since it is broken (https://github.com/digitalocean/ansible-collection/issues/229)."
+
+Bugfixes
+--------
+
+- droplet - add misisng ``droplet_id`` parameter when for ``state: absent`` (https://github.com/digitalocean/ansible-collection/issues/229).
 
 v0.6.0
 ======
@@ -16,12 +35,12 @@ Minor Changes
 v0.5.1
 ======
 
-Trivial Changes
----------------
+Minor Changes
+-------------
 
-- docs - fix broken links due to Ansible Galaxy NG launch (https://github.com/digitalocean/ansible-collection/pull/91).
-- tests - bump Kubernetes version in its integration test (https://github.com/digitalocean/ansible-collection/issues/100).
-- lint - tweaked ansible-lint configuration so production profile is now the target for this repo (https://github.com/digitalocean/ansible-collection/pull/104).
+- Bump Kubernetes version in its integration test (https://github.com/digitalocean/ansible-collection/issues/100).
+- Fix broken links due to Ansible Galaxy NG launch (https://github.com/digitalocean/ansible-collection/pull/91).
+- Lint tweaked ansible-lint configuration so production profile is now the target for this repo (https://github.com/digitalocean/ansible-collection/pull/104).
 
 v0.5.0
 ======
