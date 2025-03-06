@@ -78,8 +78,8 @@ Every voice is important. If you have something on your mind, create an issue or
 | ------------- | ------ |
 | `stable-2.14` | `3.9`  |
 | `stable-2.15` | `3.10` |
-| `stable-2.16` | `3.10` |
-| `devel`       | `3.10` |
+| `stable-2.16` | `3.11` |
+| `devel`       | `3.11` |
 
 ## External requirements
 
@@ -408,7 +408,7 @@ You can also install a specific version of the collection, for example, if you n
 Use the following syntax to install version `0.5.0`:
 
 ```shell
-ansible-galaxy collection install digitalocean.cloud:==0.5.0
+ansible-galaxy collection install digitalocean.cloud:==1.0.0
 ```
 
 See [Ansible Using collections](https://docs.ansible.com/ansible/devel/user_guide/collections_using.html) for more details.
