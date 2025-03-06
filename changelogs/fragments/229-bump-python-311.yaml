@@ -1,0 +1,2 @@
+minor_changes:
+  - "Bump Python to 3.11.11 and Poetry to 1.8.5 (https://github.com/digitalocean/ansible-collection/issues/229)."
