@@ -28,8 +28,8 @@ jobs:
       fail-fast: false
       matrix:
         versions:
-          - ansible: stable-2.14
-            python: "3.9"
+          - ansible: stable-2.16
+            python: "3.11"
         module:
           - account_info
           - balance_info

@@ -7,7 +7,7 @@ droplet:
 policy:
   alerts:
     email:
-      - mamercad@gmail.com
+      - mmercado@digitalocean.com
     function: []
     slack: []
   compare: GreaterThan
