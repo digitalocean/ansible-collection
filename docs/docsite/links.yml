@@ -29,10 +29,11 @@ extra_links:
 
 # Specify communication channels for your collection. We suggest to not specify more
 # than one place for communication per communication tool to avoid confusion.
-communication:
-  github_discussions:
-    - topic: "Start a new discussion"
-      room: "TBD"
+communication: {}
+  # Sigh ...
+  # github_discussions:
+  #   - topic: "Start a new discussion"
+  #     room: "TBD"
   # matrix_rooms:
   #   - topic: General usage and support questions
   #     room: "#users:ansible.im"
