@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - droplet - add misisng ``droplet_id`` parameter when ``state: absent`` (https://github.com/digitalocean/ansible-collection/issues/229).

@@ -551,7 +551,7 @@ class Droplet(DigitalOceanCommonModule):
                 droplet=[],
             )
 
-        droplet = self.get_droplet_by_id()
+        droplet = self.get_droplet_by_id(self.droplet_id)
         if not droplet:
             self.module.exit_json(
                 changed=False,
