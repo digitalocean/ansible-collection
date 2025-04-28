@@ -59,8 +59,25 @@ options:
   size:
     description:
       - The slug identifier for the size that you wish to select for this Droplet.
+      - Required if C(state=present).
+      - If C(resize) is set to C(true), this will be the new size of the Droplet.
+      - If C(resize_disk) is also set to C(true), this will be the new size of the Droplet disk.
     type: str
     required: false
+  resize:
+    description:
+      - Resize the Droplet to a larger size if C(size) is larger than the current size.
+      - If a permanent resize with disk changes included is desired, set the C(resize_disk) attribute to C(true).
+    type: bool
+    required: false
+    default: false
+  resize_disk:
+    description:
+      - Resize the Droplet to a larger size if C(size) is larger than the current size.
+      - If a permanent resize with disk changes included is desired, set this attribute to C(true).
+    type: bool
+    required: false
+    default: false
   image:
     description:
       - The image ID of a public or private image or the slug identifier for a public image.
@@ -319,6 +336,9 @@ from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanFunctions,
     DigitalOceanConstants,
 )
+from ansible_collections.digitalocean.cloud.plugins.module_utils.droplet_resize import (
+    DropletResize,
+)
 
 
 class Droplet(DigitalOceanCommonModule):
@@ -334,6 +354,8 @@ class Droplet(DigitalOceanCommonModule):
         self.backups = module.params.get("backups")
         self.ipv6 = module.params.get("ipv6")
         self.monitoring = module.params.get("monitoring")
+        self.resize = module.params.get("resize")
+        self.resize_disk = module.params.get("resize_disk")
         self.tags = module.params.get("tags")
         self.user_data = module.params.get("user_data")
         self.volumes = module.params.get("volumes")
@@ -478,6 +500,44 @@ class Droplet(DigitalOceanCommonModule):
             )
 
     def present(self):
+        if self.module.params.get("resize"):
+            if not self.droplet_id:
+                self.module.fail_json(
+                    changed=False,
+                    msg="Unable to find Droplet ID for resize",
+                )
+
+            droplet = self.get_droplet_by_id(self.droplet_id)
+            if not droplet:
+                self.module.fail_json(
+                    changed=False,
+                    msg=f"Droplet with ID {self.droplet_id} not found",
+                )
+
+            self.current_size = droplet["size"]["slug"]
+
+            if self.current_size == self.new_size:
+                self.module.exit_json(
+                    changed=False,
+                    msg=f"Droplet {droplet['name']} ({self.droplet_id}) is already size {self.new_size}",
+                    droplet=droplet,
+                )
+
+            if self.module.check_mode:
+                self.module.exit_json(
+                    changed=True,
+                    msg=f"Droplet {droplet['name']} ({self.droplet_id}) would be resized to size {self.new_size}",
+                    droplet=droplet,
+                )
+
+            resize_action = DropletResize(
+                module=self.module,
+                droplet_id=self.droplet_id,
+                new_size=self.new_size,
+                resize_disk=self.resize_disk,
+            )
+            resize_action.resize_droplet()
+
         if self.unique_name:
             droplets = self.get_droplets_by_name_and_region()
             if len(droplets) == 0:
@@ -582,6 +642,8 @@ def main():
         backups=dict(type="bool", required=False, default=False),
         ipv6=dict(type="bool", required=False, default=False),
         monitoring=dict(type="bool", required=False, default=False),
+        resize=dict(type="bool", required=False, default=False),
+        resize_disk=dict(type="bool", required=False, default=False),
         tags=dict(type="list", elements="str", required=False, default=[]),
         user_data=dict(type="str", required=False),
         volumes=dict(type="list", elements="str", required=False, default=[]),
@@ -597,6 +659,7 @@ def main():
         ],
         required_by={
             "unique_name": "region",
+            "resize_disk": "resize",
         },
     )
     Droplet(module)

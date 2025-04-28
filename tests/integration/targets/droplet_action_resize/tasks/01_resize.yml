@@ -1,7 +1,31 @@
 # code: language=ansible
 - name: 01_resize | Testing block
   block:
-    - name: 01_resize | Resize Droplet
+    - name: 01_resize | Resize Droplet (bigger)
+      when: true
+      digitalocean.cloud.droplet_action_resize:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        size: "{{ droplet_new_size }}"
+        disk: true
+        timeout: 600
+      register: result
+
+
+    - name: "Set facts for Droplet id and size slug"
+      ansible.builtin.set_fact:
+        droplet_id: "{{ result.droplet.id }}"
+        droplet_size_slug: "{{ result.droplet.size.slug }}"
+
+    - name: 01_resize | Verify resize Droplet
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Resized Droplet " ~ droplet_name ~ " (" ~ droplet_id ~ ") to size " ~ droplet_new_size
+
+    - name: 01_resize | Resize Droplet (same size)
       when: true
       digitalocean.cloud.droplet_action_resize:
         token: "{{ digitalocean_token }}"
@@ -16,6 +40,49 @@
     - name: 01_resize | Verify resize Droplet
       ansible.builtin.assert:
         that:
-          - result.changed
-          - result.msg == "Droplet " ~ droplet_name ~ " (" ~ result.action.resource_id ~ ") in "
-            ~ droplet_region ~ " sent action 'resize', new size is '{{ droplet_new_size }}'"
+          - not result.changed
+          - result.msg == "Droplet " ~ droplet_name ~ " (" ~ droplet_id ~ ") in " ~ droplet_region
+            ~ " not sent action 'resize', requested size is '" ~ droplet_new_size ~ "' and current"
+            ~ " size is '" ~ droplet_size_slug ~ "'"
+
+    - name: 01_resize | Resize Droplet (smaller and resize disk) should fail
+      block:
+        - name: 01_resize | Resize Droplet (smaller and resize disk)
+          digitalocean.cloud.droplet_action_resize:
+            token: "{{ digitalocean_token }}"
+            state: present
+            name: "{{ droplet_name }}"
+            region: "{{ droplet_region }}"
+            size: "{{ droplet_size }}"
+            disk: true
+            timeout: 600
+          register: result
+
+      rescue:
+        - name: 01_resize | Verify unchanged Droplet
+          ansible.builtin.assert:
+            that:
+              - result is failed
+              - not result.changed
+              - "'This size is not available because it has a smaller disk' in result.msg"
+
+    - name: 01_resize | Resize Droplet (smaller and no resize disk) should fail
+      block:
+        - name: 01_resize | Resize Droplet (smaller and no resize disk)
+          digitalocean.cloud.droplet_action_resize:
+            token: "{{ digitalocean_token }}"
+            state: present
+            name: "{{ droplet_name }}"
+            region: "{{ droplet_region }}"
+            size: "{{ droplet_size }}"
+            disk: false
+            timeout: 600
+          register: result
+
+      rescue:
+        - name: 01_resize | Verify unchanged Droplet
+          ansible.builtin.assert:
+            that:
+              - result is failed
+              - not result.changed
+              - "'This size is not available because it has a smaller disk' in result.msg"
