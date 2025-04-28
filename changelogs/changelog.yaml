@@ -319,3 +319,10 @@ releases:
     - 229-disable-monitoring-alert-policy-and-one-click-int-tests.yml
     - 229-droplet-id-absent.yaml
     release_date: '2025-03-06'
+  1.1.0:
+    changes:
+      minor_changes:
+      - droplet - Add ``resize`` and ``resize_disk`` functionality (https://github.com/digitalocean/ansible-collection/issues/236).
+    fragments:
+    - 236-droplet-resize.yml
+    release_date: '2025-04-28'
