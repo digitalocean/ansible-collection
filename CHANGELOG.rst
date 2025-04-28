@@ -4,6 +4,14 @@ DigitalOcean Collection Release Notes
 
 .. contents:: Topics
 
+v1.1.0
+======
+
+Minor Changes
+-------------
+
+- droplet - Add ``resize`` and ``resize_disk`` functionality (https://github.com/digitalocean/ansible-collection/issues/236).
+
 v1.0.0
 ======
 
