@@ -132,7 +132,7 @@ msg:
     - Attached volume test-vol in nyc3 to test-droplet
     - Volume test-vol in nyc3 not attached to test-droplet
     - Detached volume test-vol in nyc3 from test-droplet
-    - Volume test-vol in nyc3 would be attahed to test-droplet
+    - Volume test-vol in nyc3 would be attached to test-droplet
     - Volume test-vol in nyc3 would be detached from test-droplet
 """
 
