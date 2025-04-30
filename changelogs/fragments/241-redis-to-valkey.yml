@@ -1,0 +1,2 @@
+major_changes:
+- database_cluster -  Replace Redis with Valkey (https://github.com/digitalocean/ansible-collection/issues/241).
