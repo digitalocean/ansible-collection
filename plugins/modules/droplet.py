@@ -500,44 +500,6 @@ class Droplet(DigitalOceanCommonModule):
             )
 
     def present(self):
-        if self.module.params.get("resize"):
-            if not self.droplet_id:
-                self.module.fail_json(
-                    changed=False,
-                    msg="Unable to find Droplet ID for resize",
-                )
-
-            droplet = self.get_droplet_by_id(self.droplet_id)
-            if not droplet:
-                self.module.fail_json(
-                    changed=False,
-                    msg=f"Droplet with ID {self.droplet_id} not found",
-                )
-
-            self.current_size = droplet["size"]["slug"]
-
-            if self.current_size == self.new_size:
-                self.module.exit_json(
-                    changed=False,
-                    msg=f"Droplet {droplet['name']} ({self.droplet_id}) is already size {self.new_size}",
-                    droplet=droplet,
-                )
-
-            if self.module.check_mode:
-                self.module.exit_json(
-                    changed=True,
-                    msg=f"Droplet {droplet['name']} ({self.droplet_id}) would be resized to size {self.new_size}",
-                    droplet=droplet,
-                )
-
-            resize_action = DropletResize(
-                module=self.module,
-                droplet_id=self.droplet_id,
-                new_size=self.new_size,
-                resize_disk=self.resize_disk,
-            )
-            resize_action.resize_droplet()
-
         if self.unique_name:
             droplets = self.get_droplets_by_name_and_region()
             if len(droplets) == 0:
@@ -549,12 +511,54 @@ class Droplet(DigitalOceanCommonModule):
                     )
                 else:
                     self.create_droplet()
+
             elif len(droplets) == 1:
+                self.droplet_id = droplets[0]["id"]
+
+                if self.module.params.get("resize"):
+                    if not self.droplet_id:
+                        self.module.fail_json(
+                            changed=False,
+                            msg="Unable to find Droplet ID for resize",
+                        )
+
+                    droplet = self.get_droplet_by_id(self.droplet_id)
+                    if not droplet:
+                        self.module.fail_json(
+                            changed=False,
+                            msg=f"Droplet with ID {self.droplet_id} not found",
+                        )
+
+                    self.current_size = droplet["size"]["slug"]
+
+                    if self.current_size == self.new_size:
+                        self.module.exit_json(
+                            changed=False,
+                            msg=f"Droplet {droplet['name']} ({self.droplet_id}) is already size {self.new_size}",
+                            droplet=droplet,
+                        )
+
+                    if self.module.check_mode:
+                        self.module.exit_json(
+                            changed=True,
+                            msg=f"Droplet {droplet['name']} ({self.droplet_id}) would be resized to size {self.new_size}",
+                            droplet=droplet,
+                        )
+
+                    resize_action = DropletResize(
+                        module=self.module,
+                        droplet_id=self.droplet_id,
+                        new_size=self.new_size,
+                        resize_disk=self.resize_disk,
+                    )
+                    resize_action.resize_droplet()
+
                 self.module.exit_json(
                     changed=False,
                     msg=f"Droplet {self.name} ({droplets[0]['id']}) in {self.region} exists",
                     droplet=droplets[0],
                 )
+
             elif len(droplets) > 1:
                 droplet_ids = ", ".join([str(droplet["id"]) for droplet in droplets])
                 self.module.fail_json(
@@ -562,6 +566,7 @@ class Droplet(DigitalOceanCommonModule):
                     msg=f"There are currently {len(droplets)} Droplets named {self.name} in {self.region}: {droplet_ids}",
                     droplet=[],
                 )
+
         if self.module.check_mode:
             self.module.exit_json(
                 changed=True,
