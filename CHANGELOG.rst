@@ -4,6 +4,19 @@ DigitalOcean Collection Release Notes
 
 .. contents:: Topics
 
+v1.2.0
+======
+
+Major Changes
+-------------
+
+- database_cluster -  Replace Redis with Valkey (https://github.com/digitalocean/ansible-collection/issues/241).
+
+Bugfixes
+--------
+
+- droplet - Fix resize for new Droplets (https://github.com/digitalocean/ansible-collection/issues/239).
+
 v1.1.0
 ======
 
