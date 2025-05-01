@@ -326,3 +326,13 @@ releases:
     fragments:
     - 236-droplet-resize.yml
     release_date: '2025-04-28'
+  1.2.0:
+    changes:
+      bugfixes:
+      - droplet - Fix resize for new Droplets (https://github.com/digitalocean/ansible-collection/issues/239).
+      major_changes:
+      - database_cluster -  Replace Redis with Valkey (https://github.com/digitalocean/ansible-collection/issues/241).
+    fragments:
+    - 239-fix-droplet-resize-new-droplets.yml
+    - 241-redis-to-valkey.yml
+    release_date: '2025-04-30'
