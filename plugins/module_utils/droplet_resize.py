@@ -15,11 +15,13 @@ from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
 
 
 class DropletResize(DigitalOceanCommonModule):
-    def __init__(self, module, droplet_id, new_size, resize_disk):
+    def __init__(self, module, droplet_id, region, current_size, new_size, resize_disk):
         super().__init__(module)
         self.droplet_id = droplet_id
+        self.current_size = current_size
         self.resize_disk = resize_disk
         self.new_size = new_size
+        self.region = region
         self.type = "resize"
         self.timeout = module.params.get("timeout")
 
@@ -40,14 +42,14 @@ class DropletResize(DigitalOceanCommonModule):
                 if droplet["size"]["slug"] == self.new_size:
                     self.module.exit_json(
                         changed=True,
-                        msg=f"Resized Droplet {droplet['name']} ({self.droplet_id}) to size {self.new_size}",
+                        msg=f"Resized Droplet {droplet['name']} ({self.droplet_id}) in {self.region} from size {self.current_size} to size {self.new_size}",
                         droplet=droplet,
                     )
                 time.sleep(DigitalOceanConstants.SLEEP)
 
             self.module.fail_json(
                 changed=False,
-                msg=f"Resizing Droplet {self.droplet_id} to size {self.new_size} has failed",
+                msg=f"Resizing Droplet {self.droplet_id} from {self.current_size} to size {self.new_size} has failed",
             )
         except Exception as err:
             self.module.fail_json(

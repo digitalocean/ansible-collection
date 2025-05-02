@@ -8,11 +8,10 @@
         state: present
         name: "{{ droplet_name }}"
         region: "{{ droplet_region }}"
-        size: "{{ droplet_new_size }}"
+        size: "{{ droplet_bigger_size }}"
         disk: true
         timeout: 600
       register: result
-
 
     - name: "Set facts for Droplet id and size slug"
       ansible.builtin.set_fact:
@@ -23,7 +22,8 @@
       ansible.builtin.assert:
         that:
           - result.changed
-          - result.msg == "Resized Droplet " ~ droplet_name ~ " (" ~ droplet_id ~ ") to size " ~ droplet_new_size
+          - result.msg == "Resized Droplet " ~ droplet_name ~ " (" ~ droplet_id ~ ") in " ~ droplet_region
+            ~ " from size " ~ droplet_size ~ " to size " ~ droplet_bigger_size
 
     - name: 01_resize | Resize Droplet (same size)
       when: true
@@ -32,7 +32,7 @@
         state: present
         name: "{{ droplet_name }}"
         region: "{{ droplet_region }}"
-        size: "{{ droplet_new_size }}"
+        size: "{{ droplet_bigger_size }}"
         disk: true
         timeout: 600
       register: result
@@ -42,7 +42,7 @@
         that:
           - not result.changed
           - result.msg == "Droplet " ~ droplet_name ~ " (" ~ droplet_id ~ ") in " ~ droplet_region
-            ~ " not sent action 'resize', requested size is '" ~ droplet_new_size ~ "' and current"
+            ~ " not sent action 'resize', requested size is '" ~ droplet_bigger_size ~ "' and current"
             ~ " size is '" ~ droplet_size_slug ~ "'"
 
     - name: 01_resize | Resize Droplet (smaller and resize disk) should fail

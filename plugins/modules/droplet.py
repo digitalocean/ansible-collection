@@ -530,8 +530,9 @@ class Droplet(DigitalOceanCommonModule):
                         )
 
                     self.current_size = droplet["size"]["slug"]
+                    self.new_size = self.size
 
-                    if self.current_size == self.new_size:
+                    if self.current_size == self.size:
                         self.module.exit_json(
                             changed=False,
                             msg=f"Droplet {droplet['name']} ({self.droplet_id}) is already size {self.new_size}",
@@ -548,6 +549,8 @@ class Droplet(DigitalOceanCommonModule):
                     resize_action = DropletResize(
                         module=self.module,
                         droplet_id=self.droplet_id,
+                        region=self.region,
+                        current_size=self.current_size,
                         new_size=self.new_size,
                         resize_disk=self.resize_disk,
                     )
