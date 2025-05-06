@@ -336,3 +336,10 @@ releases:
     - 239-fix-droplet-resize-new-droplets.yml
     - 241-redis-to-valkey.yml
     release_date: '2025-04-30'
+  1.2.1:
+    changes:
+      minor_changes:
+      - droplet - Add more Droplet tests and fix Droplet "noop" resize (https://github.com/digitalocean/ansible-collection/issues/245).
+    fragments:
+    - 245-add-more-droplet-tests.yaml
+    release_date: '2025-05-06'
