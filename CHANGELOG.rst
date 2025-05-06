@@ -4,6 +4,14 @@ DigitalOcean Collection Release Notes
 
 .. contents:: Topics
 
+v1.2.1
+======
+
+Minor Changes
+-------------
+
+- droplet - Add more Droplet tests and fix Droplet "noop" resize (https://github.com/digitalocean/ansible-collection/issues/245).
+
 v1.2.0
 ======
 
