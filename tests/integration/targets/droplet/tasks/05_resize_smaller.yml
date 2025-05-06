@@ -1,0 +1,67 @@
+---
+# code: language=ansible
+- name: 05_resize_smaller | Testing block
+  block:
+    - name: 05_resize_smaller | Create Droplet
+      digitalocean.cloud.droplet:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        size: "{{ droplet_bigger_size }}"
+        resize: false
+        resize_disk: false
+        image: "{{ droplet_image }}"
+        unique_name: true
+      register: result
+
+    - name: 05_resize_smaller | Verify create Droplet
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+          - result.droplet is iterable
+          - result.droplet.id is integer
+          - result.droplet.name == droplet_name
+          - result.droplet.region.slug == droplet_region
+          - result.droplet.size.slug == droplet_bigger_size
+          - result.msg == "Created Droplet " ~ droplet_name ~ " (" ~ result.droplet.id ~ ") in " ~ droplet_region
+
+    - name: Resize smaller block
+      block:
+        - name: 05_resize_smaller | Resize Droplet
+          digitalocean.cloud.droplet:
+            token: "{{ digitalocean_token }}"
+            state: present
+            name: "{{ droplet_name }}"
+            region: "{{ droplet_region }}"
+            size: "{{ droplet_size }}"
+            resize: true
+            resize_disk: true
+            image: "{{ droplet_image }}"
+            unique_name: true
+          register: result
+
+      rescue:
+        - name: 05_resize_smaller | Ensure blah blah
+          ansible.builtin.assert:
+            that:
+              - not result.changed
+              - result.failed
+              - "'This size is not available because it has a smaller disk' in result.msg"
+
+    - name: 05_resize_smaller | Delete Droplet
+      digitalocean.cloud.droplet:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        unique_name: true
+      register: result
+
+    - name: 05_resize_smaller | Verify delete Droplet
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+          - result.msg == "Deleted Droplet " ~ droplet_name ~ " (" ~ result.droplet.id ~ ") in " ~ droplet_region

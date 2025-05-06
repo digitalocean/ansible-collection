@@ -1,19 +1,21 @@
 ---
 # code: language=ansible
-- name: 01_create_delete_unique_name_and_region | Testing block
+- name: 02_resize_noop | Testing block
   block:
-    - name: 01_create_delete_unique_name_and_region | Create Droplet
+    - name: 02_resize_noop | Create Droplet
       digitalocean.cloud.droplet:
         token: "{{ digitalocean_token }}"
         state: present
         name: "{{ droplet_name }}"
         region: "{{ droplet_region }}"
         size: "{{ droplet_size }}"
+        resize: false
+        resize_disk: false
         image: "{{ droplet_image }}"
         unique_name: true
       register: result
 
-    - name: 01_create_delete_unique_name_and_region | Verify create Droplet
+    - name: 02_resize_noop | Verify create Droplet
       ansible.builtin.assert:
         that:
           - result.changed
@@ -25,30 +27,26 @@
           - result.droplet.size.slug == droplet_size
           - result.msg == "Created Droplet " ~ droplet_name ~ " (" ~ result.droplet.id ~ ") in " ~ droplet_region
 
-    - name: 01_create_delete_unique_name_and_region | Create Droplet again
+    - name: 02_resize_noop | Resize Droplet (no size change)
       digitalocean.cloud.droplet:
         token: "{{ digitalocean_token }}"
         state: present
         name: "{{ droplet_name }}"
         region: "{{ droplet_region }}"
         size: "{{ droplet_size }}"
+        resize: true
+        resize_disk: true
         image: "{{ droplet_image }}"
         unique_name: true
       register: result
 
-    - name: 01_create_delete_unique_name_and_region | Verify create Droplet idempotency
+    - name: 02_resize_noop | Verify resize Droplet (no size change)
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.msg is string
-          - result.droplet is iterable
-          - result.droplet.id is integer
-          - result.droplet.name == droplet_name
-          - result.droplet.region.slug == droplet_region
-          - result.droplet.size.slug == droplet_size
-          - result.msg == "Droplet " ~ droplet_name ~ " (" ~ result.droplet.id ~ ") in " ~ droplet_region ~ " exists"
+          - result.msg == "Droplet " ~ droplet_name ~ " (" ~ result.droplet.id ~ ") is already size " ~ droplet_size
 
-    - name: 01_create_delete_unique_name_and_region | Delete Droplet
+    - name: 02_resize_noop | Delete Droplet
       digitalocean.cloud.droplet:
         token: "{{ digitalocean_token }}"
         state: absent
@@ -57,25 +55,9 @@
         unique_name: true
       register: result
 
-    - name: 01_create_delete_unique_name_and_region | Verify delete Droplet
+    - name: 02_resize_noop | Verify delete Droplet
       ansible.builtin.assert:
         that:
           - result.changed
           - result.msg is string
           - result.msg == "Deleted Droplet " ~ droplet_name ~ " (" ~ result.droplet.id ~ ") in " ~ droplet_region
-
-    - name: 01_create_delete_unique_name_and_region | Delete Droplet again
-      digitalocean.cloud.droplet:
-        token: "{{ digitalocean_token }}"
-        state: absent
-        name: "{{ droplet_name }}"
-        region: "{{ droplet_region }}"
-        unique_name: true
-      register: result
-
-    - name: 01_create_delete_unique_name_and_region | Verify delete Droplet idempotency
-      ansible.builtin.assert:
-        that:
-          - not result.changed
-          - result.msg is string
-          - result.msg == "Droplet " ~ droplet_name ~ " in " ~ droplet_region ~ " not found"

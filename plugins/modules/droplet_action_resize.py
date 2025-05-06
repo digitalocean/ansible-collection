@@ -218,6 +218,8 @@ class DropletActionResize(DigitalOceanCommonModule):
             dr = DropletResize(
                 module=self.module,
                 droplet_id=self.droplet["id"],
+                region=self.droplet["region"]["slug"],
+                current_size=self.droplet["size"]["slug"],
                 new_size=self.size,
                 resize_disk=self.disk,
             )
