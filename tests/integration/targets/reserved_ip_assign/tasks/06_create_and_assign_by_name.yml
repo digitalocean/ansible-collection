@@ -1,0 +1,61 @@
+---
+- block:
+
+    - name: Create reserved IP and assign it to droplet by name and region
+      digitalocean.cloud.reserved_ip_assign:
+        token: "{{ digitalocean_token }}"
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+      register: result_create_assign_by_name
+
+    - name: Wait for creation and assignment to complete
+      ansible.builtin.pause:
+        seconds: 15
+
+    - name: Verify create and assign reserved IP by name
+      ansible.builtin.assert:
+        that:
+          - result_create_assign_by_name.changed
+          - result_create_assign_by_name.reserved_ip is defined
+          - result_create_assign_by_name.reserved_ip.ip is defined
+          - result_create_assign_by_name.reserved_ip.droplet is defined
+          - result_create_assign_by_name.reserved_ip.droplet.id == droplet_id
+          - result_create_assign_by_name.reserved_ip.droplet.name == droplet_name
+          - result_create_assign_by_name.action is not defined or result_create_assign_by_name.action == []
+          - result_create_assign_by_name.msg is search("Created reserved IP")
+          - result_create_assign_by_name.msg is search("assigned to Droplet")
+
+    - name: Set fact for reserved IP address
+      ansible.builtin.set_fact:
+        reserved_ip: "{{ result_create_assign_by_name.reserved_ip.ip }}"
+
+    - name: Create and assign reserved IP to same droplet again (test idempotency)
+      digitalocean.cloud.reserved_ip_assign:
+        token: "{{ digitalocean_token }}"
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+      register: result_create_assign_by_name_idempotent
+      failed_when: false
+
+    - name: Verify idempotency (should fail or find existing reserved IP)
+      ansible.builtin.assert:
+        that:
+          - result_create_assign_by_name_idempotent.failed | bool or not result_create_assign_by_name_idempotent.changed
+
+  rescue:
+
+    - name: Teardown | Delete reserved IP
+      digitalocean.cloud.reserved_ip:
+        state: absent
+        token: "{{ digitalocean_token }}"
+        floating_ip: "{{ reserved_ip | default('') }}"
+      ignore_errors: true
+
+    - name: Teardown | Delete Droplet
+      digitalocean.cloud.droplet:
+        state: absent
+        token: "{{ digitalocean_token }}"
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        unique_name: true
+      ignore_errors: true

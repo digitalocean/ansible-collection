@@ -1,0 +1,32 @@
+---
+- block:
+
+    - name: Create Droplet
+      digitalocean.cloud.droplet:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        size: "{{ droplet_size }}"
+        image: "{{ droplet_image }}"
+        unique_name: true
+      register: droplet
+
+    - name: Set fact for droplet ID
+      ansible.builtin.set_fact:
+        droplet_id: "{{ droplet.droplet.id }}"
+
+    - name: Wait for droplet to be active
+      ansible.builtin.pause:
+        seconds: 30
+
+  rescue:
+
+    - name: Teardown | Delete Droplet
+      digitalocean.cloud.droplet:
+        state: absent
+        token: "{{ digitalocean_token }}"
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        unique_name: true
+      ignore_errors: true

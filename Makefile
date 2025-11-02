@@ -24,6 +24,10 @@ sanity: collection-cleanup collection-prep
 integration: collection-cleanup collection-prep
 	poetry run tests/run-integration.sh
 
+.PHONY: units
+units: collection-cleanup collection-prep
+	poetry run tests/run-units.sh
+
 # Make a copy of the collection available in an expected Ansible path
 # For running tooling in Codespaces or other environments
 # If you get ansible-lint errors about unresolved modules in this collection,

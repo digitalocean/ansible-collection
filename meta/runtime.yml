@@ -37,6 +37,7 @@ action_groups:
     - projects_info
     - regions_info
     - reserved_ip
+    - reserved_ip_assign
     - reserved_ips_info
     - sizes_info
     - snapshot

@@ -1,0 +1,18 @@
+{
+  "include": [
+    "."
+  ],
+  "executionEnvironments": [
+    {
+      "root": ".",
+      "pythonVersion": "3.11",
+      "extraPaths": [
+        "../../.."
+      ]
+    }
+  ],
+  "extraPaths": [
+    "../../.."
+  ]
+}
+

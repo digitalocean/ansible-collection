@@ -134,6 +134,7 @@ There is a [pyproject.toml](./pyproject.toml) is the root of this repository as 
 | `digitalocean.cloud.projects_resources_info`        | Get projects resources                       |
 | `digitalocean.cloud.regions_info`                   | Get regions                                  |
 | `digitalocean.cloud.reserved_ip`                    | Create and delete reserved IP                |
+| `digitalocean.cloud.reserved_ip_assign`             | Assign reserved IP to Droplet                |
 | `digitalocean.cloud.reserved_ips_info`              | Get reserved IPs                             |
 | `digitalocean.cloud.sizes_info`                     | Get sizes                                    |
 | `digitalocean.cloud.snapshot`                       | Create and delete snapshots                  |

@@ -29,3 +29,10 @@ autopep8 = "^2.3.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pyright]
+include = ["."]
+executionEnvironments = [
+  { root = ".", pythonVersion = "3.11", extraPaths = ["../../.."] }
+]
+extraPaths = ["../../.."]
