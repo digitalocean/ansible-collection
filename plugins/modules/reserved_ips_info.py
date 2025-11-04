@@ -96,7 +96,8 @@ class ReservedIPsInformation(DigitalOceanCommonModule):
 
     def present(self):
         try:
-            reserved_ips = self.client.reserved_ips.list()
+            reserved_ips_response = self.client.reserved_ips.list()
+            reserved_ips = reserved_ips_response.get("reserved_ips", [])
             if reserved_ips:
                 self.module.exit_json(
                     changed=False, msg="Current reserved IPs", reserved_ips=reserved_ips

@@ -1,5 +1,36 @@
 ---
 - block:
+    - name: Cleanup | Get all reserved IPs
+      digitalocean.cloud.reserved_ips_info:
+        token: "{{ digitalocean_token }}"
+      register: all_reserved_ips
+
+    - name: Cleanup | Initialize reserved IPs to delete list
+      ansible.builtin.set_fact:
+        reserved_ips_to_delete: []
+
+    - name: Cleanup | Set fact for reserved IPs assigned to this droplet
+      ansible.builtin.set_fact:
+        reserved_ips_to_delete: "{{ reserved_ips_to_delete + [item.ip] }}"
+      loop: "{{ all_reserved_ips.reserved_ips | default([]) }}"
+      when:
+        - item.droplet is defined
+        - item.droplet is not none
+        - item.droplet.id == droplet_id | int
+
+    - name: Cleanup | Delete reserved IPs assigned to droplet
+      digitalocean.cloud.reserved_ip:
+        state: absent
+        token: "{{ digitalocean_token }}"
+        floating_ip: "{{ item }}"
+      loop: "{{ reserved_ips_to_delete | default([]) }}"
+      ignore_errors: true
+      when: reserved_ips_to_delete is defined and reserved_ips_to_delete | length > 0
+
+    - name: Wait for cleanup to complete
+      ansible.builtin.pause:
+        seconds: 5
+      when: reserved_ips_to_delete is defined and reserved_ips_to_delete | length > 0
 
     - name: Create reserved IP (unassigned) for testing assignment
       digitalocean.cloud.reserved_ip_assign:
@@ -10,6 +41,7 @@
     - name: Set fact for reserved IP address
       ansible.builtin.set_fact:
         reserved_ip: "{{ create_result.reserved_ip.ip }}"
+        reserved_ips_to_cleanup: "{{ reserved_ips_to_cleanup | default([]) + [create_result.reserved_ip.ip] }}"
 
     - name: Wait for reserved IP to be ready
       ansible.builtin.pause:
@@ -56,19 +88,8 @@
           - result_idempotent.msg is search("already assigned")
 
   rescue:
-
     - name: Teardown | Delete reserved IP
       digitalocean.cloud.reserved_ip:
         state: absent
         token: "{{ digitalocean_token }}"
         floating_ip: "{{ reserved_ip | default('') }}"
-      ignore_errors: true
-
-    - name: Teardown | Delete Droplet
-      digitalocean.cloud.droplet:
-        state: absent
-        token: "{{ digitalocean_token }}"
-        name: "{{ droplet_name }}"
-        region: "{{ droplet_region }}"
-        unique_name: true
-      ignore_errors: true

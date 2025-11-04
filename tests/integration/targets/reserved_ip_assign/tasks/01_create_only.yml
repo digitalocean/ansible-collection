@@ -1,0 +1,28 @@
+---
+- name: 01_create_only
+  block:
+    - name: 01_create_only | Create reserved IP without assigning it
+      digitalocean.cloud.reserved_ip_assign:
+        token: "{{ digitalocean_token }}"
+        region: "{{ droplet_region }}"
+      register: result_create_only
+
+    - name: 01_create_only | Verify create reserved IP
+      ansible.builtin.assert:
+        that:
+          - result_create_only.changed
+          - result_create_only.reserved_ip is defined
+          - result_create_only.reserved_ip.ip is defined
+          - result_create_only.reserved_ip.droplet is not defined or result_create_only.reserved_ip.droplet is none
+          - result_create_only.msg is search("Created reserved IP")
+
+    - name: 01_create_only | Set fact for reserved IP address
+      ansible.builtin.set_fact:
+        reserved_ip: "{{ result_create_only.reserved_ip.ip }}"
+
+  always:
+    - name: 01_create_only | Delete reserved IP
+      digitalocean.cloud.reserved_ip:
+        state: absent
+        token: "{{ digitalocean_token }}"
+        floating_ip: "{{ reserved_ip | mandatory }}"

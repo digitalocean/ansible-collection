@@ -1,0 +1,31 @@
+---
+- name: 06_assign_no_params
+  block:
+    - name: 06_assign_no_params | Create reserved IP (unassigned) for testing validation
+      digitalocean.cloud.reserved_ip_assign:
+        token: "{{ digitalocean_token }}"
+        region: "{{ droplet_region }}"
+      register: result_create_validation
+
+    - name: 06_assign_no_params | Set fact for reserved IP address
+      ansible.builtin.set_fact:
+        reserved_ip: "{{ result_create_validation.reserved_ip.ip }}"
+
+    - name: 06_assign_no_params | Attempt to assign reserved IP without droplet_id, name, or region (should fail)
+      digitalocean.cloud.reserved_ip_assign:
+        token: "{{ digitalocean_token }}"
+        reserved_ip: "{{ reserved_ip | mandatory }}"
+      register: result_no_params
+
+    - name: 06_assign_no_params | Verify validation error occurs
+      ansible.builtin.assert:
+        that:
+          - result_no_params.failed | bool
+          - result_no_params.msg is search("Must provide either droplet_id or both name and region")
+
+  always:
+    - name: 06_assign_no_params | Delete reserved IP
+      digitalocean.cloud.reserved_ip_assign:
+        token: "{{ digitalocean_token }}"
+        reserved_ip: "{{ reserved_ip | mandatory }}"
+        state: absent
