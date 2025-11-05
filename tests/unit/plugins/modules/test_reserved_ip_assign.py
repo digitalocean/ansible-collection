@@ -11,6 +11,7 @@ from unittest.mock import MagicMock, patch
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.digitalocean.cloud.plugins.modules import reserved_ip_assign
+from ansible_collections.digitalocean.cloud.plugins.module_utils import common
 
 
 @pytest.fixture(autouse=True)
@@ -84,7 +85,7 @@ def test_create_unassigned_reserved_ip():
         }
 
         with patch(
-            "pydo.Client",
+            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
             return_value=client_mock,
         ):
             instance = reserved_ip_assign.ReservedIPAssign(module)
@@ -128,7 +129,7 @@ def test_create_and_assign_by_droplet_id():
         module = create_module(params, check_mode=False)
 
         with patch(
-            "pydo.Client",
+            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
             return_value=client_mock,
         ):
             with patch(
@@ -186,7 +187,7 @@ def test_assign_existing_by_droplet_id():
         module = create_module(params, check_mode=False)
 
         with patch(
-            "pydo.Client",
+            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
             return_value=client_mock,
         ):
             with patch(
@@ -229,7 +230,7 @@ def test_create_unassigned_missing_region():
         )
 
         with patch(
-            "pydo.Client",
+            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
             return_value=client_mock,
         ):
             try:
@@ -263,26 +264,14 @@ def test_assign_existing_missing_droplet_params():
     client_mock = MagicMock()
     client_mock.reserved_ips.get.return_value = {"reserved_ip": reserved_ip_data}
 
-    def mock_init(self, module):
-        """Mock DigitalOceanCommonModule.__init__ to set client directly."""
-        self.module = module
-        self.module_override_options = module.params.get("module_override_options")
-        self.client_options = {"token": module.params.get("token")}
-        self.client_override_options = module.params.get("client_override_options")
-        if self.client_override_options:
-            self.client_options.update(**self.client_override_options)
-        self.client = client_mock
-        self.state = module.params.get("state")
-
     with patch.object(basic.AnsibleModule, "__init__", return_value=None):
         module = create_module(
             params, check_mode=False, fail_json_side_effect=SystemExit(1)
         )
 
-        with patch.object(
-            reserved_ip_assign.DigitalOceanCommonModule,
-            "__init__",
-            mock_init,
+        with patch(
+            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
+            return_value=client_mock,
         ):
             try:
                 instance = reserved_ip_assign.ReservedIPAssign(module)
@@ -322,7 +311,7 @@ def test_name_requires_region():
         )
 
         with patch(
-            "pydo.Client",
+            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
             return_value=client_mock,
         ):
             try:
@@ -353,7 +342,7 @@ def test_create_check_mode():
         module = create_module(params, check_mode=True)
 
         with patch(
-            "pydo.Client",
+            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
             return_value=client_mock,
         ):
             # create() is called during __init__ in check_mode
@@ -406,24 +395,12 @@ def test_assign_idempotent():
     # Mock reserved_ip_actions.post to prevent hanging in assign() polling loop
     client_mock.reserved_ip_actions.post.return_value = {"action": action_data}
 
-    def mock_init(self, module):
-        """Mock DigitalOceanCommonModule.__init__ to set client directly."""
-        self.module = module
-        self.module_override_options = module.params.get("module_override_options")
-        self.client_options = {"token": module.params.get("token")}
-        self.client_override_options = module.params.get("client_override_options")
-        if self.client_override_options:
-            self.client_options.update(**self.client_override_options)
-        self.client = client_mock
-        self.state = module.params.get("state")
-
     with patch.object(basic.AnsibleModule, "__init__", return_value=None):
         module = create_module(params, check_mode=False)
 
-        with patch.object(
-            reserved_ip_assign.DigitalOceanCommonModule,
-            "__init__",
-            mock_init,
+        with patch(
+            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
+            return_value=client_mock,
         ):
             with patch(
                 "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanFunctions.find_droplet"
@@ -509,7 +486,7 @@ def test_reserved_ip_not_found():
         module = create_module(params, check_mode=False)
 
         with patch(
-            "pydo.Client",
+            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
             return_value=client_mock,
         ):
             try:
@@ -556,7 +533,7 @@ def test_create_and_assign_by_name_region():
         module = create_module(params, check_mode=False)
 
         with patch(
-            "pydo.Client",
+            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
             return_value=client_mock,
         ):
             with patch(
@@ -592,7 +569,7 @@ def test_droplet_id_and_name_mutually_exclusive():
         )
 
         with patch(
-            "pydo.Client",
+            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
             return_value=client_mock,
         ):
             try:
