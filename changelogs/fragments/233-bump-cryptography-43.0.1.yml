@@ -1,3 +1,0 @@
----
-minor_changes:
-  - dependencies - bump cryptography from 42.0.8 to 43.0.1 (https://github.com/digitalocean/ansible-collection/issues/233).

@@ -1,3 +1,0 @@
----
-minor_changes:
-  - reserved_ip_assign - new module for assigning an existing reserved IP to a Droplet (https://github.com/digitalocean/ansible-collection/issues/233).

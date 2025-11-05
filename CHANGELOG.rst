@@ -4,6 +4,22 @@ DigitalOcean Collection Release Notes
 
 .. contents:: Topics
 
+v1.3.0
+======
+
+Minor Changes
+-------------
+
+- dependencies - bump aiohttp from 3.9.5 to 3.10.2 (https://github.com/digitalocean/ansible-collection/issues/233).
+- dependencies - bump certifi from 2024.6.2 to 2024.7.4 (https://github.com/digitalocean/ansible-collection/issues/233).
+- dependencies - bump cryptography from 42.0.8 to 43.0.1 (https://github.com/digitalocean/ansible-collection/issues/233).
+- reserved_ip_assign - new module for assigning an existing reserved IP to a Droplet (https://github.com/digitalocean/ansible-collection/issues/233).
+
+New Modules
+-----------
+
+- reserved_ip_assign - Create and/or assign a reserved IP to a Droplet
+
 v1.2.1
 ======
 

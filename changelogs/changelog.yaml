@@ -343,3 +343,21 @@ releases:
     fragments:
     - 245-add-more-droplet-tests.yaml
     release_date: '2025-05-06'
+  1.3.0:
+    changes:
+      minor_changes:
+      - dependencies - bump aiohttp from 3.9.5 to 3.10.2 (https://github.com/digitalocean/ansible-collection/issues/233).
+      - dependencies - bump certifi from 2024.6.2 to 2024.7.4 (https://github.com/digitalocean/ansible-collection/issues/233).
+      - dependencies - bump cryptography from 42.0.8 to 43.0.1 (https://github.com/digitalocean/ansible-collection/issues/233).
+      - reserved_ip_assign - new module for assigning an existing reserved IP to a
+        Droplet (https://github.com/digitalocean/ansible-collection/issues/233).
+    fragments:
+    - 233-bump-aiohttp-3.10.2.yml
+    - 233-bump-certifi-2024.7.4.yml
+    - 233-bump-cryptography-43.0.1.yml
+    - 233-reserved-ip-assign.yml
+    modules:
+    - description: Create and/or assign a reserved IP to a Droplet
+      name: reserved_ip_assign
+      namespace: ''
+    release_date: '2025-11-05'
