@@ -93,7 +93,7 @@ EXAMPLES = r"""
     token: "{{ token }}"
     droplet_id: 3164444
 
-- name: Create a reserved IP and assign it to a Droplet by name
+- name: Create a reserved IP and assign it to a Droplet by name and region
   digitalocean.cloud.reserved_ip_assign:
     token: "{{ token }}"
     name: example.com
@@ -105,7 +105,7 @@ EXAMPLES = r"""
     reserved_ip: "45.55.96.47"
     droplet_id: 3164444
 
-- name: Assign an existing reserved IP to a Droplet by name
+- name: Assign an existing reserved IP to a Droplet by name and region
   digitalocean.cloud.reserved_ip_assign:
     token: "{{ token }}"
     reserved_ip: "45.55.96.47"
@@ -460,7 +460,10 @@ class ReservedIPAssign(DigitalOceanCommonModule):
         try:
             reserved_ips = self.client.reserved_ips.list()["reserved_ips"]
             for reserved_ip in reserved_ips:
-                if reserved_ip.get("droplet") and reserved_ip["droplet"]["id"] == droplet_id:
+                if (
+                    reserved_ip.get("droplet")
+                    and reserved_ip["droplet"]["id"] == droplet_id
+                ):
                     # Droplet already has a reserved IP assigned - return it (idempotent)
                     self.module.exit_json(
                         changed=False,
@@ -486,12 +489,18 @@ class ReservedIPAssign(DigitalOceanCommonModule):
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
             # Handle the case where droplet already has a reserved IP (422 error)
-            if err.status_code == 422 and "already assigned" in err.error.message.lower():
+            if (
+                err.status_code == 422
+                and "already assigned" in err.error.message.lower()
+            ):
                 # Try to find the existing reserved IP for this droplet
                 try:
                     reserved_ips = self.client.reserved_ips.list()["reserved_ips"]
                     for reserved_ip in reserved_ips:
-                        if reserved_ip.get("droplet") and reserved_ip["droplet"]["id"] == droplet_id:
+                        if (
+                            reserved_ip.get("droplet")
+                            and reserved_ip["droplet"]["id"] == droplet_id
+                        ):
                             # Found the existing reserved IP - return it (idempotent)
                             self.module.exit_json(
                                 changed=False,
@@ -504,25 +513,6 @@ class ReservedIPAssign(DigitalOceanCommonModule):
                     pass  # Fall through to fail_json below
 
             # For other errors, fail
-            error = {
-                "Message": err.error.message,
-                "Status Code": err.status_code,
-                "Reason": err.reason,
-            }
-            self.module.fail_json(
-                changed=False,
-                msg=error.get("Message"),
-                error=error,
-                action=[],
-                reserved_ip=[],
-            )
-
-    def get_action_by_id(self, action_id):
-        """Get action status by ID."""
-        try:
-            action = self.client.actions.get(action_id=action_id)["action"]
-            return action
-        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -565,7 +555,10 @@ class ReservedIPAssign(DigitalOceanCommonModule):
         try:
             reserved_ips = self.client.reserved_ips.list()["reserved_ips"]
             for reserved_ip in reserved_ips:
-                if reserved_ip.get("droplet") and reserved_ip["droplet"]["id"] == droplet_id:
+                if (
+                    reserved_ip.get("droplet")
+                    and reserved_ip["droplet"]["id"] == droplet_id
+                ):
                     # Droplet has a reserved IP assigned - check if it's the same one
                     if reserved_ip["ip"] == self.reserved_ip:
                         # Same reserved IP already assigned - idempotent
@@ -643,12 +636,18 @@ class ReservedIPAssign(DigitalOceanCommonModule):
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
             # Handle the case where droplet already has a reserved IP (422 error)
-            if err.status_code == 422 and "already assigned" in err.error.message.lower():
+            if (
+                err.status_code == 422
+                and "already assigned" in err.error.message.lower()
+            ):
                 # Try to find the existing reserved IP for this droplet
                 try:
                     reserved_ips = self.client.reserved_ips.list()["reserved_ips"]
                     for reserved_ip in reserved_ips:
-                        if reserved_ip.get("droplet") and reserved_ip["droplet"]["id"] == droplet_id:
+                        if (
+                            reserved_ip.get("droplet")
+                            and reserved_ip["droplet"]["id"] == droplet_id
+                        ):
                             # Check if it's the same reserved IP we're trying to assign
                             if reserved_ip["ip"] == self.reserved_ip:
                                 # Same reserved IP already assigned - idempotent
