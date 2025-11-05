@@ -49,9 +49,9 @@ jobs:
           # around creation of a new stable branch, this might cause a problem
           # that two different versions of ansible-test use the same sanity test
           # ignore.txt file.
-          - stable-2.14
           - stable-2.15
           - stable-2.16
+          - stable-2.17
           - devel
     # Ansible-test on various stable branches does not yet work well with cgroups v2.
     # Since ubuntu-latest now uses Ubuntu 22.04, we need to fall back to the ubuntu-20.04
@@ -60,7 +60,7 @@ jobs:
     # for the latest list.
     runs-on: >-
       ${{ contains(fromJson(
-          '["stable-2.14", "stable-2.15", "stable-2.16"]'
+          '["stable-2.15", "stable-2.16", "stable-2.17"]'
       ), matrix.ansible) && 'ubuntu-22.04' || 'ubuntu-latest' }}
     steps:
       # Run sanity tests inside a Docker container.
@@ -96,7 +96,7 @@ jobs:
     # for the latest list.
     runs-on: >-
       ${{ contains(fromJson(
-          '["stable-2.14", "stable-2.15", "stable-2.16"]'
+          '["stable-2.15", "stable-2.16", "stable-2.17"]'
       ), matrix.ansible) && 'ubuntu-22.04' || 'ubuntu-latest' }}
     name: Units (Ⓐ${{ matrix.versions.ansible }}+py${{ matrix.versions.python }})
     strategy:
@@ -104,24 +104,24 @@ jobs:
       fail-fast: true
       matrix:
         versions:
-          - ansible: stable-2.14
-            python: "3.9"
           - ansible: stable-2.15
             python: "3.10"
           - ansible: stable-2.16
             python: "3.10"
+          - ansible: stable-2.17
+            python: "3.11"
           - ansible: devel
             python: "3.11"
 
     steps:
       - name: >-
           Perform unit testing against
-          Ansible version ${{ matrix.ansible }}
+          Ansible version ${{ matrix.versions.ansible }}
         # See the documentation for the following GitHub action on
         # https://github.com/ansible-community/ansible-test-gh-action/blob/main/README.md
         uses: ansible-community/ansible-test-gh-action@release/v1
         with:
-          ansible-core-version: ${{ matrix.ansible }}
+          ansible-core-version: ${{ matrix.versions.ansible }}
           testing-type: units
           # OPTIONAL If your unit tests require code
           # from other collections, install them like this
@@ -150,7 +150,7 @@ jobs:
     # for the latest list.
     runs-on: >-
       ${{ contains(fromJson(
-          '["stable-2.14", "stable-2.15", "stable-2.16"]'
+          '["stable-2.15", "stable-2.16", "stable-2.17"]'
       ), matrix.ansible) && 'ubuntu-22.04' || 'ubuntu-latest' }}
     name: I (Ⓐ${{ matrix.versions.ansible }}+py${{ matrix.versions.python }})
     strategy:
@@ -158,12 +158,12 @@ jobs:
       matrix:
         # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html
         versions:
-          - ansible: stable-2.14
-            python: "3.9"
           - ansible: stable-2.15
             python: "3.10"
           - ansible: stable-2.16
             python: "3.10"
+          - ansible: stable-2.17
+            python: "3.11"
           - ansible: devel
             python: "3.11"
         python:
@@ -180,16 +180,16 @@ jobs:
     steps:
       - name: >-
           Perform integration testing against
-          Ansible version ${{ matrix.ansible }}
-          under Python ${{ matrix.python }}
+          Ansible version ${{ matrix.versions.ansible }}
+          under Python ${{ matrix.versions.python }}
         # See the documentation for the following GitHub action on
         # https://github.com/ansible-community/ansible-test-gh-action/blob/main/README.md
         uses: ansible-community/ansible-test-gh-action@release/v1
         with:
-          ansible-core-version: ${{ matrix.ansible }}
+          ansible-core-version: ${{ matrix.versions.ansible }}
           # OPTIONAL command to run before invoking `ansible-test integration`
           # pre-test-cmd:
-          target-python-version: ${{ matrix.python }}
+          target-python-version: ${{ matrix.versions.python }}
           testing-type: integration
           # OPTIONAL If your integration tests require code
           # from other collections, install them like this
