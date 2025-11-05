@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - dependencies - bump certifi from 2024.6.2 to 2024.7.4 (https://github.com/digitalocean/ansible-collection/issues/233).
