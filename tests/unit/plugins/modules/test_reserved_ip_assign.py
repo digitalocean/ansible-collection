@@ -36,7 +36,9 @@ def set_module_args(args):
     )
 
 
-def create_module(params, check_mode=False, fail_json_side_effect=None, exit_json_side_effect=None):
+def create_module(
+    params, check_mode=False, fail_json_side_effect=None, exit_json_side_effect=None
+):
     """Helper function to create a properly mocked AnsibleModule.
 
     Note: This must be called within a 'with patch.object(basic.AnsibleModule, "__init__", return_value=None):' context.
@@ -222,7 +224,9 @@ def test_create_unassigned_missing_region():
     client_mock = MagicMock()
 
     with patch.object(basic.AnsibleModule, "__init__", return_value=None):
-        module = create_module(params, check_mode=False, fail_json_side_effect=SystemExit(1))
+        module = create_module(
+            params, check_mode=False, fail_json_side_effect=SystemExit(1)
+        )
 
         with patch(
             "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
@@ -260,7 +264,9 @@ def test_assign_existing_missing_droplet_params():
     client_mock.reserved_ips.get.return_value = {"reserved_ip": reserved_ip_data}
 
     with patch.object(basic.AnsibleModule, "__init__", return_value=None):
-        module = create_module(params, check_mode=False, fail_json_side_effect=SystemExit(1))
+        module = create_module(
+            params, check_mode=False, fail_json_side_effect=SystemExit(1)
+        )
 
         with patch(
             "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
@@ -278,7 +284,9 @@ def test_assign_existing_missing_droplet_params():
                 if "Must provide either droplet_id" in str(call):
                     found_msg = True
                     break
-            assert found_msg or "Must provide either droplet_id" in str(module.fail_json.call_args)
+            assert found_msg or "Must provide either droplet_id" in str(
+                module.fail_json.call_args
+            )
 
 
 def test_name_requires_region():
@@ -297,7 +305,9 @@ def test_name_requires_region():
     client_mock = MagicMock()
 
     with patch.object(basic.AnsibleModule, "__init__", return_value=None):
-        module = create_module(params, check_mode=False, fail_json_side_effect=SystemExit(1))
+        module = create_module(
+            params, check_mode=False, fail_json_side_effect=SystemExit(1)
+        )
 
         with patch(
             "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
@@ -413,11 +423,15 @@ def test_assign_idempotent():
                     exit_calls = module.exit_json.call_args_list
                     idempotent_call = None
                     for call in exit_calls:
-                        if call[1].get("changed") is False and "already assigned" in call[1].get("msg", ""):
+                        if call[1].get(
+                            "changed"
+                        ) is False and "already assigned" in call[1].get("msg", ""):
                             idempotent_call = call
                             break
 
-                    assert idempotent_call is not None, "Idempotent check exit_json not called"
+                    assert (
+                        idempotent_call is not None
+                    ), "Idempotent check exit_json not called"
                     assert idempotent_call[1]["changed"] is False
                     assert "already assigned" in idempotent_call[1]["msg"]
 
@@ -439,8 +453,11 @@ def test_reserved_ip_not_found():
     # Create a proper exception class that derives from BaseException
     try:
         from azure.core.exceptions import HttpResponseError as AzureHttpResponseError
+
         # Create a real exception instance
-        http_error = AzureHttpResponseError(message="Reserved IP not found", response=MagicMock())
+        http_error = AzureHttpResponseError(
+            message="Reserved IP not found", response=MagicMock()
+        )
         http_error.error = MagicMock()
         http_error.error.message = "Reserved IP not found"
         http_error.status_code = 404
@@ -456,7 +473,9 @@ def test_reserved_ip_not_found():
                 self.error.message = message
                 super().__init__(message)
 
-        http_error = HttpResponseError("Reserved IP not found", status_code=404, reason="Not Found")
+        http_error = HttpResponseError(
+            "Reserved IP not found", status_code=404, reason="Not Found"
+        )
 
     client_mock = MagicMock()
     client_mock.reserved_ips.get.side_effect = http_error
@@ -474,7 +493,10 @@ def test_reserved_ip_not_found():
                 pass
 
             module.fail_json.assert_called_once()
-            assert "Reserved IP 192.168.1.1 not found" in module.fail_json.call_args[1]["msg"]
+            assert (
+                "Reserved IP 192.168.1.1 not found"
+                in module.fail_json.call_args[1]["msg"]
+            )
 
 
 def test_create_and_assign_by_name_region():
@@ -540,7 +562,9 @@ def test_droplet_id_and_name_mutually_exclusive():
     client_mock = MagicMock()
 
     with patch.object(basic.AnsibleModule, "__init__", return_value=None):
-        module = create_module(params, check_mode=False, fail_json_side_effect=SystemExit(1))
+        module = create_module(
+            params, check_mode=False, fail_json_side_effect=SystemExit(1)
+        )
 
         with patch(
             "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
@@ -552,4 +576,7 @@ def test_droplet_id_and_name_mutually_exclusive():
                 pass
 
             module.fail_json.assert_called_once()
-            assert "droplet_id and name are mutually exclusive" in module.fail_json.call_args[1]["msg"]
+            assert (
+                "droplet_id and name are mutually exclusive"
+                in module.fail_json.call_args[1]["msg"]
+            )
