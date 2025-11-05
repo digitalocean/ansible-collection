@@ -1,5 +1,5 @@
 ---
-requires_ansible: ">=2.14.0" # Use '>= 2.9.10' instead, if needed
+requires_ansible: ">=2.15.0" # Use '>= 2.9.10' instead, if needed
 action_groups:
   all:
     - account_info
