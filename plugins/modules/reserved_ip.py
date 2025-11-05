@@ -44,26 +44,17 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Create firewall
-  digitalocean.cloud.firewall:
+- name: Create a reserved IP and assign it to a Droplet
+  digitalocean.cloud.reserved_ip:
     token: "{{ token }}"
     state: present
-    name: firewall
-    inbound_rules:
-      - protocol: tcp
-        ports: 80
-        sources:
-          - load_balancer_uids:
-              - "4de7ac8b-495b-4884-9a69-1050c6793cd6"
-    outbound_rules:
-      - protocol: tcp
-        ports: 80
-        destinations:
-          - addresses:
-              - "0.0.0.0/0"
-              - "::/0"
-    droplet_ids:
-      - 8043964
+    droplet_id: 3164444
+
+- name: Delete a reserved IP
+  digitalocean.cloud.reserved_ip:
+    token: "{{ token }}"
+    state: absent
+    floating_ip: "45.55.96.47"
 """
 
 
