@@ -46,7 +46,7 @@ options:
       - The reserved IP address to assign or delete.
       - If not provided, a new reserved IP will be created (only when C(state=present)).
       - Required when C(state=absent).
-      - Aliases: C(floating_ip).
+      - Aliases C(floating_ip).
     type: str
     required: false
     aliases:
@@ -572,7 +572,10 @@ class ReservedIPAssign(DigitalOceanCommonModule):
                         # Different reserved IP assigned - this is an error condition
                         self.module.fail_json(
                             changed=False,
-                            msg=f"Droplet {droplet_name} ({droplet_id}) is already assigned to reserved IP {reserved_ip['ip']}. Cannot assign {self.reserved_ip}.",
+                            msg=(
+                                f"Droplet {droplet_name} ({droplet_id}) is already assigned to reserved IP "
+                                f"{reserved_ip['ip']}. Cannot assign {self.reserved_ip}."
+                            ),
                             error={
                                 "Message": f"Droplet is already assigned to another reserved IP ({reserved_ip['ip']})",
                                 "Status Code": 422,
@@ -662,7 +665,10 @@ class ReservedIPAssign(DigitalOceanCommonModule):
                                 # Different reserved IP assigned - error condition
                                 self.module.fail_json(
                                     changed=False,
-                                    msg=f"Droplet {droplet_name} ({droplet_id}) is already assigned to reserved IP {reserved_ip['ip']}. Cannot assign {self.reserved_ip}.",
+                                    msg=(
+                                        f"Droplet {droplet_name} ({droplet_id}) is already assigned to reserved IP "
+                                        f"{reserved_ip['ip']}. Cannot assign {self.reserved_ip}."
+                                    ),
                                     error={
                                         "Message": err.error.message,
                                         "Status Code": err.status_code,
