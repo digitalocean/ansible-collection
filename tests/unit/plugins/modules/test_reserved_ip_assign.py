@@ -84,7 +84,7 @@ def test_create_unassigned_reserved_ip():
         }
 
         with patch(
-            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
+            "pydo.Client",
             return_value=client_mock,
         ):
             instance = reserved_ip_assign.ReservedIPAssign(module)
@@ -128,7 +128,7 @@ def test_create_and_assign_by_droplet_id():
         module = create_module(params, check_mode=False)
 
         with patch(
-            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
+            "pydo.Client",
             return_value=client_mock,
         ):
             with patch(
@@ -186,7 +186,7 @@ def test_assign_existing_by_droplet_id():
         module = create_module(params, check_mode=False)
 
         with patch(
-            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
+            "pydo.Client",
             return_value=client_mock,
         ):
             with patch(
@@ -229,7 +229,7 @@ def test_create_unassigned_missing_region():
         )
 
         with patch(
-            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
+            "pydo.Client",
             return_value=client_mock,
         ):
             try:
@@ -269,7 +269,7 @@ def test_assign_existing_missing_droplet_params():
         )
 
         with patch(
-            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
+            "pydo.Client",
             return_value=client_mock,
         ):
             try:
@@ -310,7 +310,7 @@ def test_name_requires_region():
         )
 
         with patch(
-            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
+            "pydo.Client",
             return_value=client_mock,
         ):
             try:
@@ -341,7 +341,7 @@ def test_create_check_mode():
         module = create_module(params, check_mode=True)
 
         with patch(
-            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
+            "pydo.Client",
             return_value=client_mock,
         ):
             # create() is called during __init__ in check_mode
@@ -397,7 +397,7 @@ def test_assign_idempotent():
         module = create_module(params, check_mode=False)
 
         with patch(
-            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
+            "pydo.Client",
             return_value=client_mock,
         ):
             with patch(
@@ -484,7 +484,7 @@ def test_reserved_ip_not_found():
         module = create_module(params, check_mode=False)
 
         with patch(
-            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
+            "pydo.Client",
             return_value=client_mock,
         ):
             try:
@@ -531,7 +531,7 @@ def test_create_and_assign_by_name_region():
         module = create_module(params, check_mode=False)
 
         with patch(
-            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
+            "pydo.Client",
             return_value=client_mock,
         ):
             with patch(
@@ -567,7 +567,7 @@ def test_droplet_id_and_name_mutually_exclusive():
         )
 
         with patch(
-            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
+            "pydo.Client",
             return_value=client_mock,
         ):
             try:
