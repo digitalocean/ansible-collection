@@ -11,7 +11,6 @@ from unittest.mock import MagicMock, patch
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.digitalocean.cloud.plugins.modules import reserved_ip_assign
-from ansible_collections.digitalocean.cloud.plugins.module_utils import common
 
 
 @pytest.fixture(autouse=True)
