@@ -263,14 +263,26 @@ def test_assign_existing_missing_droplet_params():
     client_mock = MagicMock()
     client_mock.reserved_ips.get.return_value = {"reserved_ip": reserved_ip_data}
 
+    def mock_init(self, module):
+        """Mock DigitalOceanCommonModule.__init__ to set client directly."""
+        self.module = module
+        self.module_override_options = module.params.get("module_override_options")
+        self.client_options = {"token": module.params.get("token")}
+        self.client_override_options = module.params.get("client_override_options")
+        if self.client_override_options:
+            self.client_options.update(**self.client_override_options)
+        self.client = client_mock
+        self.state = module.params.get("state")
+
     with patch.object(basic.AnsibleModule, "__init__", return_value=None):
         module = create_module(
             params, check_mode=False, fail_json_side_effect=SystemExit(1)
         )
 
-        with patch(
-            "pydo.Client",
-            return_value=client_mock,
+        with patch.object(
+            reserved_ip_assign.DigitalOceanCommonModule,
+            "__init__",
+            mock_init,
         ):
             try:
                 instance = reserved_ip_assign.ReservedIPAssign(module)
@@ -390,15 +402,28 @@ def test_assign_idempotent():
 
     client_mock = MagicMock()
     client_mock.reserved_ips.get.return_value = {"reserved_ip": reserved_ip_data}
+    client_mock.reserved_ips.list.return_value = {"reserved_ips": [reserved_ip_data]}
     # Mock reserved_ip_actions.post to prevent hanging in assign() polling loop
     client_mock.reserved_ip_actions.post.return_value = {"action": action_data}
+
+    def mock_init(self, module):
+        """Mock DigitalOceanCommonModule.__init__ to set client directly."""
+        self.module = module
+        self.module_override_options = module.params.get("module_override_options")
+        self.client_options = {"token": module.params.get("token")}
+        self.client_override_options = module.params.get("client_override_options")
+        if self.client_override_options:
+            self.client_options.update(**self.client_override_options)
+        self.client = client_mock
+        self.state = module.params.get("state")
 
     with patch.object(basic.AnsibleModule, "__init__", return_value=None):
         module = create_module(params, check_mode=False)
 
-        with patch(
-            "pydo.Client",
-            return_value=client_mock,
+        with patch.object(
+            reserved_ip_assign.DigitalOceanCommonModule,
+            "__init__",
+            mock_init,
         ):
             with patch(
                 "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanFunctions.find_droplet"
