@@ -168,23 +168,35 @@ class DigitalOceanFunctions:
                     error=error,
                 )
         elif name and region:
-            droplets = DigitalOceanFunctions.get_droplet_by_name_in_region(
-                module=module,
-                client=client,
-                region=region,
-                name=name,
-            )
-            if len(droplets) == 0:
+            try:
+                droplets = DigitalOceanFunctions.get_droplet_by_name_in_region(
+                    module=module,
+                    client=client,
+                    region=region,
+                    name=name,
+                )
+                if len(droplets) == 0:
+                    module.fail_json(
+                        changed=False,
+                        msg=f"No Droplet named {name} in {region}",
+                    )
+                elif len(droplets) > 1:
+                    module.fail_json(
+                        changed=False,
+                        msg=f"Multiple Droplets ({len(droplets)}) named {name} found in {region}",
+                    )
+                return droplets[0]
+            except DigitalOceanCommonModule.HttpResponseError as err:
+                error = {
+                    "Message": err.error.message,
+                    "Status Code": err.status_code,
+                    "Reason": err.reason,
+                }
                 module.fail_json(
                     changed=False,
-                    msg=f"No Droplet named {name} in {region}",
+                    msg=f"Error finding Droplet named {name} in {region}",
+                    error=error,
                 )
-            elif len(droplets) > 1:
-                module.fail_json(
-                    changed=False,
-                    msg=f"Multiple Droplets ({len(droplets)}) named {name} found in {region}",
-                )
-            return droplets[0]
 
         module.fail_json(
             changed=False,
