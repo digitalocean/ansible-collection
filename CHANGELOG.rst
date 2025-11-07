@@ -4,6 +4,70 @@ DigitalOcean Collection Release Notes
 
 .. contents:: Topics
 
+v1.3.0
+======
+
+Minor Changes
+-------------
+
+- dependencies - bump aiohttp from 3.9.5 to 3.10.2 (https://github.com/digitalocean/ansible-collection/issues/233).
+- dependencies - bump certifi from 2024.6.2 to 2024.7.4 (https://github.com/digitalocean/ansible-collection/issues/233).
+- dependencies - bump cryptography from 42.0.8 to 43.0.1 (https://github.com/digitalocean/ansible-collection/issues/233).
+- reserved_ip_assign - new module for assigning an existing reserved IP to a Droplet (https://github.com/digitalocean/ansible-collection/issues/233).
+
+New Modules
+-----------
+
+- reserved_ip_assign - Create and/or assign a reserved IP to a Droplet
+
+v1.2.1
+======
+
+Minor Changes
+-------------
+
+- droplet - Add more Droplet tests and fix Droplet "noop" resize (https://github.com/digitalocean/ansible-collection/issues/245).
+
+v1.2.0
+======
+
+Major Changes
+-------------
+
+- database_cluster -  Replace Redis with Valkey (https://github.com/digitalocean/ansible-collection/issues/241).
+
+Bugfixes
+--------
+
+- droplet - Fix resize for new Droplets (https://github.com/digitalocean/ansible-collection/issues/239).
+
+v1.1.0
+======
+
+Minor Changes
+-------------
+
+- droplet - Add ``resize`` and ``resize_disk`` functionality (https://github.com/digitalocean/ansible-collection/issues/236).
+
+v1.0.0
+======
+
+Release Summary
+---------------
+
+Bump Python, project-wide, to 3.11.11. Fix ``state: absent`` bug in the Droplet module. Disable integration testing for the ``monitoring_alert_policy`` and ``one_click`` modules since they are broken (https://github.com/digitalocean/ansible-collection/pull/234).
+
+Minor Changes
+-------------
+
+- Bump Python to 3.11.11 and Poetry to 1.8.5 (https://github.com/digitalocean/ansible-collection/issues/229).
+- monitoring_alert_policy - mark integration test as ``disabled`` since it is broken (https://github.com/digitalocean/ansible-collection/issues/229)."
+- one_click - mark this integration test as ``disabled`` since it is broken (https://github.com/digitalocean/ansible-collection/issues/229)."
+
+Bugfixes
+--------
+
+- droplet - add misisng ``droplet_id`` parameter when for ``state: absent`` (https://github.com/digitalocean/ansible-collection/issues/229).
 
 v0.6.0
 ======
@@ -16,12 +80,12 @@ Minor Changes
 v0.5.1
 ======
 
-Trivial Changes
----------------
+Minor Changes
+-------------
 
-- docs - fix broken links due to Ansible Galaxy NG launch (https://github.com/digitalocean/ansible-collection/pull/91).
-- tests - bump Kubernetes version in its integration test (https://github.com/digitalocean/ansible-collection/issues/100).
-- lint - tweaked ansible-lint configuration so production profile is now the target for this repo (https://github.com/digitalocean/ansible-collection/pull/104).
+- Bump Kubernetes version in its integration test (https://github.com/digitalocean/ansible-collection/issues/100).
+- Fix broken links due to Ansible Galaxy NG launch (https://github.com/digitalocean/ansible-collection/pull/91).
+- Lint tweaked ansible-lint configuration so production profile is now the target for this repo (https://github.com/digitalocean/ansible-collection/pull/104).
 
 v0.5.0
 ======

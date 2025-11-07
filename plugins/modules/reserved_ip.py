@@ -44,26 +44,17 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Create firewall
-  digitalocean.cloud.firewall:
+- name: Create a reserved IP and assign it to a Droplet
+  digitalocean.cloud.reserved_ip:
     token: "{{ token }}"
     state: present
-    name: firewall
-    inbound_rules:
-      - protocol: tcp
-        ports: 80
-        sources:
-          - load_balancer_uids:
-              - "4de7ac8b-495b-4884-9a69-1050c6793cd6"
-    outbound_rules:
-      - protocol: tcp
-        ports: 80
-        destinations:
-          - addresses:
-              - "0.0.0.0/0"
-              - "::/0"
-    droplet_ids:
-      - 8043964
+    droplet_id: 3164444
+
+- name: Delete a reserved IP
+  digitalocean.cloud.reserved_ip:
+    token: "{{ token }}"
+    state: absent
+    floating_ip: "45.55.96.47"
 """
 
 
@@ -120,10 +111,12 @@ msg:
     - TODO
 """
 
+import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonModule,
     DigitalOceanOptions,
+    DigitalOceanConstants,
 )
 
 
@@ -184,13 +177,66 @@ class ReservedIP(DigitalOceanCommonModule):
                 changed=False, msg=error.get("Message"), error=error, reserved_ip=[]
             )
 
-    def delete_reserved_ip(self, reserved_ip):
+    def unassign_reserved_ip(self, reserved_ip):
+        """Unassign a reserved IP from its Droplet."""
+        reserved_ip_addr = reserved_ip["ip"]
+        droplet_id = reserved_ip["droplet"]["id"]
+        droplet_name = reserved_ip["droplet"]["name"]
+        droplet_region = reserved_ip.get("region", {}).get("slug", "unknown")
+
+        if self.module.check_mode:
+            return
+
         try:
-            self.client.reserved_ips.delete(reserved_ip=reserved_ip["ip"])
+            body = {"type": "unassign"}
+            # Based on DigitalOcean API: POST /v2/reserved_ips/{ip}/actions
+            action = self.client.reserved_ips_actions.post(
+                reserved_ip=reserved_ip_addr, body=body
+            )["action"]
+
+            end_time = time.monotonic() + 300  # 5 minute timeout
+            while time.monotonic() < end_time and action["status"] != "completed":
+                time.sleep(DigitalOceanConstants.SLEEP)
+                action = self.get_action_by_id(action_id=action["id"])
+
+            if action["status"] != "completed":
+                self.module.fail_json(
+                    changed=True,
+                    msg=(
+                        f"Reserved IP {reserved_ip_addr} unassigned from Droplet {droplet_name} ({droplet_id}) "
+                        f"but it has not completed, status is '{action['status']}'"
+                    ),
+                    action=action,
+                    reserved_ip=reserved_ip,
+                )
+        except DigitalOceanCommonModule.HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            self.module.fail_json(
+                changed=False,
+                msg=error.get("Message"),
+                error=error,
+                reserved_ip=[],
+            )
+
+    def delete_reserved_ip(self, reserved_ip):
+        """Delete a reserved IP, unassigning it first if necessary."""
+        reserved_ip_addr = reserved_ip["ip"]
+
+        # Check if reserved IP is assigned - if so, unassign it first
+        if reserved_ip.get("droplet"):
+            self.unassign_reserved_ip(reserved_ip)
+
+        try:
+            # Based on DigitalOcean API: DELETE /v2/reserved_ips/{ip}
+            self.client.reserved_ips.delete(reserved_ip=reserved_ip_addr)
             self.module.exit_json(
                 changed=True,
-                msg=f"Deleted reserved IP {reserved_ip['ip']}",
-                reserved_ip=reserved_ip,
+                msg=f"Deleted reserved IP {reserved_ip_addr}",
+                reserved_ip=[],
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
@@ -202,7 +248,7 @@ class ReservedIP(DigitalOceanCommonModule):
                 changed=False,
                 msg=error.get("Message"),
                 error=error,
-                database=[],
+                reserved_ip=[],
             )
 
     def present(self):

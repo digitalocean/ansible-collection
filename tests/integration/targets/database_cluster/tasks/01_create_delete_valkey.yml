@@ -1,8 +1,8 @@
 ---
 # code: language=ansible
-- name: 01_create_delete_redis | Testing block
+- name: 01_create_delete_valkey | Testing block
   block:
-    - name: 01_create_delete_redis | Create database cluster
+    - name: 01_create_delete_valkey | Create database cluster
       digitalocean.cloud.database_cluster:
         state: present
         token: "{{ digitalocean_token }}"
@@ -14,7 +14,7 @@
         timeout: 600
       register: result
 
-    - name: 01_create_delete_redis | Verify create database cluster
+    - name: 01_create_delete_valkey | Verify create database cluster
       ansible.builtin.assert:
         that:
           - result.changed
@@ -24,7 +24,7 @@
           - result.database.num_nodes == num_nodes
           - result.database.region == region
 
-    - name: 01_create_delete_redis | Create database cluster again
+    - name: 01_create_delete_valkey | Create database cluster again
       digitalocean.cloud.database_cluster:
         state: present
         token: "{{ digitalocean_token }}"
@@ -35,13 +35,13 @@
         num_nodes: "{{ num_nodes }}"
       register: result
 
-    - name: 01_create_delete_redis | Verify create database cluster idempotency
+    - name: 01_create_delete_valkey | Verify create database cluster idempotency
       ansible.builtin.assert:
         that:
           - not result.changed
           - result.msg == engine ~ " database cluster " ~ database_name ~ " (" ~ result.database.id ~ ") in " ~ region ~ " exists"
 
-    - name: 01_create_delete_redis | Delete database cluster
+    - name: 01_create_delete_valkey | Delete database cluster
       digitalocean.cloud.database_cluster:
         state: absent
         token: "{{ digitalocean_token }}"
@@ -50,7 +50,7 @@
         engine: "{{ engine }}"
       register: result
 
-    - name: 01_create_delete_redis | Verify delete database cluster
+    - name: 01_create_delete_valkey | Verify delete database cluster
       ansible.builtin.assert:
         that:
           - result.changed

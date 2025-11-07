@@ -2,6 +2,17 @@
 # code: language=ansible
 - name: 01_create_delete_unique_name_and_region | Testing block
   block:
+    - name: 01_create_delete_unique_name_and_region | Create Droplet
+      digitalocean.cloud.droplet:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        size: "{{ droplet_size }}"
+        image: "{{ droplet_image }}"
+        unique_name: true
+      register: result
+
     - name: 01_create_delete_unique_name_and_region | Verify create Droplet
       ansible.builtin.assert:
         that:

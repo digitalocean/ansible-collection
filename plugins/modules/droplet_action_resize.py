@@ -125,13 +125,14 @@ msg:
     - Droplet test-droplet-1 (336851565) in nyc3 sent action 'resize' and it has not completed, status is 'in-progress'
 """
 
-import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonModule,
     DigitalOceanOptions,
     DigitalOceanFunctions,
-    DigitalOceanConstants,
+)
+from ansible_collections.digitalocean.cloud.plugins.module_utils.droplet_resize import (
+    DropletResize,
 )
 
 
@@ -214,41 +215,15 @@ class DropletActionResize(DigitalOceanCommonModule):
 
     def resize(self):
         try:
-            body = {
-                "type": self.type,
-                "disk": self.disk,
-                "size": self.size,
-            }
-            if self.module_override_options:
-                body.update(self.module_override_options)
-
-            action = self.client.droplet_actions.post(
-                droplet_id=self.droplet["id"], body=body
-            )["action"]
-
-            end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and action["status"] != "completed":
-                time.sleep(DigitalOceanConstants.SLEEP)
-                action = self.get_action_by_id(action_id=action["id"])
-
-            if action["status"] != "completed":
-                self.module.fail_json(
-                    changed=True,
-                    msg=(
-                        f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']}"
-                        f" sent action '{self.type}' and it has not completed, status is '{action['status']}'"
-                    ),
-                    action=action,
-                )
-
-            self.module.exit_json(
-                changed=True,
-                msg=(
-                    f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']} sent "
-                    f"action '{self.type}', new size is '{self.size}'"
-                ),
-                action=action,
+            dr = DropletResize(
+                module=self.module,
+                droplet_id=self.droplet["id"],
+                region=self.droplet["region"]["slug"],
+                current_size=self.droplet["size"]["slug"],
+                new_size=self.size,
+                resize_disk=self.disk,
             )
+            dr.resize_droplet()
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,

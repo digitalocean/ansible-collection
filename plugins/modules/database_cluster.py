@@ -21,7 +21,7 @@ description:
   - |
     DigitalOcean's managed database service simplifies the creation and management of highly
     javailable database clusters.
-  - Currently, it offers support for PostgreSQL, Redis, MySQL, and MongoDB.
+  - Currently, it offers support for PostgreSQL, Valkey, MySQL, and MongoDB.
   - Database clusters may be deployed in a multi-node, high-availability configuration.
   - |
     If your machine type is above the basic nodes, your node plan is above the smallest option,
@@ -49,10 +49,10 @@ options:
     description:
       - A slug representing the database engine used for the cluster.
       - |
-        The possible values are "pg" for PostgreSQL, "mysql" for MySQL, "redis" for Redis,
+        The possible values are "pg" for PostgreSQL, "mysql" for MySQL, "valkey" for Valkey,
         and "mongodb" for MongoDB.
     type: str
-    choices: [pg, mysql, redis, mongodb]
+    choices: [pg, mysql, valkey, mongodb]
     required: true
   version:
     description:
@@ -187,13 +187,13 @@ msg:
   returned: always
   type: str
   sample:
-    - Created redis database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3
-    - Created redis database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3 is not 'online', it is 'creating'
-    - Deleted redis database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3
-    - redis database cluster backend in nyc3 would be created
-    - redis database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3 exists
-    - redis database cluster backend in nyc3 does not exist
-    - redis database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) would be deleted
+    - Created valkey database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3
+    - Created valkey database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3 is not 'online', it is 'creating'
+    - Deleted valkey database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3
+    - valkey database cluster backend in nyc3 would be created
+    - valkey database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) in nyc3 exists
+    - valkey database cluster backend in nyc3 does not exist
+    - valkey database cluster backend (9cc10173-e9ea-4176-9dbc-a4cee4c4ff30) would be deleted
 """
 
 import time
@@ -392,7 +392,7 @@ def main():
     argument_spec.update(
         name=dict(type="str", required=True),
         engine=dict(
-            type="str", choices=["pg", "mysql", "redis", "mongodb"], required=True
+            type="str", choices=["pg", "mysql", "valkey", "mongodb"], required=True
         ),
         version=dict(type="str", required=False),
         num_nodes=dict(type="int", default=1),

@@ -48,8 +48,8 @@ if ! test -f .env; then
 fi
 
 # Run the sanity and units tests for this collection
-ansible-test sanity --python 3.9 --verbose
-ansible-test units --python 3.9 --verbose
+ansible-test sanity --python 3.11 --verbose
+ansible-test units --python 3.11 --verbose
 
 # Set up the configuration file for integration tests
 cp tests/integration/integration_config.yml.template \
@@ -72,8 +72,8 @@ cp tests/integration/integration_config.yml.template \
 # pr_number: 0
 #
 # Running the integration tests will create real resources and cost real money
-ansible-test integration --python 3.9 --verbose # To test all modules
-ansible-test integration --python 3.9 account_info --verbose # Test a single module
+ansible-test integration --python 3.11 --verbose # To test all modules
+ansible-test integration --python 3.11 account_info --verbose # Test a single module
 
 # Set up an environment variable for the playbooks
 export DIGITALOCEAN_TOKEN='<Your DigitalOcean API token>'

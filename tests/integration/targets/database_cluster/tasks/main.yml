@@ -10,9 +10,9 @@
           - digitalocean_token | length > 0
         fail_msg: digitalocean_token should be defined in tests/integration/integration_config.yml
 
-    - name: Test database | Create and delete redis
+    - name: Test database | Create and delete valkey
       ansible.builtin.include_tasks:
-        file: 01_create_delete_redis.yml
+        file: 01_create_delete_valkey.yml
 
   always:
     - name: Teardown

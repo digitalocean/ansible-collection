@@ -78,8 +78,8 @@ Every voice is important. If you have something on your mind, create an issue or
 | ------------- | ------ |
 | `stable-2.14` | `3.9`  |
 | `stable-2.15` | `3.10` |
-| `stable-2.16` | `3.10` |
-| `devel`       | `3.10` |
+| `stable-2.16` | `3.11` |
+| `devel`       | `3.11` |
 
 ## External requirements
 
@@ -134,6 +134,7 @@ There is a [pyproject.toml](./pyproject.toml) is the root of this repository as 
 | `digitalocean.cloud.projects_resources_info`        | Get projects resources                       |
 | `digitalocean.cloud.regions_info`                   | Get regions                                  |
 | `digitalocean.cloud.reserved_ip`                    | Create and delete reserved IP                |
+| `digitalocean.cloud.reserved_ip_assign`             | Assign reserved IP to Droplet                |
 | `digitalocean.cloud.reserved_ips_info`              | Get reserved IPs                             |
 | `digitalocean.cloud.sizes_info`                     | Get sizes                                    |
 | `digitalocean.cloud.snapshot`                       | Create and delete snapshots                  |
@@ -408,7 +409,7 @@ You can also install a specific version of the collection, for example, if you n
 Use the following syntax to install version `0.5.0`:
 
 ```shell
-ansible-galaxy collection install digitalocean.cloud:==0.5.0
+ansible-galaxy collection install digitalocean.cloud:==1.0.0
 ```
 
 See [Ansible Using collections](https://docs.ansible.com/ansible/devel/user_guide/collections_using.html) for more details.

@@ -26,7 +26,25 @@
       ansible.builtin.set_fact:
         droplet_id: "{{ result.droplet.id }}"
 
-    - name: Create monitoring alert policy
+    - name: Debug
+      ansible.builtin.debug:
+        msg: |
+          - name: create monitoring alert policy
+            digitalocean.cloud.monitoring_alert_policy:
+              token: "{{ digitalocean_token }}"
+              state: present
+              alerts: "{{ policy.alerts }}"
+              compare: "{{ policy.compare }}"
+              description: "{{ policy.description }}"
+              enabled: "{{ policy.enabled }}"
+              entities: ["{{ droplet_id }}"]
+              tags: "{{ policy.tags }}"
+              type: "{{ policy.type }}"
+              value: "{{ policy.value }}"
+              window: "{{ policy.window }}"
+            register: result
+
+    - name: create monitoring alert policy
       digitalocean.cloud.monitoring_alert_policy:
         token: "{{ digitalocean_token }}"
         state: present

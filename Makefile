@@ -18,11 +18,15 @@ lint: collection-cleanup collection-prep
 # Assumes ansible-test is available in the global scope, such as within the devcontainer environment
 .PHONY: sanity
 sanity: collection-cleanup collection-prep
-	poetry run tests/run-sanity.sh
+	poetry run tests/run-sanity.sh $(filter-out $@,$(MAKECMDGOALS))
 
 .PHONY: integration
 integration: collection-cleanup collection-prep
-	poetry run tests/run-integration.sh
+	poetry run tests/run-integration.sh $(filter-out $@,$(MAKECMDGOALS))
+
+.PHONY: units
+units: collection-cleanup collection-prep
+	poetry run tests/run-units.sh $(filter-out $@,$(MAKECMDGOALS))
 
 # Make a copy of the collection available in an expected Ansible path
 # For running tooling in Codespaces or other environments
@@ -36,3 +40,8 @@ collection-prep:
 .PHONY: collection-cleanup
 collection-cleanup:
 	rm -rf ~/.ansible/collections/ansible_collections/digitalocean/cloud
+
+# Prevent Make from treating integration test targets as make targets
+# This allows commands like: make integration reserved_ip_assign
+%:
+	@:
