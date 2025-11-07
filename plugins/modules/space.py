@@ -143,7 +143,7 @@ class Space(DigitalOceanCommonModule):
 
         self.module.exit_json(
             changed=True,
-            msg=f"Deleted Space named {self.name } in {self.region}",
+            msg=f"Deleted Space named {self.name} in {self.region}",
             spaces=[],
         )
 

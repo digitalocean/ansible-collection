@@ -1,5 +1,5 @@
 ---
-requires_ansible: ">=2.14.0" # Use '>= 2.9.10' instead, if needed
+requires_ansible: ">=2.15.0" # Use '>= 2.9.10' instead, if needed
 action_groups:
   all:
     - account_info
@@ -37,6 +37,7 @@ action_groups:
     - projects_info
     - regions_info
     - reserved_ip
+    - reserved_ip_assign
     - reserved_ips_info
     - sizes_info
     - snapshot

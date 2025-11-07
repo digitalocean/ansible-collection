@@ -19,14 +19,14 @@ jobs:
       max-parallel: 4
       matrix:
         versions:
-          - ansible: stable-2.14
-            python: "3.9"
           - ansible: stable-2.15
             python: "3.10"
           - ansible: stable-2.16
             python: "3.11"
-          - ansible: devel
+          - ansible: stable-2.17
             python: "3.11"
+          - ansible: devel
+            python: "3.12"
     steps:
       - name: Perform unit testing
         uses: ansible-community/ansible-test-gh-action@release/v1

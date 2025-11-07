@@ -130,6 +130,79 @@ class DigitalOceanFunctions:
                     found_volumes.append(volume)
         return found_volumes
 
+    @staticmethod
+    def find_droplet(module, client, droplet_id=None, name=None, region=None):
+        """Find a Droplet by ID or by name and region.
+
+        Args:
+            module: The Ansible module instance
+            client: The DigitalOcean client instance
+            droplet_id: Optional droplet ID to find by
+            name: Optional droplet name (requires region)
+            region: Optional region slug (requires name)
+
+        Returns:
+            dict: The droplet data
+
+        Raises:
+            SystemExit: If droplet not found or multiple found
+        """
+        if droplet_id:
+            try:
+                droplet = client.droplets.get(droplet_id=droplet_id)["droplet"]
+                if droplet:
+                    return droplet
+                module.fail_json(
+                    changed=False,
+                    msg=f"No Droplet with ID {droplet_id}",
+                )
+            except DigitalOceanCommonModule.HttpResponseError as err:
+                error = {
+                    "Message": err.error.message,
+                    "Status Code": err.status_code,
+                    "Reason": err.reason,
+                }
+                module.fail_json(
+                    changed=False,
+                    msg=f"No Droplet with ID {droplet_id}",
+                    error=error,
+                )
+        elif name and region:
+            try:
+                droplets = DigitalOceanFunctions.get_droplet_by_name_in_region(
+                    module=module,
+                    client=client,
+                    region=region,
+                    name=name,
+                )
+                if len(droplets) == 0:
+                    module.fail_json(
+                        changed=False,
+                        msg=f"No Droplet named {name} in {region}",
+                    )
+                elif len(droplets) > 1:
+                    module.fail_json(
+                        changed=False,
+                        msg=f"Multiple Droplets ({len(droplets)}) named {name} found in {region}",
+                    )
+                return droplets[0]
+            except DigitalOceanCommonModule.HttpResponseError as err:
+                error = {
+                    "Message": err.error.message,
+                    "Status Code": err.status_code,
+                    "Reason": err.reason,
+                }
+                module.fail_json(
+                    changed=False,
+                    msg=f"Error finding Droplet named {name} in {region}",
+                    error=error,
+                )
+
+        module.fail_json(
+            changed=False,
+            msg="Must provide either droplet_id or both name and region",
+        )
+
 
 class DigitalOceanConstants:
     PAGE_SIZE = 10
@@ -222,6 +295,21 @@ class DigitalOceanCommonModule(DigitalOceanReqs):
             self.client_options.update(**self.client_override_options)
         self.client = DigitalOceanReqs.Client(**self.client_options)
         self.state = module.params.get("state")
+
+    def get_action_by_id(self, action_id):
+        """Get an action by its ID from the DigitalOcean API."""
+        try:
+            action = self.client.actions.get(action_id=action_id)["action"]
+            return action
+        except DigitalOceanCommonModule.HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            self.module.fail_json(
+                changed=False, msg=error.get("Message"), error=error, action=[]
+            )
 
     @staticmethod
     def http_response_error(module, err: dict) -> None:
