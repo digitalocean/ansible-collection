@@ -16,6 +16,7 @@
         token: "{{ digitalocean_token }}"
         reserved_ip: "{{ reserved_ip | mandatory }}"
       register: result_no_params
+      ignore_errors: true
 
     - name: 06_assign_no_params | Verify validation error occurs
       ansible.builtin.assert:
