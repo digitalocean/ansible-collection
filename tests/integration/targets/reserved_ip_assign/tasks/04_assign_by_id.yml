@@ -37,7 +37,7 @@
           - result_by_id.reserved_ip is defined
           - result_by_id.reserved_ip.ip == reserved_ip
           - result_by_id.reserved_ip.droplet is defined
-          - result_by_id.reserved_ip.droplet.id == droplet_id
+          - result_by_id.reserved_ip.droplet.id | int == droplet_id | int
           - result_by_id.reserved_ip.droplet.name == droplet_name
           - result_by_id.msg is search("assigned to Droplet")
 
@@ -53,7 +53,7 @@
         that:
           - not result_idempotent_by_id.changed
           - result_idempotent_by_id.reserved_ip is defined
-          - result_idempotent_by_id.reserved_ip.droplet.id == droplet_id
+          - result_idempotent_by_id.reserved_ip.droplet.id | int == droplet_id | int
           - result_idempotent_by_id.reserved_ip.droplet.name == droplet_name
           - result_idempotent_by_id.msg is search("already assigned")
 

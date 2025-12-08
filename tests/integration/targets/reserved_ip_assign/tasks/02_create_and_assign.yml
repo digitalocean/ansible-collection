@@ -14,7 +14,7 @@
           - result_create_assign.reserved_ip is defined
           - result_create_assign.reserved_ip.ip is defined
           - result_create_assign.reserved_ip.droplet is defined
-          - result_create_assign.reserved_ip.droplet.id == droplet_id
+          - result_create_assign.reserved_ip.droplet.id | int == droplet_id | int
           - result_create_assign.action is not defined or result_create_assign.action == []
           - result_create_assign.msg is search("Created reserved IP")
           - result_create_assign.msg is search("assigned to Droplet")
