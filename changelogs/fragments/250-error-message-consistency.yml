@@ -1,0 +1,2 @@
+minor_changes:
+  - "common, droplet_action_power, droplet_action_resize, droplet_action_snapshot - standardized error messages to include droplet IDs when multiple droplets with the same name are found, improving debugging experience. Added comprehensive unit tests for droplet_action modules (https://github.com/digitalocean/ansible-collection/issues/250)."
