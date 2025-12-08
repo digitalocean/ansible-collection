@@ -1,2 +1,0 @@
-bugfixes:
-  - droplet - fix C(unique_name) parameter not working correctly due to API name parameter not being supported. The module now fetches all droplets and filters client-side to properly detect existing droplets and prevent duplicate creation (https://github.com/digitalocean/ansible-collection/issues/250).

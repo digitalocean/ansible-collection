@@ -4,6 +4,19 @@ DigitalOcean Collection Release Notes
 
 .. contents:: Topics
 
+v1.4.0
+======
+
+Minor Changes
+-------------
+
+- common, droplet_action_power, droplet_action_resize, droplet_action_snapshot - standardized error messages to include droplet IDs when multiple droplets with the same name are found, improving debugging experience. Added comprehensive unit tests for droplet_action modules (https://github.com/digitalocean/ansible-collection/issues/250).
+
+Bugfixes
+--------
+
+- droplet - fix C(unique_name) parameter not working correctly due to API name parameter not being supported. The module now fetches all droplets and filters client-side to properly detect existing droplets and prevent duplicate creation (https://github.com/digitalocean/ansible-collection/issues/250).
+
 v1.3.0
 ======
 
