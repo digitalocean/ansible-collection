@@ -135,7 +135,9 @@ class TestDropletActionResizeFindDroplet:
         mock_get_droplets.return_value = [droplet_1, droplet_2]
 
         with patch.object(
-            droplet_action_resize.DigitalOceanCommonModule, "__init__", return_value=None
+            droplet_action_resize.DigitalOceanCommonModule,
+            "__init__",
+            return_value=None,
         ):
             resize_obj = droplet_action_resize.DropletActionResize.__new__(
                 droplet_action_resize.DropletActionResize
@@ -167,7 +169,9 @@ class TestDropletActionResizeFindDroplet:
         mock_get_droplets.return_value = [sample_droplet]
 
         with patch.object(
-            droplet_action_resize.DigitalOceanCommonModule, "__init__", return_value=None
+            droplet_action_resize.DigitalOceanCommonModule,
+            "__init__",
+            return_value=None,
         ):
             resize_obj = droplet_action_resize.DropletActionResize.__new__(
                 droplet_action_resize.DropletActionResize
@@ -188,14 +192,14 @@ class TestDropletActionResizeFindDroplet:
     @patch(
         "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanFunctions.get_droplet_by_name_in_region"
     )
-    def test_no_droplet_found(
-        self, mock_get_droplets, mock_module, mock_client
-    ):
+    def test_no_droplet_found(self, mock_get_droplets, mock_module, mock_client):
         """Test that no droplet returns error"""
         mock_get_droplets.return_value = []
 
         with patch.object(
-            droplet_action_resize.DigitalOceanCommonModule, "__init__", return_value=None
+            droplet_action_resize.DigitalOceanCommonModule,
+            "__init__",
+            return_value=None,
         ):
             resize_obj = droplet_action_resize.DropletActionResize.__new__(
                 droplet_action_resize.DropletActionResize

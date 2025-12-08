@@ -181,7 +181,9 @@ class DigitalOceanFunctions:
                         msg=f"No Droplet named {name} in {region}",
                     )
                 elif len(droplets) > 1:
-                    droplet_ids = ", ".join([str(droplet["id"]) for droplet in droplets])
+                    droplet_ids = ", ".join(
+                        [str(droplet["id"]) for droplet in droplets]
+                    )
                     module.fail_json(
                         changed=False,
                         msg=f"There are currently {len(droplets)} Droplets named {name} in {region}: {droplet_ids}",

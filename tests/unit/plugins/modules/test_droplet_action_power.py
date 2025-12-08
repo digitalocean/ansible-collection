@@ -187,9 +187,7 @@ class TestDropletActionPowerFindDroplet:
     @patch(
         "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanFunctions.get_droplet_by_name_in_region"
     )
-    def test_no_droplet_found(
-        self, mock_get_droplets, mock_module, mock_client
-    ):
+    def test_no_droplet_found(self, mock_get_droplets, mock_module, mock_client):
         """Test that no droplet returns error"""
         mock_get_droplets.return_value = []
 
