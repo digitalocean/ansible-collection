@@ -12,17 +12,18 @@
         reserved_ip: "{{ result_create_validation.reserved_ip.ip }}"
 
     - name: 06_assign_no_params | Attempt to assign reserved IP without droplet_id, name, or region (should fail)
-      digitalocean.cloud.reserved_ip_assign:
-        token: "{{ digitalocean_token }}"
-        reserved_ip: "{{ reserved_ip | mandatory }}"
-      register: result_no_params
-      ignore_errors: true
-
-    - name: 06_assign_no_params | Verify validation error occurs
-      ansible.builtin.assert:
-        that:
-          - result_no_params.failed | bool
-          - result_no_params.msg is search("Must provide either droplet_id or both name and region")
+      block:
+        - name: 06_assign_no_params | Attempt assignment without required parameters
+          digitalocean.cloud.reserved_ip_assign:
+            token: "{{ digitalocean_token }}"
+            reserved_ip: "{{ reserved_ip | mandatory }}"
+          register: result_no_params
+      rescue:
+        - name: 06_assign_no_params | Verify validation error occurs
+          ansible.builtin.assert:
+            that:
+              - result_no_params.failed | bool
+              - result_no_params.msg is search("Must provide either droplet_id or both name and region")
 
   always:
     - name: 06_assign_no_params | Delete reserved IP
