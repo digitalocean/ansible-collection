@@ -450,54 +450,51 @@ def test_reserved_ip_not_found():
         "region": None,
     }
 
-    # Mock HttpResponseError
-    # Create a proper exception class that derives from BaseException
-    try:
-        from azure.core.exceptions import HttpResponseError as AzureHttpResponseError
+    # Mock HttpResponseError - create exception that matches expected interface
+    from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
+        DigitalOceanCommonModule,
+    )
 
-        # Create a real exception instance
-        http_error = AzureHttpResponseError(
-            message="Reserved IP not found", response=MagicMock()
-        )
-        http_error.error = MagicMock()
-        http_error.error.message = "Reserved IP not found"
-        http_error.status_code = 404
-        http_error.reason = "Not Found"
-    except ImportError:
-        # Fallback if azure.core is not available - create a real exception class
-        class HttpResponseError(Exception):
-            def __init__(self, message, status_code=404, reason="Not Found"):
-                self.message = message
-                self.status_code = status_code
-                self.reason = reason
-                self.error = MagicMock()
-                self.error.message = message
-                super().__init__(message)
+    # Create an exception instance that matches the expected interface
+    class HttpResponseError(Exception):
+        """Mock HttpResponseError exception with required attributes"""
 
-        http_error = HttpResponseError(
-            "Reserved IP not found", status_code=404, reason="Not Found"
-        )
+        def __init__(
+            self, message="Reserved IP not found", status_code=404, reason="Not Found"
+        ):
+            self.message = message
+            self.status_code = status_code
+            self.reason = reason
+            self.error = MagicMock()
+            self.error.message = message
+            super().__init__(message)
+
+    http_error = HttpResponseError(
+        "Reserved IP not found", status_code=404, reason="Not Found"
+    )
 
     client_mock = MagicMock()
     client_mock.reserved_ips.get.side_effect = http_error
 
-    with patch.object(basic.AnsibleModule, "__init__", return_value=None):
-        module = create_module(params, check_mode=False)
+    # Patch HttpResponseError in the module to use our mock exception class
+    with patch.object(DigitalOceanCommonModule, "HttpResponseError", HttpResponseError):
+        with patch.object(basic.AnsibleModule, "__init__", return_value=None):
+            module = create_module(params, check_mode=False)
 
-        with patch(
-            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
-            return_value=client_mock,
-        ):
-            try:
-                instance = reserved_ip_assign.ReservedIPAssign(module)
-            except SystemExit:
-                pass
+            with patch(
+                "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
+                return_value=client_mock,
+            ):
+                try:
+                    instance = reserved_ip_assign.ReservedIPAssign(module)
+                except SystemExit:
+                    pass
 
-            module.fail_json.assert_called_once()
-            assert (
-                "Reserved IP 192.168.1.1 not found"
-                in module.fail_json.call_args[1]["msg"]
-            )
+                module.fail_json.assert_called_once()
+                assert (
+                    "Reserved IP 192.168.1.1 not found"
+                    in module.fail_json.call_args[1]["msg"]
+                )
 
 
 def test_create_and_assign_by_name_region():

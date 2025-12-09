@@ -231,9 +231,10 @@ class DropletActionPower(DigitalOceanCommonModule):
                     action=[],
                 )
             elif len(droplets) > 1:
+                droplet_ids = ", ".join([str(droplet["id"]) for droplet in droplets])
                 self.module.fail_json(
                     changed=False,
-                    msg=f"Multiple Droplets ({len(droplets)}) named {self.name} found in {self.region}",
+                    msg=f"There are currently {len(droplets)} Droplets named {self.name} in {self.region}: {droplet_ids}",
                     action=[],
                 )
             return droplets[0]

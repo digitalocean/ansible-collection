@@ -181,9 +181,13 @@ class DigitalOceanFunctions:
                         msg=f"No Droplet named {name} in {region}",
                     )
                 elif len(droplets) > 1:
+                    droplet_ids = ", ".join(
+                        [str(droplet["id"]) for droplet in droplets]
+                    )
                     module.fail_json(
                         changed=False,
-                        msg=f"Multiple Droplets ({len(droplets)}) named {name} found in {region}",
+                        msg=f"There are currently {len(droplets)} Droplets named {name} in {region}: {droplet_ids}",
+                        droplet=[],
                     )
                 return droplets[0]
             except DigitalOceanCommonModule.HttpResponseError as err:
