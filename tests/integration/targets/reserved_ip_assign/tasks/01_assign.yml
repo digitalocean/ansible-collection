@@ -69,7 +69,7 @@
           - result.reserved_ip is defined
           - result.reserved_ip.ip == reserved_ip
           - result.reserved_ip.droplet is defined
-          - result.reserved_ip.droplet.id == droplet_id
+          - result.reserved_ip.droplet.id | int == droplet_id | int
           - result.msg is search("assigned to Droplet")
 
     - name: Assign reserved IP to same droplet again (test idempotency)
@@ -84,7 +84,7 @@
         that:
           - not result_idempotent.changed
           - result_idempotent.reserved_ip is defined
-          - result_idempotent.reserved_ip.droplet.id == droplet_id
+          - result_idempotent.reserved_ip.droplet.id | int == droplet_id | int
           - result_idempotent.msg is search("already assigned")
 
   rescue:

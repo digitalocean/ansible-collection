@@ -28,6 +28,37 @@ integration: collection-cleanup collection-prep
 units: collection-cleanup collection-prep
 	poetry run tests/run-units.sh $(filter-out $@,$(MAKECMDGOALS))
 
+# Run unit tests with coverage collection
+.PHONY: units-coverage
+units-coverage: collection-cleanup collection-prep
+	poetry run tests/run-units.sh --coverage
+
+# Generate coverage reports after running units-coverage
+.PHONY: coverage-report
+coverage-report:
+	poetry run ansible-test coverage combine
+	poetry run ansible-test coverage report
+
+# Generate HTML coverage report (open tests/output/reports/coverage/index.html)
+.PHONY: coverage-html
+coverage-html:
+	poetry run ansible-test coverage combine
+	poetry run ansible-test coverage html
+	@echo "HTML report: tests/output/reports/coverage/index.html"
+
+# Generate XML coverage report for CI/CD (codecov, etc.)
+.PHONY: coverage-xml
+coverage-xml:
+	poetry run ansible-test coverage combine
+	poetry run ansible-test coverage xml
+	@echo "XML report: tests/output/reports/coverage.xml"
+
+# Clean coverage data
+.PHONY: coverage-clean
+coverage-clean:
+	poetry run ansible-test coverage erase
+	rm -rf tests/output/coverage tests/output/reports/coverage*
+
 # Make a copy of the collection available in an expected Ansible path
 # For running tooling in Codespaces or other environments
 # If you get ansible-lint errors about unresolved modules in this collection,

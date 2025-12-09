@@ -186,9 +186,10 @@ class DropletActionResize(DigitalOceanCommonModule):
                     action=[],
                 )
             elif len(droplets) > 1:
+                droplet_ids = ", ".join([str(droplet["id"]) for droplet in droplets])
                 self.module.fail_json(
                     changed=False,
-                    msg=f"Multiple Droplets ({len(droplets)}) named {self.name} found in {self.region}",
+                    msg=f"There are currently {len(droplets)} Droplets named {self.name} in {self.region}: {droplet_ids}",
                     action=[],
                 )
             return droplets[0]
@@ -198,20 +199,6 @@ class DropletActionResize(DigitalOceanCommonModule):
             msg="Should not reach this",
             action=[],
         )
-
-    def get_action_by_id(self, action_id):
-        try:
-            action = self.client.actions.get(action_id=action_id)["action"]
-            return action
-        except DigitalOceanCommonModule.HttpResponseError as err:
-            error = {
-                "Message": err.error.message,
-                "Status Code": err.status_code,
-                "Reason": err.reason,
-            }
-            self.module.fail_json(
-                changed=False, msg=error.get("Message"), error=error, action=[]
-            )
 
     def resize(self):
         try:

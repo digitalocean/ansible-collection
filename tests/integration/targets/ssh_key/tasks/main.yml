@@ -9,6 +9,10 @@
           - digitalocean_token | length > 0
         fail_msg: digitalocean_token should be defined in tests/integration/integration_config.yml
 
-    - name: Test firewall | Create and delete
+    - name: Test SSH key | Create and delete
       ansible.builtin.include_tasks:
         file: 01_create_delete.yml
+
+    - name: Test SSH key | Idempotent behavior
+      ansible.builtin.include_tasks:
+        file: 02_idempotent.yml
