@@ -51,6 +51,29 @@ fi
 ansible-test sanity --python 3.11 --verbose
 ansible-test units --python 3.11 --verbose
 
+## Code Coverage
+
+# Run unit tests with coverage collection
+make units-coverage
+
+# Generate coverage reports
+make coverage-report              # Console report
+make coverage-html                # HTML report (interactive)
+make coverage-xml                 # XML report (for CI/CD)
+
+# View HTML coverage report
+open tests/output/reports/coverage/index.html
+
+# Clean coverage data
+make coverage-clean
+
+# Or use ansible-test directly
+ansible-test units --python 3.11 --coverage
+ansible-test coverage combine
+ansible-test coverage report      # Console output
+ansible-test coverage html        # Generate HTML report
+ansible-test coverage xml         # Generate XML report
+
 # Set up the configuration file for integration tests
 cp tests/integration/integration_config.yml.template \
   tests/integration/integration_config.yml

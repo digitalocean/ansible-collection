@@ -251,14 +251,18 @@ class DigitalOceanOptions:
 class DigitalOceanReqs:
     HAS_AZURE_LIBRARY = False
     AZURE_LIBRARY_IMPORT_ERROR = None
+    # Expose HttpResponseError as a class attribute so it can be accessed as
+    # DigitalOceanCommonModule.HttpResponseError in exception handlers
+    HttpResponseError = None
     try:
         from azure.core.exceptions import (
-            HttpResponseError,
-        )  # pylint: disable=unused-import
+            HttpResponseError as _HttpResponseError,
+        )
     except ImportError:
         AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
     else:
         HAS_AZURE_LIBRARY = True
+        HttpResponseError = _HttpResponseError
 
     HAS_PYDO_LIBRARY = False
     PYDO_LIBRARY_IMPORT_ERROR = None

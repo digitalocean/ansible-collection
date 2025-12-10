@@ -245,20 +245,6 @@ class DropletActionPower(DigitalOceanCommonModule):
             action=[],
         )
 
-    def get_action_by_id(self, action_id):
-        try:
-            action = self.client.actions.get(action_id=action_id)["action"]
-            return action
-        except DigitalOceanCommonModule.HttpResponseError as err:
-            error = {
-                "Message": err.error.message,
-                "Status Code": err.status_code,
-                "Reason": err.reason,
-            }
-            self.module.fail_json(
-                changed=False, msg=error.get("Message"), error=error, action=[]
-            )
-
     def set_power_off(self):
         try:
             body = {

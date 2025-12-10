@@ -42,6 +42,9 @@ options:
     description:
       - Droplet attributes to include as host variables.
       - Consult the API documentation U(https://docs.digitalocean.com/reference/api/api-reference/#operation/droplets_create) for attribute examples.
+      - |
+        Note: The C(tags) attribute will be automatically renamed to C(do_tags) to avoid
+        conflicting with Ansible's reserved C(tags) variable used for task tagging.
     type: list
     elements: str
     required: false
@@ -84,7 +87,7 @@ attributes:
   - size_slug
   - networks
   - region
-  - tags
+  - tags  # Note: Will be available as 'do_tags' to avoid Ansible reserved name
   - vpc_uuid
 compose:
   ansible_host: networks.v4 | selectattr("type", "eq", "public") | map(attribute="ip_address") | first
@@ -94,7 +97,7 @@ keyed_groups:
   - key: image.slug | default("null", true)
     prefix: image
     separator: "_"
-  - key: tags
+  - key: do_tags  # Use 'do_tags' instead of 'tags' to avoid Ansible reserved variable name
     prefix: tag
     separator: "_"
   - key: region.slug
@@ -166,7 +169,9 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
             for k, v in droplet.items():
                 attributes = self.config.get("attributes", [])
                 if k in attributes:
-                    self.inventory.set_variable(host_name, k, v)
+                    # Rename 'tags' to 'do_tags' to avoid Ansible reserved variable name
+                    var_name = "do_tags" if k == "tags" else k
+                    self.inventory.set_variable(host_name, var_name, v)
 
             host_vars = self.inventory.get_host(host_name).get_vars()
 
