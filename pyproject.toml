@@ -16,7 +16,7 @@ boto3 = "^1.34.131"
 jmespath = "^1.0.1"
 setuptools = "70.1.0"
 certifi = "2024.7.4"
-aiohttp = "3.10.2"
+aiohttp = "3.12.14"
 cryptography = "43.0.1"
 
 [tool.poetry.group.dev.dependencies]
