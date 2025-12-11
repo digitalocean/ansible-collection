@@ -9,13 +9,13 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "~3.11.11"
-ansible-core = "^2.19.4"
+ansible-core = "^2.19.5"
 azure-core = "1.36.0"
-pydo = "^0.19.0"
-boto3 = "^1.40.69"
+pydo = "^0.22.0"
+boto3 = "^1.42.7"
 jmespath = "^1.0.1"
 setuptools = "80.9.0"
-certifi = "2025.10.5"
+certifi = "2025.11.12"
 aiohttp = "3.13.2"
 cryptography = "46.0.3"
 
