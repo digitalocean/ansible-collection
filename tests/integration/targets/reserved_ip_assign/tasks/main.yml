@@ -35,6 +35,7 @@
       ansible.builtin.include_tasks:
         file: 06_assign_no_params.yml
 
+  always:
     - name: main | Destroy Droplet
       ansible.builtin.include_tasks:
         file: 99_teardown.yml

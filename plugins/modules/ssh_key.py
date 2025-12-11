@@ -18,6 +18,9 @@ version_added: 0.2.0
 
 description:
   - Create or delete SSH keys.
+  - |
+    The module is idempotent - if an SSH key with the same public key already exists on your account,
+    it will be returned without making changes, even if the name differs.
   - View the create API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#tag/SSH-Keys).
 
 author: Mark Mercado (@mamercad)
@@ -143,6 +146,24 @@ class SSHKey(DigitalOceanCommonModule):
                 ssh_key=ssh_key,
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
+            # Handle the case where the public key already exists (422 error)
+            if err.status_code == 422 and "already in use" in err.error.message.lower():
+                # Try to find the existing SSH key with the same public key
+                try:
+                    ssh_keys = self.client.ssh_keys.list()["ssh_keys"]
+                    for ssh_key in ssh_keys:
+                        if ssh_key.get("public_key") == self.public_key:
+                            # Found the existing SSH key - return it (idempotent)
+                            self.module.exit_json(
+                                changed=False,
+                                msg=f"SSH key with this public key already exists as {ssh_key['name']} ({ssh_key['fingerprint']})",
+                                ssh_key=ssh_key,
+                            )
+                            return
+                except DigitalOceanCommonModule.HttpResponseError:
+                    pass  # Fall through to fail_json below
+
+            # For other errors, fail
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
@@ -176,6 +197,21 @@ class SSHKey(DigitalOceanCommonModule):
     def present(self):
         ssh_keys = self.get_ssh_keys()
         if len(ssh_keys) == 0:
+            # Before creating, check if a key with the same public_key already exists
+            try:
+                all_ssh_keys = self.client.ssh_keys.list()["ssh_keys"]
+                for ssh_key in all_ssh_keys:
+                    if ssh_key.get("public_key") == self.public_key:
+                        # Found an existing SSH key with the same public key
+                        self.module.exit_json(
+                            changed=False,
+                            msg=f"SSH key with this public key already exists as {ssh_key['name']} ({ssh_key['fingerprint']})",
+                            ssh_key=ssh_key,
+                        )
+            except DigitalOceanCommonModule.HttpResponseError:
+                # If we can't list SSH keys, continue with creation attempt
+                pass
+
             if self.module.check_mode:
                 self.module.exit_json(
                     changed=True,

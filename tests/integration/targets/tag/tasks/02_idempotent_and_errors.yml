@@ -1,0 +1,80 @@
+# code: language=ansible
+---
+- block:
+
+    - name: Create tag (first time)
+      digitalocean.cloud.tag:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ tag_name }}"
+      register: result
+
+    - name: Verify tag was created
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created tag " ~ tag_name
+          - result.tag.name == tag_name
+
+    - name: Create tag again (should be idempotent)
+      digitalocean.cloud.tag:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ tag_name }}"
+      register: result
+
+    - name: Verify tag creation is idempotent
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == "Tag " ~ tag_name ~ " exists"
+          - result.tag.name == tag_name
+
+    - name: Delete tag
+      digitalocean.cloud.tag:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ tag_name }}"
+      register: result
+
+    - name: Verify tag was deleted
+      ansible.builtin.assert:
+        that:
+          - result.changed
+
+    - name: Delete tag again (should be idempotent)
+      digitalocean.cloud.tag:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ tag_name }}"
+      register: result
+
+    - name: Verify tag deletion is idempotent
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg == "Tag " ~ tag_name ~ " does not exist"
+
+    - name: Try to create tag with invalid name (dots are not allowed)
+      digitalocean.cloud.tag:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "infra.domain.tld"
+      register: result
+      ignore_errors: true
+
+    - name: Verify invalid tag name is rejected with proper error message
+      ansible.builtin.assert:
+        that:
+          - result.failed
+          - not result.changed
+          - "'invalid' in result.msg or 'characters' in result.msg"
+
+  always:
+
+    - name: Cleanup tag | Leftover from unexpected failure
+      digitalocean.cloud.tag:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ tag_name }}"
+      ignore_errors: true

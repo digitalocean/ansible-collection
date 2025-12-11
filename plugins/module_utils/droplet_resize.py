@@ -33,27 +33,44 @@ class DropletResize(DigitalOceanCommonModule):
                 "disk": self.resize_disk,
             }
 
-            self.client.droplet_actions.post(droplet_id=self.droplet_id, body=body)
+            # Capture the action response from the API
+            action = self.client.droplet_actions.post(
+                droplet_id=self.droplet_id, body=body
+            )["action"]
 
-            # Wait for the resize action to complete
+            # Poll the action status until it completes
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time:
-                droplet = self.client.droplets.get(self.droplet_id)["droplet"]
-                if droplet["size"]["slug"] == self.new_size:
-                    self.module.exit_json(
-                        changed=True,
-                        msg=f"Resized Droplet {droplet['name']} ({self.droplet_id}) in {self.region} from size {self.current_size} to size {self.new_size}",
-                        droplet=droplet,
-                    )
+            while time.monotonic() < end_time and action["status"] != "completed":
                 time.sleep(DigitalOceanConstants.SLEEP)
+                action = self.get_action_by_id(action_id=action["id"])
 
-            self.module.fail_json(
-                changed=False,
-                msg=f"Resizing Droplet {self.droplet_id} from {self.current_size} to size {self.new_size} has failed",
+            # Check if the action completed successfully
+            if action["status"] != "completed":
+                self.module.fail_json(
+                    changed=True,
+                    msg=(
+                        f"Resize action for Droplet {self.droplet_id} from "
+                        f"{self.current_size} to {self.new_size} has not completed, "
+                        f"status is '{action['status']}'"
+                    ),
+                    action=action,
+                )
+
+            # Get the updated droplet information
+            droplet = self.client.droplets.get(self.droplet_id)["droplet"]
+
+            self.module.exit_json(
+                changed=True,
+                msg=f"Resized Droplet {droplet['name']} ({self.droplet_id}) in {self.region} from size {self.current_size} to size {self.new_size}",
+                droplet=droplet,
+                action=action,
             )
-        except Exception as err:
+        except DigitalOceanCommonModule.HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
             self.module.fail_json(
-                changed=False,
-                msg=f"An error occurred while resizing the Droplet: {str(err)}",
-                error=str(err),
+                changed=False, msg=error.get("Message"), error=error, action=[]
             )

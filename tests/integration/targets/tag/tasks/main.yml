@@ -12,3 +12,7 @@
     - name: Test tag | Create and delete
       ansible.builtin.include_tasks:
         file: 01_create_delete.yml
+
+    - name: Test tag | Idempotent behavior and error handling
+      ansible.builtin.include_tasks:
+        file: 02_idempotent_and_errors.yml

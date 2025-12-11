@@ -194,7 +194,12 @@ class Project(DigitalOceanCommonModule):
                 project=[],
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
-            # TODO: https://github.com/digitalocean/pydo/issues/158
+            # Workaround for PyDO bug: https://github.com/digitalocean/pydo/issues/158
+            # The DigitalOcean API requires Content-Type: application/json for DELETE requests
+            # to the projects endpoint, but PyDO doesn't automatically add this header.
+            # This bug still exists as of PyDO 0.21.0 (verified 2025-12-09).
+            # If the error is "Unsupported Media Type", fall back to using fetch_url with
+            # the proper Content-Type header.
             if (
                 str(err)
                 == "Operation returned an invalid status 'Unsupported Media Type'"

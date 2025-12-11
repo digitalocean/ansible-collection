@@ -181,9 +181,13 @@ class DigitalOceanFunctions:
                         msg=f"No Droplet named {name} in {region}",
                     )
                 elif len(droplets) > 1:
+                    droplet_ids = ", ".join(
+                        [str(droplet["id"]) for droplet in droplets]
+                    )
                     module.fail_json(
                         changed=False,
-                        msg=f"Multiple Droplets ({len(droplets)}) named {name} found in {region}",
+                        msg=f"There are currently {len(droplets)} Droplets named {name} in {region}: {droplet_ids}",
+                        droplet=[],
                     )
                 return droplets[0]
             except DigitalOceanCommonModule.HttpResponseError as err:
@@ -247,14 +251,18 @@ class DigitalOceanOptions:
 class DigitalOceanReqs:
     HAS_AZURE_LIBRARY = False
     AZURE_LIBRARY_IMPORT_ERROR = None
+    # Expose HttpResponseError as a class attribute so it can be accessed as
+    # DigitalOceanCommonModule.HttpResponseError in exception handlers
+    HttpResponseError = None
     try:
         from azure.core.exceptions import (
-            HttpResponseError,
-        )  # pylint: disable=unused-import
+            HttpResponseError as _HttpResponseError,
+        )
     except ImportError:
         AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
     else:
         HAS_AZURE_LIBRARY = True
+        HttpResponseError = _HttpResponseError
 
     HAS_PYDO_LIBRARY = False
     PYDO_LIBRARY_IMPORT_ERROR = None

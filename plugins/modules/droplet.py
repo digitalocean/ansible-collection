@@ -374,7 +374,7 @@ class Droplet(DigitalOceanCommonModule):
             obj=self.client.droplets,
             meth="list",
             key="droplets",
-            params=dict(name=self.name),
+            params=dict(),
             exc=DigitalOceanCommonModule.HttpResponseError,
         )
         # NOTE: DigitalOcean Droplet names are not required to be unique!
