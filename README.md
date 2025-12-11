@@ -22,7 +22,7 @@ This is a grounds-up rewrite of the [`community.digitalocean`](https://galaxy.an
 [![codecov](https://codecov.io/gh/digitalocean/ansible-collection/branch/main/graph/badge.svg)](https://codecov.io/gh/digitalocean/ansible-collection)
 [![Publish Collection on Galaxy](https://github.com/digitalocean/ansible-collection/actions/workflows/publish-galaxy.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/publish-galaxy.yml)
 [![Lint extra docsite docs and links](https://github.com/digitalocean/ansible-collection/actions/workflows/extra-docs-linting.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/extra-docs-linting.yml)
-[![Python psf/black](https://github.com/digitalocean/ansible-collection/actions/workflows/psf-black.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/psf-black.yml)
+[![Ruff](https://github.com/digitalocean/ansible-collection/actions/workflows/ruff.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/ruff.yml)
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/digitalocean/ansible-collection?quickstart=1)
 
@@ -422,12 +422,12 @@ See the [changelog](https://github.com/digitalocean/ansible-collection/tree/main
 ## Releasing instructions
 
 Please review the [upstream documentation](https://docs.ansible.com/ansible/latest/community/collection_contributors/collection_releasing.html) for releasing Ansible collections.
-The utility for creating the release metadata is [antibull-changelog](https://github.com/ansible-community/antsibull-changelog) and can be install from [PyPI](https://pypi.org/project/antsibull-changelog/) with `pip install --user antsibull-changelog` or, in this project, `poetry install --with=dev`.
+The utility for creating the release metadata is [antsibull-changelog](https://github.com/ansible-community/antsibull-changelog) and can be install from [PyPI](https://pypi.org/project/antsibull-changelog/) with `pip install --user antsibull-changelog` or, in this project, `uv sync --all-groups`.
 In general, the steps are as follow:
 
 1. Create a new branch for the release with `git checkout -b release/X.Y.Z`
 2. Bump the collection version in [galaxy.yml](./galaxy.yml) to `X.Y.Z`
-3. Run `antsibull-changelog release` to generate the release metadata (or `poetry run antsibull-changelog release`) to generate the release metadata
+3. Run `antsibull-changelog release` to generate the release metadata (or `uv run antsibull-changelog release`) to generate the release metadata
 4. Commit all changes, push the branch, and open a pull request against this branch
 5. Once all tests pass and approvals are finalized, merge the pull request
 6. After tests pass after the merge into `main`, create and push the `vX.Y.Z` based off of the merge commit

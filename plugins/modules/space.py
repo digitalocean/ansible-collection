@@ -107,8 +107,7 @@ msg:
     - Failed to list Spaces in nyc3
 """
 
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.basic import env_fallback
+from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonModule,
     DigitalOceanOptions,

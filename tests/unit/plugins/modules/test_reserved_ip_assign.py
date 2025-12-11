@@ -6,8 +6,9 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.digitalocean.cloud.plugins.modules import reserved_ip_assign
@@ -197,9 +198,12 @@ def test_assign_existing_by_droplet_id():
                 # Mock time.sleep() and get_action_by_id() to prevent hanging
                 # The action status is "completed" so the loop won't run, but we mock
                 # these just in case to prevent any potential hangs
-                with patch("time.sleep"), patch(
-                    "ansible_collections.digitalocean.cloud.plugins.modules.reserved_ip_assign.ReservedIPAssign.get_action_by_id",
-                    return_value=action_data,
+                with (
+                    patch("time.sleep"),
+                    patch(
+                        "ansible_collections.digitalocean.cloud.plugins.modules.reserved_ip_assign.ReservedIPAssign.get_action_by_id",
+                        return_value=action_data,
+                    ),
                 ):
                     instance = reserved_ip_assign.ReservedIPAssign(module)
 
@@ -409,9 +413,12 @@ def test_assign_idempotent():
                 # Mock time.sleep() and get_action_by_id() to prevent hanging
                 # The assign() method will be called during __init__, so we need
                 # to mock these before instantiation
-                with patch("time.sleep"), patch(
-                    "ansible_collections.digitalocean.cloud.plugins.modules.reserved_ip_assign.ReservedIPAssign.get_action_by_id",
-                    return_value=action_data,
+                with (
+                    patch("time.sleep"),
+                    patch(
+                        "ansible_collections.digitalocean.cloud.plugins.modules.reserved_ip_assign.ReservedIPAssign.get_action_by_id",
+                        return_value=action_data,
+                    ),
                 ):
                     instance = reserved_ip_assign.ReservedIPAssign(module)
 

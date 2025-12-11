@@ -1,42 +1,88 @@
-[tool.poetry]
-name = "digitalocean"
+[project]
+name = "digitalocean-cloud"
 version = "0.0.1"
 description = "Ansible DigitalOcean Collection"
-authors = ["Mark Mercado <mmercado@digitalocean.com>", "Ari Kalfus <akalfus@digitalocean.com>"]
-license = "GPL-3.0"
 readme = "README.md"
-package-mode = false
+license = "GPL-3.0"
+authors = [
+    { name = "Mark Mercado", email = "mmercado@digitalocean.com" },
+    { name = "Ari Kalfus", email = "akalfus@digitalocean.com" },
+]
+requires-python = "~=3.11.11"
+dependencies = [
+    "ansible-core>=2.19.4",
+    "azure-core==1.36.0",
+    "pydo>=0.19.0",
+    "boto3>=1.40.69",
+    "jmespath>=1.0.1",
+    "setuptools==80.9.0",
+    "certifi==2025.10.5",
+    "aiohttp==3.13.2",
+    "cryptography==46.0.3",
+]
 
-[tool.poetry.dependencies]
-python = "~3.11.11"
-ansible-core = "^2.19.4"
-azure-core = "1.36.0"
-pydo = "^0.19.0"
-boto3 = "^1.40.69"
-jmespath = "^1.0.1"
-setuptools = "80.9.0"
-certifi = "2025.10.5"
-aiohttp = "3.13.2"
-cryptography = "46.0.3"
-
-[tool.poetry.group.dev.dependencies]
-ansible-lint = { version = "^25.9.2", markers = "platform_system != 'Windows'" }
-black = "24.8.0"
-pre-commit = "3.8.0"
-pylint = "3.3.0"
-pytest = "8.3.3"
-pytest-xdist = "^3.5.0"
-antsibull-changelog = "0.30.0"
-antsibull-docs = "2.14.0"
-autopep8 = "^2.3.1"
+[dependency-groups]
+dev = [
+    "ansible-lint>=25.9.2; platform_system != 'Windows'",
+    "ruff>=0.8.0",
+    "pre-commit==3.8.0",
+    "pytest==8.3.3",
+    "pytest-xdist>=3.5.0",
+    "antsibull-changelog==0.30.0",
+    "antsibull-docs==2.14.0",
+    "autopep8>=2.3.1",
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["plugins"]
 
 [tool.pyright]
 include = ["."]
 executionEnvironments = [
-  { root = ".", pythonVersion = "3.11", extraPaths = ["../../.."] }
+    { root = ".", pythonVersion = "3.11", extraPaths = ["../../.."] }
 ]
 extraPaths = ["../../.."]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "tests/output",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "F",      # pyflakes
+    "W",      # pycodestyle warnings
+    "I",      # isort
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+]
+
+[tool.ruff.lint.per-file-ignores]
+# E402: Module level import not at top of file - required for mocking in tests
+# F841: Local variable assigned but never used - common in test setup
+"tests/**/*.py" = ["E402", "F841"]
+# E402: Ansible modules require imports after DOCUMENTATION block
+"plugins/modules/*.py" = ["E402"]
+"plugins/module_utils/*.py" = ["E402"]
+# E402: Inventory plugin requires imports after DOCUMENTATION block
+"plugins/inventory/*.py" = ["E402"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["plugins"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

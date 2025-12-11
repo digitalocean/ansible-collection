@@ -8,6 +8,7 @@ __metaclass__ = type
 
 import sys
 from unittest.mock import MagicMock, patch
+
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
 
@@ -185,11 +186,14 @@ def test_create_ssh_key_already_exists_by_public_key_in_create():
         # Create fails with 422 error
         client_mock.ssh_keys.create.side_effect = http_error
 
-        with patch(
-            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
-            return_value=client_mock,
-        ), patch.object(
-            ssh_key.DigitalOceanCommonModule, "HttpResponseError", HttpResponseError
+        with (
+            patch(
+                "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
+                return_value=client_mock,
+            ),
+            patch.object(
+                ssh_key.DigitalOceanCommonModule, "HttpResponseError", HttpResponseError
+            ),
         ):
             ssh_key.SSHKey(module)
 
