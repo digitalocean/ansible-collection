@@ -20,14 +20,14 @@ aiohttp = "3.10.2"
 cryptography = "44.0.1"
 
 [tool.poetry.group.dev.dependencies]
-ansible-lint = { version = "^25.9.2", markers = "platform_system != 'Windows'" }
-black = "24.8.0"
-pre-commit = "3.8.0"
-pylint = "3.3.0"
-pytest = "8.3.3"
+ansible-lint = { version = "^25.11.0", markers = "platform_system != 'Windows'" }
+black = "25.11.0"
+pre-commit = "4.4.0"
+pylint = "4.0.2"
+pytest = "9.0.0"
 pytest-xdist = "^3.5.0"
-antsibull-changelog = "0.30.0"
-antsibull-docs = "2.14.0"
+antsibull-changelog = "0.34.0"
+antsibull-docs = "2.22.0"
 autopep8 = "^2.3.1"
 coverage = "7.6.1"
 
