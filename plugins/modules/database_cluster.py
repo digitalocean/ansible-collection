@@ -197,6 +197,7 @@ msg:
 """
 
 import time
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonModule,

@@ -206,6 +206,7 @@ msg:
 """
 
 import time
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonModule,
@@ -302,9 +303,9 @@ class KubernetesCluster(DigitalOceanCommonModule):
             ):
                 time.sleep(DigitalOceanConstants.SLEEP)
                 kubernetes_cluster["status"]["state"] = (
-                    self.get_kubernetes_cluster_by_id(kubernetes_cluster["id"])[
-                        "status"
-                    ]["state"]
+                    self.get_kubernetes_cluster_by_id(
+                        kubernetes_cluster["id"]
+                    )["status"]["state"]
                 )
 
             if kubernetes_cluster["status"]["state"] != "running":

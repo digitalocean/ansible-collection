@@ -25,13 +25,12 @@ git clone git@github.com:digitalocean/ansible-collection.git \
 # Change directory to the checkout
 cd "${HOME}/src/ansible_collections/digitalocean/cloud"
 
-# Optional: install Poetry https://python-poetry.org and set up this repository
+# Optional: install UV https://docs.astral.sh/uv/ and set up this repository
 # and its requirements (having a consistent and dedicated Python environment
 # is generally quite helpful)
-poetry shell
-poetry install
+uv sync --all-groups
 
-# Configure Ansible for Poetry's python and set Ansible's collection search path
+# Configure Ansible for UV's python and set Ansible's collection search path
 export ANSIBLE_PYTHON_INTERPRETER="$(which python3)"
 
 # Place this checkout first so that the checkout modules are accessible first

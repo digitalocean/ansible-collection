@@ -114,8 +114,8 @@ groups:
 """
 
 
-from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, Constructable
 from ansible.module_utils.basic import env_fallback
+from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, Constructable
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonInventory,
     DigitalOceanFunctions,

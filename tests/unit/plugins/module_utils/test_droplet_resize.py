@@ -6,12 +6,13 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-import pytest
+import json
 import sys
 from unittest.mock import MagicMock, patch
+
+import pytest
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
-import json
 
 
 # Create a custom Exception class for HttpResponseError
@@ -39,11 +40,11 @@ sys.modules["azure"] = azure_mock
 sys.modules["azure.core"] = azure_core_mock
 sys.modules["azure.core.exceptions"] = azure_exceptions_mock
 
-from ansible_collections.digitalocean.cloud.plugins.module_utils.droplet_resize import (
-    DropletResize,
-)
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonModule,
+)
+from ansible_collections.digitalocean.cloud.plugins.module_utils.droplet_resize import (
+    DropletResize,
 )
 
 
@@ -185,11 +186,12 @@ class TestDropletResize:
             "droplet": {**sample_droplet, "size": {"slug": "s-2vcpu-2gb"}}
         }
 
-        with patch.object(
-            DigitalOceanCommonModule, "__init__", return_value=None
-        ), patch(
-            "ansible_collections.digitalocean.cloud.plugins.module_utils.droplet_resize.time"
-        ) as mock_time_module:
+        with (
+            patch.object(DigitalOceanCommonModule, "__init__", return_value=None),
+            patch(
+                "ansible_collections.digitalocean.cloud.plugins.module_utils.droplet_resize.time"
+            ) as mock_time_module,
+        ):
             # Mock time functions
             # First call: calculate end_time
             # Second call: enter while loop (in-progress)
@@ -228,11 +230,12 @@ class TestDropletResize:
         mock_client.droplet_actions.post.return_value = {"action": in_progress_action}
         mock_client.actions.get.return_value = {"action": in_progress_action}
 
-        with patch.object(
-            DigitalOceanCommonModule, "__init__", return_value=None
-        ), patch(
-            "ansible_collections.digitalocean.cloud.plugins.module_utils.droplet_resize.time"
-        ) as mock_time_module:
+        with (
+            patch.object(DigitalOceanCommonModule, "__init__", return_value=None),
+            patch(
+                "ansible_collections.digitalocean.cloud.plugins.module_utils.droplet_resize.time"
+            ) as mock_time_module,
+        ):
             # Mock both monotonic and sleep
             mock_time_module.monotonic.side_effect = [
                 0,
@@ -267,10 +270,11 @@ class TestDropletResize:
             message="Invalid size", status_code=422, reason="Unprocessable Entity"
         )
 
-        with patch.object(
-            DigitalOceanCommonModule, "__init__", return_value=None
-        ), patch.object(
-            DigitalOceanCommonModule, "HttpResponseError", HttpResponseError
+        with (
+            patch.object(DigitalOceanCommonModule, "__init__", return_value=None),
+            patch.object(
+                DigitalOceanCommonModule, "HttpResponseError", HttpResponseError
+            ),
         ):
             dr = DropletResize.__new__(DropletResize)
             dr.module = mock_module

@@ -1,4 +1,4 @@
-name: Python psf/black
+name: Ruff
 
 on:
   pull_request:
@@ -15,12 +15,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  psf-black:
+  ruff:
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:
       - name: Check out code
         uses: actions/checkout@v5
 
-      - name: Run psf/black
-        uses: psf/black@stable
+      - name: Run Ruff
+        uses: chartboost/ruff-action@v1

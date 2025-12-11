@@ -8,6 +8,7 @@ __metaclass__ = type
 
 
 import time
+
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonModule,
     DigitalOceanConstants,
