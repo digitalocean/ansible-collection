@@ -217,8 +217,7 @@ class MonitoringAlertPolicy(DigitalOceanCommonModule):
                 if (
                     self.alerts == monitoring_alert_policy["alerts"]
                     and self.compare == monitoring_alert_policy["compare"]
-                    # TODO: Description not being set
-                    # and self.description == monitoring_alert_policy["description"]
+                    and self.description == monitoring_alert_policy["description"]
                     and self.enabled == monitoring_alert_policy["enabled"]
                     and self.entities == monitoring_alert_policy["entities"]
                     and self.tags == monitoring_alert_policy["tags"]
@@ -246,7 +245,7 @@ class MonitoringAlertPolicy(DigitalOceanCommonModule):
             body = {
                 "alerts": self.alerts,
                 "compare": self.compare,
-                "desciption": self.description,
+                "description": self.description,
                 "enabled": self.enabled,
                 "entities": self.entities,
                 "tags": self.tags,
