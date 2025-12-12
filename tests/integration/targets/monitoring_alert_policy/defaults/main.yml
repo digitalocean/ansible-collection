@@ -8,7 +8,6 @@ policy:
   alerts:
     email:
       - mmercado@digitalocean.com
-    function: []
     slack: []
   compare: GreaterThan
   description: CPU Alert Testing

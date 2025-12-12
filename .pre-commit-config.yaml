@@ -6,14 +6,21 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
-  - repo: https://github.com/ansible/ansible-lint
-    rev: v6.20.0
+  - repo: local
     hooks:
       - id: ansible-lint
-  - repo: https://github.com/psf/black
-    rev: 23.7.0
+        name: Ansible-lint
+        entry: poetry run ansible-lint --fix
+        language: system
+        pass_filenames: false
+        always_run: true
+  - repo: local
     hooks:
       - id: black
+        name: black
+        entry: poetry run black
+        language: system
+        types: [python]
   - repo: https://github.com/koalaman/shellcheck-precommit
     rev: v0.9.0
     hooks:

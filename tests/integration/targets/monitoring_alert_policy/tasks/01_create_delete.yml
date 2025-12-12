@@ -65,6 +65,41 @@
           - result.changed
           - result.msg == "Created monitoring alert policy " ~ policy.description ~ " (" ~ result.policy.uuid ~ ")"
 
+    - name: Verify description is set in response
+      ansible.builtin.assert:
+        that:
+          - result.policy.description == policy.description
+
+    - name: Set a fact for the policy UUID
+      ansible.builtin.set_fact:
+        policy_uuid: "{{ result.policy.uuid }}"
+
+    - name: Sleep for a few seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Create same monitoring alert policy again (idempotency test)
+      digitalocean.cloud.monitoring_alert_policy:
+        token: "{{ digitalocean_token }}"
+        state: present
+        alerts: "{{ policy.alerts }}"
+        compare: "{{ policy.compare }}"
+        description: "{{ policy.description }}"
+        enabled: "{{ policy.enabled }}"
+        entities: ["{{ droplet_id }}"]
+        tags: "{{ policy.tags }}"
+        type: "{{ policy.type }}"
+        value: "{{ policy.value }}"
+        window: "{{ policy.window }}"
+      register: result
+
+    - name: Verify idempotency - no change on second create
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - '"exists" in result.msg'
+          - result.policy.uuid == policy_uuid
+
     - name: Sleep for a few seconds
       ansible.builtin.pause:
         seconds: 10

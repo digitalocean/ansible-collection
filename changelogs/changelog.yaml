@@ -405,3 +405,16 @@ releases:
     - 243-droplet-action-response.yaml
     - 249-inventory-tags-reserved-name.yaml
     release_date: '2025-12-09'
+  1.6.0:
+    changes:
+      bugfixes:
+      - monitoring_alert_policy - Fixed idempotency by re-enabling description comparison
+        (https://github.com/digitalocean/ansible-collection/issues/265).
+      - monitoring_alert_policy - Fixed typo 'desciption' to 'description' in API
+        request body (https://github.com/digitalocean/ansible-collection/issues/264).
+      minor_changes:
+      - Bump dependency versions via Dependabot (https://github.com/digitalocean/ansible-collection/pull/260).
+    fragments:
+    - 264-monitoring-alert-policy-description-typo.yml
+    - dependabot-rollup-2025-12-11.yml
+    release_date: '2025-12-12'

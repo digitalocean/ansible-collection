@@ -4,6 +4,20 @@ DigitalOcean Collection Release Notes
 
 .. contents:: Topics
 
+v1.6.0
+======
+
+Minor Changes
+-------------
+
+- Bump dependency versions via Dependabot (https://github.com/digitalocean/ansible-collection/pull/260).
+
+Bugfixes
+--------
+
+- monitoring_alert_policy - Fixed idempotency by re-enabling description comparison (https://github.com/digitalocean/ansible-collection/issues/265).
+- monitoring_alert_policy - Fixed typo 'desciption' to 'description' in API request body (https://github.com/digitalocean/ansible-collection/issues/264).
+
 v1.5.0
 ======
 
