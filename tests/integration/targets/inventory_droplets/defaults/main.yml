@@ -1,0 +1,6 @@
+---
+droplet_name: "ansible-gh-ci-inventory-{{ pr_number }}"
+droplet_region: nyc3
+droplet_size: s-1vcpu-1gb
+droplet_image: ubuntu-24-04-x64
+droplet_tag: test-tag

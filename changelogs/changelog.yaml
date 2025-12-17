@@ -418,3 +418,14 @@ releases:
     - 264-monitoring-alert-policy-description-typo.yml
     - dependabot-rollup-2025-12-11.yml
     release_date: '2025-12-12'
+  1.7.0:
+    changes:
+      minor_changes:
+      - droplets inventory plugin - add two-tier filtering system with api_filters
+        for server-side filtering (tag_name, name) and filters for client-side Jinja2
+        template filtering. This addresses performance issues for large infrastructures
+        by reducing API response size and provides granular control for environment
+        isolation.
+    fragments:
+    - inventory-filters.yml
+    release_date: '2025-12-17'

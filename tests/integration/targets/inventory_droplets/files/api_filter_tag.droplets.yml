@@ -1,0 +1,11 @@
+---
+# Inventory with API-level tag filter
+plugin: digitalocean.cloud.droplets
+cache: false
+api_filters:
+  tag_name: test-tag
+attributes:
+  - id
+  - region
+  - tags
+  - status
