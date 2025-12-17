@@ -1,0 +1,9 @@
+---
+# Basic inventory without filters
+plugin: digitalocean.cloud.droplets
+cache: false
+attributes:
+  - id
+  - region
+  - tags
+  - status

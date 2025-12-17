@@ -53,6 +53,7 @@ jobs:
           - firewall
           - firewalls_info
           - images_info
+          - inventory_droplets
           - kubernetes_cluster
           - kubernetes_clusters_info
           - load_balancer

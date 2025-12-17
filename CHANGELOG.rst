@@ -4,6 +4,14 @@ DigitalOcean Collection Release Notes
 
 .. contents:: Topics
 
+v1.7.0
+======
+
+Minor Changes
+-------------
+
+- droplets inventory plugin - add two-tier filtering system with api_filters for server-side filtering (tag_name, name) and filters for client-side Jinja2 template filtering. This addresses performance issues for large infrastructures by reducing API response size and provides granular control for environment isolation.
+
 v1.6.0
 ======
 
