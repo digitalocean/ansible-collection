@@ -1,0 +1,27 @@
+---
+- name: Testing block
+  block:
+    - name: Setup
+      ansible.builtin.include_tasks:
+        file: 00_setup.yml
+
+    - name: Create resources and project
+      ansible.builtin.include_tasks:
+        file: 01_create_resources.yml
+
+    - name: Assign resources by project ID
+      ansible.builtin.include_tasks:
+        file: 02_assign_by_id.yml
+
+    - name: Assign resources by project name
+      ansible.builtin.include_tasks:
+        file: 03_assign_by_name.yml
+
+    - name: Verify assignment
+      ansible.builtin.include_tasks:
+        file: 04_verify.yml
+
+  always:
+    - name: Cleanup
+      ansible.builtin.include_tasks:
+        file: 99_cleanup.yml

@@ -1,0 +1,9 @@
+---
+- name: 00_setup | Testing block
+  block:
+    - name: 00_setup | Verify API token
+      ansible.builtin.assert:
+        that:
+          - digitalocean_token is string
+          - digitalocean_token | length > 0
+        fail_msg: digitalocean_token should be defined in tests/integration/integration_config.yml

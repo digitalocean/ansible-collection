@@ -1,0 +1,37 @@
+---
+- name: 03_assign_by_name | Testing block
+  block:
+    - name: 03_assign_by_name | Assign Droplet to project by name (check mode)
+      digitalocean.cloud.project_resources:
+        token: "{{ digitalocean_token }}"
+        state: present
+        project_name: "{{ project_name }}"
+        resources:
+          - "{{ droplet_urn }}"
+      check_mode: true
+      register: result
+
+    - name: 03_assign_by_name | Verify check mode result
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.project.name == project_name
+          - "'would be assigned' in result.msg"
+
+    - name: 03_assign_by_name | Assign Droplet to project by name
+      digitalocean.cloud.project_resources:
+        token: "{{ digitalocean_token }}"
+        state: present
+        project_name: "{{ project_name }}"
+        resources:
+          - "{{ droplet_urn }}"
+      register: result
+
+    - name: 03_assign_by_name | Verify assignment result
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.project.name == project_name
+          - result.resources is defined
+          - result.resources | length > 0
+          - "'Assigned 1 resource(s)' in result.msg"

@@ -429,3 +429,15 @@ releases:
     fragments:
     - inventory-filters.yml
     release_date: '2025-12-17'
+  1.8.0:
+    changes:
+      minor_changes:
+      - project_resources - add new module project_resources to assign resources to
+        a project by project name or ID (https://github.com/digitalocean/ansible-collection/issues/119).
+    fragments:
+    - 119-project_resources.yml
+    modules:
+    - description: Assign resources to a project
+      name: project_resources
+      namespace: ''
+    release_date: '2025-12-18'
