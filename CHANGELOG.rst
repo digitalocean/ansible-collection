@@ -4,6 +4,19 @@ DigitalOcean Collection Release Notes
 
 .. contents:: Topics
 
+v1.8.0
+======
+
+Minor Changes
+-------------
+
+- project_resources - add new module project_resources to assign resources to a project by project name or ID (https://github.com/digitalocean/ansible-collection/issues/119).
+
+New Modules
+-----------
+
+- project_resources - Assign resources to a project
+
 v1.7.0
 ======
 

@@ -1,0 +1,18 @@
+---
+- name: 99_cleanup | Testing block
+  block:
+    - name: 99_cleanup | Delete Droplet
+      digitalocean.cloud.droplet:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        unique_name: true
+      when: droplet_id is defined
+
+    - name: 99_cleanup | Delete project
+      digitalocean.cloud.project:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ project_name }}"
+      when: project_id is defined

@@ -1,0 +1,15 @@
+---
+- name: 04_verify | Testing block
+  block:
+    - name: 04_verify | Get project resources
+      digitalocean.cloud.project_resources_info:
+        token: "{{ digitalocean_token }}"
+        project_id: "{{ project_id }}"
+      register: result
+
+    - name: 04_verify | Verify Droplet is in project
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.project_resources | length > 0
+          - result.project_resources | selectattr('urn', 'equalto', droplet_urn) | list | length == 1
