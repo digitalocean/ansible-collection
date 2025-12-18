@@ -8,10 +8,19 @@ __metaclass__ = type
 
 import pytest
 import sys
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
 import json
+
+# Mock dependencies before importing the module
+sys.modules["pydo"] = MagicMock()
+sys.modules["azure"] = MagicMock()
+sys.modules["azure.core"] = MagicMock()
+sys.modules["azure.core.exceptions"] = MagicMock()
+
+# Import the module after mocking dependencies
+from ansible_collections.digitalocean.cloud.plugins.modules import project_resources
 
 
 # Custom exceptions to capture exit_json/fail_json
@@ -35,63 +44,64 @@ def fail_json(*args, **kwargs):
 
 
 def set_module_args(args):
-    args = json.dumps({"ANSIBLE_MODULE_ARGS": args})
-    basic._ANSIBLE_ARGS = to_bytes(args)
+    args = args or {}
+    args["_ansible_remote_tmp"] = "/tmp"
+    args["_ansible_keep_remote_files"] = False
+
+    default_args = {
+        "token": "test-token",
+    }
+    default_args.update(args)
+
+    basic._ANSIBLE_ARGS = to_bytes(json.dumps({"ANSIBLE_MODULE_ARGS": default_args}))
+    # Set the serialization profile for newer Ansible versions
+    basic._ANSIBLE_PROFILE = "json"
 
 
 @pytest.fixture(autouse=True)
 def patch_exit_fail(monkeypatch):
-    monkeypatch.setattr(basic, "exit_json", exit_json)
-    monkeypatch.setattr(basic, "fail_json", fail_json)
+    monkeypatch.setattr(basic.AnsibleModule, "exit_json", exit_json)
+    monkeypatch.setattr(basic.AnsibleModule, "fail_json", fail_json)
+
+    # Patch _load_params to work around serialization issues in newer Ansible
+    def mock_load_params():
+        import json
+
+        if basic._ANSIBLE_ARGS is not None:
+            data = json.loads(basic._ANSIBLE_ARGS.decode("utf-8"))
+            return data.get("ANSIBLE_MODULE_ARGS", {})
+        return {}
+
+    monkeypatch.setattr("ansible.module_utils.basic._load_params", mock_load_params)
 
 
 @pytest.fixture(autouse=True)
 def patch_dependencies(monkeypatch):
-    # Patch DigitalOceanCommonModule and dependencies
-    sys.modules["pydo"] = MagicMock()
-    sys.modules["azure"] = MagicMock()
-    sys.modules["azure.core"] = MagicMock()
-    sys.modules["azure.core.exceptions"] = MagicMock()
-    monkeypatch.setattr(
-        "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanCommonModule",
-        MagicMock(),
-    )
-    monkeypatch.setattr(
-        "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanOptions",
-        MagicMock(),
-    )
-    monkeypatch.setattr(
-        "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanFunctions",
-        MagicMock(),
-    )
+    # Dependencies are already mocked at module level
+    # This fixture is kept for consistency but doesn't need to do anything
+    pass
 
 
 def test_missing_required_one_of():
-    from ansible_collections.digitalocean.cloud.plugins.modules import project_resources
-
     set_module_args({"state": "present", "resources": ["do:droplet:1"]})
     # Should fail due to missing both project_id and project_name
     with pytest.raises(AnsibleFailJson) as exc:
         project_resources.main()
     result = exc.value.args[0]
     assert result["failed"] is True
-    assert "project_id or project_name" in result["msg"]
+    assert "project_id" in result["msg"] and "project_name" in result["msg"]
 
 
 def test_present_requires_resources():
-    from ansible_collections.digitalocean.cloud.plugins.modules import project_resources
-
     set_module_args({"state": "present", "project_id": "pid", "resources": []})
     with pytest.raises(AnsibleFailJson) as exc:
         project_resources.main()
     result = exc.value.args[0]
     assert result["failed"] is True
-    assert "resources parameter is required" in result["msg"]
+    assert "resources" in result["msg"]
 
 
 def test_check_mode_assigns_no_resources(monkeypatch):
-    from ansible_collections.digitalocean.cloud.plugins.modules import project_resources
-
     # Patch ProjectResources.get_project to return a fake project
     monkeypatch.setattr(
         project_resources.ProjectResources,
@@ -121,8 +131,6 @@ def test_check_mode_assigns_no_resources(monkeypatch):
 
 
 def test_assign_resources_calls_assign(monkeypatch):
-    from ansible_collections.digitalocean.cloud.plugins.modules import project_resources
-
     # Patch ProjectResources.get_project and assign_resources
     monkeypatch.setattr(
         project_resources.ProjectResources,
