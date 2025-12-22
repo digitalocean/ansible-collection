@@ -1,0 +1,42 @@
+# code: language=ansible
+---
+- block:
+    - name: Create NFS share
+      digitalocean.cloud.nfs:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ nfs_name }}"
+        region: "{{ nfs_region }}"
+        size_gigabytes: "{{ nfs_size_gigabytes }}"
+      register: result
+
+    - name: Verify create NFS share
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+          - result.nfs.id is string
+
+    - name: Delete NFS share
+      digitalocean.cloud.nfs:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ nfs_name }}"
+        id: "{{ result.nfs.id }}"
+      register: delete_result
+
+    - name: Verify delete NFS share
+      ansible.builtin.assert:
+        that:
+          - delete_result.changed
+          - delete_result.msg is string
+
+  always:
+    - name: Cleanup NFS share
+      digitalocean.cloud.nfs:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ nfs_name }}"
+        id: "{{ result.nfs.id | default('') }}"
+      when: result is defined and result.nfs is defined
+      ignore_errors: true

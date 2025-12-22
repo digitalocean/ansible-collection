@@ -1,0 +1,16 @@
+# code: language=ansible
+---
+- name: 99_teardown | Delete VPC NAT Gateway
+  digitalocean.cloud.vpc_nat_gateway:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    name: "{{ nat_gateway_name }}"
+  ignore_errors: true
+
+- name: 99_teardown | Delete VPC
+  digitalocean.cloud.vpc:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    name: "{{ vpc_name }}"
+    region: "{{ vpc_region }}"
+  ignore_errors: true

@@ -1,0 +1,38 @@
+# code: language=ansible
+---
+- block:
+    - name: Create container registry
+      digitalocean.cloud.container_registry:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ registry_name }}"
+        subscription_tier_slug: "{{ registry_tier }}"
+        region: "{{ registry_region }}"
+      register: result
+
+    - name: Verify create registry
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+
+    - name: Delete container registry
+      digitalocean.cloud.container_registry:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ registry_name }}"
+      register: result
+
+    - name: Verify delete registry
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+
+  always:
+    - name: Cleanup container registry
+      digitalocean.cloud.container_registry:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ registry_name }}"
+      ignore_errors: true

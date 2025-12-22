@@ -1,0 +1,28 @@
+# code: language=ansible
+---
+- name: 00_setup | Create project
+  digitalocean.cloud.project:
+    token: "{{ digitalocean_token }}"
+    state: present
+    name: "{{ project_name }}"
+    description: "{{ project_description }}"
+    purpose: "{{ project_purpose }}"
+    environment: "{{ project_environment }}"
+  register: project_result
+
+- name: 00_setup | Create Droplet
+  digitalocean.cloud.droplet:
+    token: "{{ digitalocean_token }}"
+    state: present
+    name: "{{ droplet_name }}"
+    region: "{{ droplet_region }}"
+    size: "{{ droplet_size }}"
+    image: "{{ droplet_image }}"
+    unique_name: true
+  register: droplet_result
+
+- name: 00_setup | Set facts
+  ansible.builtin.set_fact:
+    project_id: "{{ project_result.project.id }}"
+    resource_urns:
+      - "do:droplet:{{ droplet_result.droplet.id }}"

@@ -1,0 +1,35 @@
+# code: language=ansible
+---
+- name: 01_test | Create database connection pool
+  digitalocean.cloud.database_connection_pool:
+    token: "{{ digitalocean_token }}"
+    state: present
+    cluster_id: "{{ database_cluster_id }}"
+    name: "{{ pool_name }}"
+    mode: transaction
+    size: 10
+    db: defaultdb
+    user: doadmin
+  register: result
+
+- name: 01_test | Verify create connection pool
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string
+
+- name: 01_test | Delete database connection pool
+  digitalocean.cloud.database_connection_pool:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    cluster_id: "{{ database_cluster_id }}"
+    name: "{{ pool_name }}"
+    db: defaultdb
+    user: doadmin
+  register: result
+
+- name: 01_test | Verify delete connection pool
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string

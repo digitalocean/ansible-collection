@@ -1,0 +1,24 @@
+# code: language=ansible
+---
+- name: 99_teardown | Delete VPC peering
+  digitalocean.cloud.vpc_peering:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    name: "{{ vpc_peering_name }}"
+  ignore_errors: true
+
+- name: 99_teardown | Delete VPC A
+  digitalocean.cloud.vpc:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    name: "{{ vpc_name_a }}"
+    region: "{{ vpc_region }}"
+  ignore_errors: true
+
+- name: 99_teardown | Delete VPC B
+  digitalocean.cloud.vpc:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    name: "{{ vpc_name_b }}"
+    region: "{{ vpc_region }}"
+  ignore_errors: true

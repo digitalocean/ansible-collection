@@ -1,0 +1,6 @@
+---
+# code: language=ansible
+vpc_region: nyc3
+vpc_name_a: "ansible-gh-ci-vpc-a-{{ pr_number | default(0, true) }}"
+vpc_name_b: "ansible-gh-ci-vpc-b-{{ pr_number | default(0, true) }}"
+vpc_peering_name: "ansible-gh-ci-vpc-peering-{{ pr_number | default(0, true) }}"

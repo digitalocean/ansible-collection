@@ -1,0 +1,4 @@
+---
+# code: language=ansible
+byoip_prefix: ""
+byoip_description: "Ansible test BYOIP prefix"

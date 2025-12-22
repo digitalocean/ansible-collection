@@ -1,0 +1,8 @@
+---
+# code: language=ansible
+check:
+  name: "ansible-gh-ci-alerts-check-{{ pr_number | default(0, true) }}"
+  type: ping
+  target: api.digitalocean.com
+  regions: [us_east]
+  enabled: true

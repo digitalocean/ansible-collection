@@ -1,0 +1,12 @@
+---
+# code: language=ansible
+app_name: "ansible-gh-ci-app-{{ pr_number | default(0, true) }}"
+app_region: nyc
+app_service_name: web
+app_repo: ""
+app_branch: main
+app_run_command: "npm start"
+app_http_port: 8080
+app_instance_count: 1
+app_instance_count_updated: 2
+app_instance_size_slug: basic-xxs

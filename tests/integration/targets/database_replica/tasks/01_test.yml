@@ -1,0 +1,31 @@
+# code: language=ansible
+---
+- name: 01_test | Create database replica
+  digitalocean.cloud.database_replica:
+    token: "{{ digitalocean_token }}"
+    state: present
+    cluster_id: "{{ database_cluster_id }}"
+    name: "{{ replica_name }}"
+    region: "{{ region }}"
+    size: "{{ replica_size }}"
+  register: result
+
+- name: 01_test | Verify create replica
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string
+
+- name: 01_test | Delete database replica
+  digitalocean.cloud.database_replica:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    cluster_id: "{{ database_cluster_id }}"
+    name: "{{ replica_name }}"
+  register: result
+
+- name: 01_test | Verify delete replica
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string

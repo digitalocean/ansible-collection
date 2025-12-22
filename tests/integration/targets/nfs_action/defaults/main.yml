@@ -1,0 +1,6 @@
+---
+# code: language=ansible
+nfs_name: "ansible-gh-ci-nfs-action-{{ pr_number | default(0, true) }}"
+nfs_region: nyc3
+nfs_size_gigabytes: 100
+nfs_resize_size_gigabytes: 150

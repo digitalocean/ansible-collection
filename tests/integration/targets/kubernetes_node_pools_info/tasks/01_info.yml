@@ -1,0 +1,13 @@
+# code: language=ansible
+---
+- name: 01_info | Get node pools
+  digitalocean.cloud.kubernetes_node_pools_info:
+    token: "{{ digitalocean_token }}"
+    cluster_id: "{{ kubernetes_cluster_id }}"
+  register: result
+
+- name: 01_info | Verify node pools
+  ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.msg is string

@@ -1,0 +1,24 @@
+# code: language=ansible
+---
+- name: 00_setup | Create Droplet
+  digitalocean.cloud.droplet:
+    token: "{{ digitalocean_token }}"
+    state: present
+    name: "{{ droplet_name }}"
+    region: "{{ droplet_region }}"
+    size: "{{ droplet_size }}"
+    image: "{{ droplet_image }}"
+    unique_name: true
+  register: droplet_result
+
+- name: 00_setup | Create floating IP
+  digitalocean.cloud.floating_ip:
+    token: "{{ digitalocean_token }}"
+    state: present
+    region: "{{ droplet_region }}"
+  register: floating_ip_result
+
+- name: 00_setup | Set facts
+  ansible.builtin.set_fact:
+    droplet_id: "{{ droplet_result.droplet.id }}"
+    floating_ip: "{{ floating_ip_result.floating_ip.ip }}"

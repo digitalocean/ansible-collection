@@ -1,0 +1,7 @@
+---
+# code: language=ansible
+image_name: "ansible-gh-ci-image-{{ pr_number | default(0, true) }}"
+image_url: ""
+image_region: nyc3
+image_distribution: Ubuntu
+image_description: "Ansible test image"

@@ -1,0 +1,9 @@
+# code: language=ansible
+---
+- name: 99_teardown | Delete Uptime check
+  digitalocean.cloud.uptime_check:
+    state: absent
+    token: "{{ digitalocean_token }}"
+    name: "{{ check.name }}"
+    unique_name: true
+  ignore_errors: true

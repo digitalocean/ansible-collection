@@ -1,0 +1,44 @@
+# code: language=ansible
+---
+- block:
+    - name: Create custom image
+      digitalocean.cloud.image:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ image_name }}"
+        url: "{{ image_url }}"
+        region: "{{ image_region }}"
+        distribution: "{{ image_distribution }}"
+        description: "{{ image_description }}"
+      register: result
+
+    - name: Verify create image
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+          - result.image.id is integer
+
+    - name: Delete custom image
+      digitalocean.cloud.image:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ image_name }}"
+        id: "{{ result.image.id }}"
+      register: delete_result
+
+    - name: Verify delete image
+      ansible.builtin.assert:
+        that:
+          - delete_result.changed
+          - delete_result.msg is string
+
+  always:
+    - name: Cleanup custom image
+      digitalocean.cloud.image:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ image_name }}"
+        id: "{{ result.image.id | default(0) }}"
+      when: result is defined and result.image is defined
+      ignore_errors: true

@@ -1,0 +1,38 @@
+# code: language=ansible
+---
+- block:
+
+    - name: Verify API token
+      ansible.builtin.assert:
+        that:
+          - digitalocean_token is string
+          - digitalocean_token | length > 0
+        fail_msg: digitalocean_token should be defined in tests/integration/integration_config.yml
+
+    - name: Get invoices
+      digitalocean.cloud.invoices_info:
+        token: "{{ digitalocean_token }}"
+      register: invoices_result
+
+    - name: Verify invoices exist
+      ansible.builtin.assert:
+        that:
+          - invoices_result.invoices is iterable
+          - invoices_result.invoices | length > 0
+        fail_msg: No invoices available to test invoice_items_info
+
+    - name: Set invoice UUID
+      ansible.builtin.set_fact:
+        invoice_uuid: "{{ invoices_result.invoices[0].invoice_uuid }}"
+
+    - name: Get invoice items
+      digitalocean.cloud.invoice_items_info:
+        token: "{{ digitalocean_token }}"
+        invoice_uuid: "{{ invoice_uuid }}"
+      register: result
+
+    - name: Verify invoice items
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg is string

@@ -1,0 +1,14 @@
+---
+# code: language=ansible
+check:
+  name: "ansible-gh-ci-alert-check-{{ pr_number | default(0, true) }}"
+  type: ping
+  target: api.digitalocean.com
+  regions: [us_east]
+  enabled: true
+alert_name: "ansible-gh-ci-alert-{{ pr_number | default(0, true) }}"
+alert_type: latency
+alert_threshold: 500
+alert_comparison: greater_than
+alert_email: alerts@example.com
+alert_period: 5m

@@ -1,0 +1,7 @@
+---
+# code: language=ansible
+region: nyc3
+size: db-s-1vcpu-2gb
+engine: pg
+database_name: "ansible-gh-ci-db-{{ pr_number | default(0, true) }}-database_firewall_rules_info"
+num_nodes: 1

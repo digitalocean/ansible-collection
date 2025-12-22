@@ -1,0 +1,13 @@
+# code: language=ansible
+---
+- name: 01_info | Get droplet_snapshots_info
+  digitalocean.cloud.droplet_snapshots_info:
+    token: "{ digitalocean_token }"
+    droplet_id: "{ droplet_id }"
+  register: result
+
+- name: 01_info | Verify droplet_snapshots_info result
+  ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.msg is string

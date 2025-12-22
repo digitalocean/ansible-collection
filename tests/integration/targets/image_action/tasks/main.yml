@@ -1,0 +1,21 @@
+# code: language=ansible
+---
+- block:
+
+    - name: Verify API token
+      ansible.builtin.assert:
+        that:
+          - digitalocean_token is string
+          - digitalocean_token | length > 0
+        fail_msg: digitalocean_token should be defined in tests/integration/integration_config.yml
+
+    - name: Verify image action inputs
+      ansible.builtin.assert:
+        that:
+          - image_action_id | int > 0
+          - image_action_type in ["transfer", "convert"]
+        fail_msg: image_action_id and image_action_type must be set in defaults or extra vars
+
+    - name: Test image_action | Perform action
+      ansible.builtin.include_tasks:
+        file: 01_action.yml

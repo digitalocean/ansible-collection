@@ -1,0 +1,4 @@
+---
+# code: language=ansible
+function_namespace: "ansible-gh-ci-fn-{{ pr_number | default(0, true) }}"
+function_region: nyc3

@@ -1,0 +1,13 @@
+# code: language=ansible
+---
+- name: 01_info | Get uptime alerts
+  digitalocean.cloud.uptime_alerts_info:
+    token: "{{ digitalocean_token }}"
+    check_id: "{{ check_id }}"
+  register: result
+
+- name: 01_info | Verify uptime alerts
+  ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.msg is string

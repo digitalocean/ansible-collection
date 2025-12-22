@@ -1,0 +1,31 @@
+# code: language=ansible
+---
+- name: 01_test | Update database firewall rules
+  digitalocean.cloud.database_firewall:
+    token: "{{ digitalocean_token }}"
+    state: present
+    cluster_id: "{{ database_cluster_id }}"
+    rules:
+      - type: ip_addr
+        value: 192.168.1.0/24
+  register: result
+
+- name: 01_test | Verify firewall update
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg == "Updated database firewall rules"
+
+- name: 01_test | Clear database firewall rules
+  digitalocean.cloud.database_firewall:
+    token: "{{ digitalocean_token }}"
+    state: present
+    cluster_id: "{{ database_cluster_id }}"
+    rules: []
+  register: result
+
+- name: 01_test | Verify firewall cleared
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg == "Updated database firewall rules"

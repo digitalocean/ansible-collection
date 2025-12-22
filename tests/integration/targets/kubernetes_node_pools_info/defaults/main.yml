@@ -1,0 +1,7 @@
+---
+# code: language=ansible
+kubernetes_cluster_name: "ansible-gh-ci-k8s-{{ pr_number | default(0, true) }}"
+kubernetes_region: nyc3
+kubernetes_default_pool_name: "ansible-gh-ci-k8s-pool-0"
+kubernetes_default_pool_size: s-2vcpu-4gb
+kubernetes_default_pool_count: 1

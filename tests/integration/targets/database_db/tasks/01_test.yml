@@ -1,0 +1,29 @@
+# code: language=ansible
+---
+- name: 01_test | Create database
+  digitalocean.cloud.database_db:
+    token: "{{ digitalocean_token }}"
+    state: present
+    cluster_id: "{{ database_cluster_id }}"
+    name: "{{ db_name }}"
+  register: result
+
+- name: 01_test | Verify create database
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string
+
+- name: 01_test | Delete database
+  digitalocean.cloud.database_db:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    cluster_id: "{{ database_cluster_id }}"
+    name: "{{ db_name }}"
+  register: result
+
+- name: 01_test | Verify delete database
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string

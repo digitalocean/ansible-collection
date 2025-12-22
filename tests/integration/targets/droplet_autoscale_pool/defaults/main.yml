@@ -1,0 +1,8 @@
+---
+# code: language=ansible
+autoscale_pool_name: "ansible-gh-ci-autoscale-{{ pr_number | default(0, true) }}"
+autoscale_region: nyc3
+autoscale_droplet_size: s-1vcpu-2gb
+autoscale_image: ubuntu-22-04-x64
+autoscale_min_instances: 1
+autoscale_max_instances: 2

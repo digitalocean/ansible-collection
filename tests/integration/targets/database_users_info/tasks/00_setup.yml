@@ -1,0 +1,17 @@
+# code: language=ansible
+---
+- name: 00_setup | Create database cluster
+  digitalocean.cloud.database_cluster:
+    state: present
+    token: "{{ digitalocean_token }}"
+    name: "{{ database_name }}"
+    region: "{{ region }}"
+    engine: "{{ engine }}"
+    size: "{{ size }}"
+    num_nodes: "{{ num_nodes }}"
+    timeout: 600
+  register: database_result
+
+- name: 00_setup | Set database cluster ID
+  ansible.builtin.set_fact:
+    database_cluster_id: "{{ database_result.database.id }}"

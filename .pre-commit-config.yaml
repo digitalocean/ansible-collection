@@ -6,10 +6,14 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
-  - repo: https://github.com/ansible/ansible-lint
-    rev: v6.20.0
+  - repo: local
     hooks:
       - id: ansible-lint
+        name: Ansible-lint
+        entry: poetry run ansible-lint --force-color
+        language: system
+        types: [yaml]
+        pass_filenames: false
   - repo: https://github.com/psf/black
     rev: 23.7.0
     hooks:

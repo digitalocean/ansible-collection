@@ -1,0 +1,10 @@
+# code: language=ansible
+---
+- name: 99_teardown | Delete database cluster
+  digitalocean.cloud.database_cluster:
+    state: absent
+    token: "{{ digitalocean_token }}"
+    name: "{{ database_name }}"
+    region: "{{ region }}"
+    engine: "{{ engine }}"
+  ignore_errors: true

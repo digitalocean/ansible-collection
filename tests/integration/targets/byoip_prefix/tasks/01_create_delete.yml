@@ -1,0 +1,37 @@
+# code: language=ansible
+---
+- block:
+    - name: Create BYOIP prefix
+      digitalocean.cloud.byoip_prefix:
+        token: "{{ digitalocean_token }}"
+        state: present
+        prefix: "{{ byoip_prefix }}"
+        description: "{{ byoip_description }}"
+      register: result
+
+    - name: Verify create BYOIP prefix
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+
+    - name: Delete BYOIP prefix
+      digitalocean.cloud.byoip_prefix:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        prefix: "{{ byoip_prefix }}"
+      register: result
+
+    - name: Verify delete BYOIP prefix
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+
+  always:
+    - name: Cleanup BYOIP prefix
+      digitalocean.cloud.byoip_prefix:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        prefix: "{{ byoip_prefix }}"
+      ignore_errors: true

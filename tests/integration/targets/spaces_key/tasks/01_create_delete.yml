@@ -1,0 +1,40 @@
+# code: language=ansible
+---
+- block:
+    - name: Create Spaces key
+      digitalocean.cloud.spaces_key:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ spaces_key_name }}"
+      register: result
+
+    - name: Verify create Spaces key
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+          - result.spaces_key.access_key is string
+
+    - name: Delete Spaces key
+      digitalocean.cloud.spaces_key:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ spaces_key_name }}"
+        access_key: "{{ result.spaces_key.access_key }}"
+      register: delete_result
+
+    - name: Verify delete Spaces key
+      ansible.builtin.assert:
+        that:
+          - delete_result.changed
+          - delete_result.msg is string
+
+  always:
+    - name: Cleanup Spaces key
+      digitalocean.cloud.spaces_key:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ spaces_key_name }}"
+        access_key: "{{ result.spaces_key.access_key | default('') }}"
+      when: result is defined and result.spaces_key is defined
+      ignore_errors: true

@@ -1,0 +1,16 @@
+# code: language=ansible
+---
+- name: 01_action | Perform image action
+  digitalocean.cloud.image_action:
+    token: "{{ digitalocean_token }}"
+    state: present
+    image_id: "{{ image_action_id }}"
+    type: "{{ image_action_type }}"
+    region: "{{ image_action_region if image_action_type == 'transfer' else omit }}"
+  register: result
+
+- name: 01_action | Verify image action
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string

@@ -1,0 +1,16 @@
+# code: language=ansible
+---
+- name: 01_resize | Resize NFS share
+  digitalocean.cloud.nfs_action:
+    token: "{{ digitalocean_token }}"
+    state: present
+    nfs_id: "{{ nfs_id }}"
+    type: resize
+    size_gigabytes: "{{ nfs_resize_size_gigabytes }}"
+  register: result
+
+- name: 01_resize | Verify resize action
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string

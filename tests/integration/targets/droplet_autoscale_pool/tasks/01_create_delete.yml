@@ -1,0 +1,45 @@
+# code: language=ansible
+---
+- block:
+    - name: Create Droplet autoscale pool
+      digitalocean.cloud.droplet_autoscale_pool:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ autoscale_pool_name }}"
+        config:
+          min_instances: "{{ autoscale_min_instances }}"
+          max_instances: "{{ autoscale_max_instances }}"
+          target_cpu_utilization: 0.5
+          cooldown_minutes: 5
+        droplet_template:
+          size: "{{ autoscale_droplet_size }}"
+          region: "{{ autoscale_region }}"
+          image: "{{ autoscale_image }}"
+      register: result
+
+    - name: Verify create Droplet autoscale pool
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+
+    - name: Delete Droplet autoscale pool
+      digitalocean.cloud.droplet_autoscale_pool:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ autoscale_pool_name }}"
+      register: result
+
+    - name: Verify delete Droplet autoscale pool
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+
+  always:
+    - name: Cleanup Droplet autoscale pool
+      digitalocean.cloud.droplet_autoscale_pool:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ autoscale_pool_name }}"
+      ignore_errors: true

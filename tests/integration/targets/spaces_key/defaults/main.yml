@@ -1,0 +1,3 @@
+---
+# code: language=ansible
+spaces_key_name: "ansible-gh-ci-spaces-key-{{ pr_number | default(0, true) }}"

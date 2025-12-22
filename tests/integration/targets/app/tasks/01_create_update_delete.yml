@@ -1,0 +1,76 @@
+# code: language=ansible
+---
+- block:
+    - name: Create app
+      digitalocean.cloud.app:
+        token: "{{ digitalocean_token }}"
+        state: present
+        spec:
+          name: "{{ app_name }}"
+          region: "{{ app_region }}"
+          services:
+            - name: "{{ app_service_name }}"
+              github:
+                repo: "{{ app_repo }}"
+                branch: "{{ app_branch }}"
+              run_command: "{{ app_run_command }}"
+              http_port: "{{ app_http_port }}"
+              instance_count: "{{ app_instance_count }}"
+              instance_size_slug: "{{ app_instance_size_slug }}"
+      register: create_result
+
+    - name: Verify create app
+      ansible.builtin.assert:
+        that:
+          - create_result.changed
+          - create_result.msg is string
+          - create_result.app.id is string
+          - create_result.app.spec.name == app_name
+
+    - name: Update app
+      digitalocean.cloud.app:
+        token: "{{ digitalocean_token }}"
+        state: present
+        id: "{{ create_result.app.id }}"
+        spec:
+          name: "{{ app_name }}"
+          region: "{{ app_region }}"
+          services:
+            - name: "{{ app_service_name }}"
+              github:
+                repo: "{{ app_repo }}"
+                branch: "{{ app_branch }}"
+              run_command: "{{ app_run_command }}"
+              http_port: "{{ app_http_port }}"
+              instance_count: "{{ app_instance_count_updated }}"
+              instance_size_slug: "{{ app_instance_size_slug }}"
+      register: update_result
+
+    - name: Verify update app
+      ansible.builtin.assert:
+        that:
+          - update_result.changed
+          - update_result.msg is string
+          - update_result.app.id == create_result.app.id
+
+    - name: Delete app
+      digitalocean.cloud.app:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        id: "{{ create_result.app.id }}"
+      register: delete_result
+
+    - name: Verify delete app
+      ansible.builtin.assert:
+        that:
+          - delete_result.changed
+          - delete_result.msg is string
+
+  always:
+    - name: Cleanup app
+      digitalocean.cloud.app:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        id: "{{ create_result.app.id | default('') }}"
+      when: create_result is defined and create_result.app is defined
+      ignore_errors: true

@@ -1,0 +1,17 @@
+# code: language=ansible
+---
+- name: 00_setup | Create Kubernetes cluster
+  digitalocean.cloud.kubernetes_cluster:
+    token: "{{ digitalocean_token }}"
+    state: present
+    name: "{{ kubernetes_cluster_name }}"
+    region: "{{ kubernetes_region }}"
+    node_pools:
+      - size: "{{ kubernetes_default_pool_size }}"
+        name: "{{ kubernetes_default_pool_name }}"
+        count: "{{ kubernetes_default_pool_count }}"
+  register: cluster_result
+
+- name: 00_setup | Set cluster ID
+  ansible.builtin.set_fact:
+    kubernetes_cluster_id: "{{ cluster_result.cluster.id }}"
