@@ -4,6 +4,65 @@ DigitalOcean Collection Release Notes
 
 .. contents:: Topics
 
+v1.4.0
+======
+
+Minor Changes
+-------------
+
+- actions_info - new module to list account actions history.
+- app - new module to manage App Platform applications.
+- apps_info - new module to list App Platform applications.
+- byoip_prefix - new module to manage BYOIP prefixes.
+- byoip_prefixes_info - new module to list BYOIP prefixes.
+- container_registry - new module to manage container registries.
+- database_backups_info - new module to list database cluster backups.
+- database_config - new module to configure database cluster settings.
+- database_config_info - new module to get database cluster configuration.
+- database_connection_pool - new module to manage database connection pools.
+- database_connection_pools_info - new module to list database connection pools.
+- database_db - new module to manage databases within a cluster.
+- database_dbs_info - new module to list databases in a cluster.
+- database_firewall - new module to manage database firewall rules.
+- database_firewall_rules_info - new module to list database firewall rules.
+- database_maintenance_window - new module to configure database maintenance windows.
+- database_replica - new module to manage database read replicas.
+- database_replicas_info - new module to list database replicas.
+- database_user - new module to manage database users.
+- database_users_info - new module to list database users.
+- droplet_autoscale_pool - new module to manage Droplet autoscale pools.
+- droplet_autoscale_pools_info - new module to list Droplet autoscale pools.
+- droplet_backups_info - new module to list Droplet backups.
+- droplet_kernels_info - new module to list available Droplet kernels.
+- droplet_neighbors_info - new module to list Droplet neighbors.
+- droplet_snapshots_info - new module to list Droplet snapshots.
+- floating_ip - new module to manage floating IPs (legacy compatibility).
+- floating_ip_action - new module to assign/unassign floating IPs (legacy compatibility).
+- floating_ips_info - new module to list floating IPs (legacy compatibility).
+- function_namespace - new module to manage Functions namespaces.
+- function_namespaces_info - new module to list Functions namespaces.
+- image - new module to manage custom images.
+- image_action - new module to perform image actions (transfer, convert).
+- invoice_items_info - new module to get invoice line items.
+- invoices_info - new module to list account invoices.
+- kubernetes_node_pool - new module to manage Kubernetes node pools.
+- kubernetes_node_pools_info - new module to list Kubernetes node pools.
+- nfs - new module to manage NFS file systems.
+- nfs_action - new module to perform NFS actions (resize).
+- nfs_info - new module to list NFS file systems.
+- project_resource - new module to assign resources to projects.
+- reserved_ipv6 - new module to manage reserved IPv6 addresses.
+- reserved_ipv6_action - new module to assign/unassign reserved IPv6.
+- reserved_ipv6s_info - new module to list reserved IPv6 addresses.
+- spaces_key - new module to manage Spaces access keys.
+- spaces_keys_info - new module to list Spaces access keys.
+- uptime_alert - new module to manage uptime check alerts.
+- uptime_alerts_info - new module to list uptime check alerts.
+- vpc_nat_gateway - new module to manage VPC NAT gateways.
+- vpc_nat_gateways_info - new module to list VPC NAT gateways.
+- vpc_peering - new module to manage VPC peerings.
+- vpc_peerings_info - new module to list VPC peerings.
+
 v1.3.0
 ======
 
