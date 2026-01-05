@@ -1,0 +1,46 @@
+---
+- name: 01_create_resources | Testing block
+  block:
+    - name: 01_create_resources | Create test project
+      digitalocean.cloud.project:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ project_name }}"
+        description: "Test project for resource assignment"
+        purpose: "Just trying out DigitalOcean"
+        environment: "Development"
+      register: project_result
+
+    - name: 01_create_resources | Set project_id
+      ansible.builtin.set_fact:
+        project_id: "{{ project_result.project.id }}"
+
+    - name: 01_create_resources | Create test Droplet
+      digitalocean.cloud.droplet:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ droplet_region }}"
+        size: "{{ droplet_size }}"
+        image: "{{ droplet_image }}"
+      register: droplet_result
+
+    - name: 01_create_resources | Set droplet facts
+      ansible.builtin.set_fact:
+        droplet_id: "{{ droplet_result.droplet.id }}"
+        droplet_urn: "do:droplet:{{ droplet_result.droplet.id }}"
+
+    - name: 01_create_resources | Verify project created
+      ansible.builtin.assert:
+        that:
+          - project_result.changed
+          - project_result.project.id is defined
+          - project_result.project.name == project_name
+
+    - name: 01_create_resources | Verify Droplet created
+      ansible.builtin.assert:
+        that:
+          - droplet_result.changed
+          - droplet_result.droplet.id is defined
+          - droplet_result.droplet.name == droplet_name

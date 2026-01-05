@@ -10,14 +10,17 @@ repos:
     hooks:
       - id: ansible-lint
         name: Ansible-lint
-        entry: poetry run ansible-lint --force-color
+        entry: poetry run ansible-lint --fix
         language: system
-        types: [yaml]
         pass_filenames: false
-  - repo: https://github.com/psf/black
-    rev: 23.7.0
+        always_run: true
+  - repo: local
     hooks:
       - id: black
+        name: black
+        entry: poetry run black
+        language: system
+        types: [python]
   - repo: https://github.com/koalaman/shellcheck-precommit
     rev: v0.9.0
     hooks:

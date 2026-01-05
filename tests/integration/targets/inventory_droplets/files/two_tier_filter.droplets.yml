@@ -1,0 +1,14 @@
+---
+# Inventory with two-tier filtering (API + client-side)
+plugin: digitalocean.cloud.droplets
+cache: false
+api_filters:
+  tag_name: test-tag
+attributes:
+  - id
+  - region
+  - tags
+  - status
+filters:
+  - 'status == "active"'
+  - '"test-tag" in do_tags'

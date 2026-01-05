@@ -1,0 +1,25 @@
+---
+- name: Assign resources to a project
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    token: "{{ lookup('ansible.builtin.env', 'DIGITALOCEAN_TOKEN') }}"
+    project_name: my-web-api
+    droplet_id: 13457723
+    volume_id: 6fc4c277-ea5c-448a-93cd-dd496cfef71f
+
+  tasks:
+    - name: Assign Droplet and volume to project by name
+      digitalocean.cloud.project_resources:
+        token: "{{ token }}"
+        state: present
+        project_name: "{{ project_name }}"
+        resources:
+          - "do:droplet:{{ droplet_id }}"
+          - "do:volume:{{ volume_id }}"
+      register: result
+
+    - name: Display result
+      ansible.builtin.debug:
+        var: result

@@ -19,6 +19,7 @@ This is a grounds-up rewrite of the [`community.digitalocean`](https://galaxy.an
 [![Integration tests](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-integration.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-integration.yml)
 [![Sanity tests](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-sanity.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-sanity.yml)
 [![Unit tests](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-unit.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/ansible-test-unit.yml)
+[![codecov](https://codecov.io/gh/digitalocean/ansible-collection/branch/main/graph/badge.svg)](https://codecov.io/gh/digitalocean/ansible-collection)
 [![Publish Collection on Galaxy](https://github.com/digitalocean/ansible-collection/actions/workflows/publish-galaxy.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/publish-galaxy.yml)
 [![Lint extra docsite docs and links](https://github.com/digitalocean/ansible-collection/actions/workflows/extra-docs-linting.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/extra-docs-linting.yml)
 [![Python psf/black](https://github.com/digitalocean/ansible-collection/actions/workflows/psf-black.yml/badge.svg)](https://github.com/digitalocean/ansible-collection/actions/workflows/psf-black.yml)
@@ -130,6 +131,7 @@ There is a [pyproject.toml](./pyproject.toml) is the root of this repository as 
 | `digitalocean.cloud.one_click`                      | Install Kubernetes 1-Click applications      |
 | `digitalocean.cloud.one_clicks_info`                | Get 1-Clicks                                 |
 | `digitalocean.cloud.project`                        | Create and delete projects                   |
+| `digitalocean.cloud.project_resources`              | Assign resources to projects                 |
 | `digitalocean.cloud.projects_info`                  | Get projects                                 |
 | `digitalocean.cloud.projects_resources_info`        | Get projects resources                       |
 | `digitalocean.cloud.regions_info`                   | Get regions                                  |
@@ -258,6 +260,29 @@ localhost                  : ok=1    changed=0    unreachable=0    failed=0    s
 > [!NOTE]
 > DigitalOcean does not require Droplet names to be unique - this functionality is enforced by the
 > `digitalocean.cloud.droplet` module in conjunction with its `unique_name` parameter.
+
+### Assigning Resources to Projects
+
+You can organize your DigitalOcean resources into projects using the `project_resources` module. Resources are identified using their URN (Uniform Resource Name) in the format `do:resource_type:resource_id`.
+
+```yaml
+---
+- name: Assign resources to project
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Assign Droplet and volume to project
+      digitalocean.cloud.project_resources:
+        state: present
+        project_name: "my-web-api"
+        resources:
+          - "do:droplet:13457723"
+          - "do:volume:6fc4c277-ea5c-448a-93cd-dd496cfef71f"
+          - "do:floatingip:192.0.2.1"
+```
+
+You can specify the project by either `project_id` or `project_name`. Supported resource types include droplets, volumes, floating IPs, domains, and load balancers.
 
 [This](./inventory/digitalocean.yml) is a sample inventory plugin file which returns the Droplets in your account:
 

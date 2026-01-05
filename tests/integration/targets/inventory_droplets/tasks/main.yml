@@ -1,0 +1,117 @@
+---
+- block:
+
+    - name: Verify API token
+      ansible.builtin.assert:
+        that:
+          - digitalocean_token is string
+          - digitalocean_token | length > 0
+        fail_msg: digitalocean_token should be defined in tests/integration/integration_config.yml
+
+    - name: Create test droplet for inventory testing
+      digitalocean.cloud.droplet:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        size: "{{ droplet_size }}"
+        image: "{{ droplet_image }}"
+        unique_name: true
+        tags:
+          - "{{ droplet_tag }}"
+      register: test_droplet
+
+    - name: Wait for droplet to be active and propagated
+      ansible.builtin.pause:
+        seconds: 30
+
+    - name: Test basic inventory (no filters)
+      ansible.builtin.command:
+        cmd: ansible-inventory -i {{ role_path }}/files/basic.droplets.yml --list
+      environment:
+        DIGITALOCEAN_TOKEN: "{{ digitalocean_token }}"
+      register: basic_inventory
+      changed_when: false
+
+    - name: Parse basic inventory output
+      ansible.builtin.set_fact:
+        basic_inventory_parsed: "{{ basic_inventory.stdout | from_yaml }}"
+
+    - name: Verify basic inventory contains hosts
+      ansible.builtin.assert:
+        that:
+          - basic_inventory_parsed['_meta']['hostvars'] | length > 0
+        fail_msg: Basic inventory should contain at least one host
+
+    - name: Test API-level tag filter
+      ansible.builtin.command:
+        cmd: ansible-inventory -i {{ role_path }}/files/api_filter_tag.droplets.yml --list
+      environment:
+        DIGITALOCEAN_TOKEN: "{{ digitalocean_token }}"
+      register: api_filter_inventory
+      changed_when: false
+
+    - name: Parse API filter inventory output
+      ansible.builtin.set_fact:
+        api_filter_inventory_parsed: "{{ api_filter_inventory.stdout | from_yaml }}"
+
+    - name: Verify API filter works
+      ansible.builtin.assert:
+        that:
+          - api_filter_inventory_parsed['_meta']['hostvars'] | length > 0
+        fail_msg: API filtered inventory should contain hosts with test-tag
+
+    - name: Test client-side filter
+      ansible.builtin.command:
+        cmd: ansible-inventory -i {{ role_path }}/files/client_filter.droplets.yml --list
+      environment:
+        DIGITALOCEAN_TOKEN: "{{ digitalocean_token }}"
+      register: client_filter_inventory
+      changed_when: false
+
+    - name: Parse client filter inventory output
+      ansible.builtin.set_fact:
+        client_filter_inventory_parsed: "{{ client_filter_inventory.stdout | from_yaml }}"
+
+    - name: Verify client-side filter works
+      ansible.builtin.assert:
+        that:
+          - client_filter_inventory_parsed['_meta']['hostvars'] | length > 0
+        fail_msg: Client filtered inventory should contain droplets (filter ensures they are active)
+
+    - name: Test two-tier filtering
+      ansible.builtin.command:
+        cmd: ansible-inventory -i {{ role_path }}/files/two_tier_filter.droplets.yml --list
+      environment:
+        DIGITALOCEAN_TOKEN: "{{ digitalocean_token }}"
+      register: two_tier_inventory
+      changed_when: false
+
+    - name: Parse two-tier filter inventory output
+      ansible.builtin.set_fact:
+        two_tier_inventory_parsed: "{{ two_tier_inventory.stdout | from_yaml }}"
+
+    - name: Verify two-tier filtering works
+      ansible.builtin.assert:
+        that:
+          - two_tier_inventory_parsed['_meta']['hostvars'] | length > 0
+        fail_msg: Two-tier filtered inventory should contain hosts
+
+    - name: Display test results
+      ansible.builtin.debug:
+        msg:
+          - "Basic inventory hosts: {{ basic_inventory_parsed['_meta']['hostvars'] | length }}"
+          - "API filtered hosts: {{ api_filter_inventory_parsed['_meta']['hostvars'] | length }}"
+          - "Client filtered hosts: {{ client_filter_inventory_parsed['_meta']['hostvars'] | length }}"
+          - "Two-tier filtered hosts: {{ two_tier_inventory_parsed['_meta']['hostvars'] | length }}"
+
+  always:
+
+    - name: Clean up test droplet
+      digitalocean.cloud.droplet:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ test_droplet.droplet.name }}"
+        region: "{{ test_droplet.droplet.region.slug }}"
+        unique_name: true
+      ignore_errors: true

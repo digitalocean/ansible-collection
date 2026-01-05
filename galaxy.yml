@@ -2,7 +2,7 @@
 # See https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
 namespace: digitalocean
 name: cloud
-version: "1.4.0"
+version: "1.9.0"
 readme: README.md
 authors:
   - Mark Mercado (@mamercad)

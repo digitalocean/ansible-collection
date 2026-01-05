@@ -1,0 +1,89 @@
+# code: language=ansible
+---
+- block:
+
+    - name: Create SSH key (first time)
+      digitalocean.cloud.ssh_key:
+        token: "{{ digitalocean_token }}"
+        state: present
+        public_key: "{{ ssh_public_key }}"
+        name: "{{ ssh_key_name }}"
+      register: result
+
+    - name: Verify create SSH key
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created SSH key " ~ ssh_key_name ~ " (" ~ result.ssh_key.fingerprint ~ ")"
+          - result.ssh_key.name == ssh_key_name
+          - result.ssh_key.fingerprint == ssh_fingerprint
+
+    - name: Create SSH key again (should be idempotent - same name and public key)
+      digitalocean.cloud.ssh_key:
+        token: "{{ digitalocean_token }}"
+        state: present
+        public_key: "{{ ssh_public_key }}"
+        name: "{{ ssh_key_name }}"
+      register: result
+
+    - name: Verify SSH key creation is idempotent
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.ssh_key.name == ssh_key_name
+          - result.ssh_key.fingerprint == ssh_fingerprint
+
+    - name: Delete SSH key
+      digitalocean.cloud.ssh_key:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        public_key: "{{ ssh_public_key }}"
+        name: "{{ ssh_key_name }}"
+      register: result
+
+    - name: Create SSH key with original name
+      digitalocean.cloud.ssh_key:
+        token: "{{ digitalocean_token }}"
+        state: present
+        public_key: "{{ ssh_public_key }}"
+        name: "{{ ssh_key_name }}"
+      register: result
+
+    - name: Verify create SSH key
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.ssh_key.name == ssh_key_name
+
+    - name: Create SSH key with different name but same public key (should be idempotent)
+      digitalocean.cloud.ssh_key:
+        token: "{{ digitalocean_token }}"
+        state: present
+        public_key: "{{ ssh_public_key }}"
+        name: "{{ ssh_key_name }}-different"
+      register: result
+
+    - name: Verify SSH key creation with different name but same public key is idempotent
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.ssh_key.fingerprint == ssh_fingerprint
+          - "'already exists' in result.msg"
+
+  always:
+
+    - name: Cleanup SSH key | Leftover from unexpected failure
+      digitalocean.cloud.ssh_key:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        public_key: "{{ ssh_public_key }}"
+        name: "{{ ssh_key_name }}"
+      ignore_errors: true
+
+    - name: Cleanup SSH key with different name | Leftover from unexpected failure
+      digitalocean.cloud.ssh_key:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        public_key: "{{ ssh_public_key }}"
+        name: "{{ ssh_key_name }}-different"
+      ignore_errors: true

@@ -4,7 +4,7 @@ DigitalOcean Collection Release Notes
 
 .. contents:: Topics
 
-v1.4.0
+v1.9.0
 ======
 
 Minor Changes
@@ -62,6 +62,70 @@ Minor Changes
 - vpc_nat_gateways_info - new module to list VPC NAT gateways.
 - vpc_peering - new module to manage VPC peerings.
 - vpc_peerings_info - new module to list VPC peerings.
+
+v1.8.0
+======
+
+Minor Changes
+-------------
+
+- project_resources - add new module project_resources to assign resources to a project by project name or ID (https://github.com/digitalocean/ansible-collection/issues/119).
+
+New Modules
+-----------
+
+- project_resources - Assign resources to a project
+
+v1.7.0
+======
+
+Minor Changes
+-------------
+
+- droplets inventory plugin - add two-tier filtering system with api_filters for server-side filtering (tag_name, name) and filters for client-side Jinja2 template filtering. This addresses performance issues for large infrastructures by reducing API response size and provides granular control for environment isolation.
+
+v1.6.0
+======
+
+Minor Changes
+-------------
+
+- Bump dependency versions via Dependabot (https://github.com/digitalocean/ansible-collection/pull/260).
+
+Bugfixes
+--------
+
+- monitoring_alert_policy - Fixed idempotency by re-enabling description comparison (https://github.com/digitalocean/ansible-collection/issues/265).
+- monitoring_alert_policy - Fixed typo 'desciption' to 'description' in API request body (https://github.com/digitalocean/ansible-collection/issues/264).
+
+v1.5.0
+======
+
+Breaking Changes / Porting Guide
+--------------------------------
+
+- droplets inventory plugin - the C(tags) attribute is now automatically renamed to C(do_tags) when included in the C(attributes) list to avoid conflicting with Ansible's reserved C(tags) variable. Users should update their inventory configurations to use C(do_tags) in C(keyed_groups), C(compose), and C(groups) sections (https://github.com/digitalocean/ansible-collection/issues/249).
+
+Bugfixes
+--------
+
+- droplet_action_resize - fixed to properly capture and poll the action response from the API instead of repeatedly querying the droplet state. The action response is now returned in the module output and used to determine when the resize operation completes (https://github.com/digitalocean/ansible-collection/issues/243).
+- droplets inventory plugin - fixed warning "[WARNING]: Found variable using reserved name 'tags'" by automatically renaming the C(tags) attribute to C(do_tags) to avoid conflicting with Ansible's reserved variable name (https://github.com/digitalocean/ansible-collection/issues/249).
+- ssh_key - module now handles the case where an SSH key with the same public key already exists on the account, making it idempotent instead of failing with a 422 error (https://github.com/digitalocean/ansible-collection/issues/102).
+- tag - fixed KeyError when tag creation fails due to validation errors. The module now properly catches and reports API error messages instead of showing a cryptic KeyError (https://github.com/digitalocean/ansible-collection/issues/181).
+
+v1.4.0
+======
+
+Minor Changes
+-------------
+
+- common, droplet_action_power, droplet_action_resize, droplet_action_snapshot - standardized error messages to include droplet IDs when multiple droplets with the same name are found, improving debugging experience. Added comprehensive unit tests for droplet_action modules (https://github.com/digitalocean/ansible-collection/issues/250).
+
+Bugfixes
+--------
+
+- droplet - fix C(unique_name) parameter not working correctly due to API name parameter not being supported. The module now fetches all droplets and filters client-side to properly detect existing droplets and prevent duplicate creation (https://github.com/digitalocean/ansible-collection/issues/250).
 
 v1.3.0
 ======

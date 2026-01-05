@@ -1,0 +1,11 @@
+---
+# Inventory with client-side filters
+plugin: digitalocean.cloud.droplets
+cache: false
+attributes:
+  - id
+  - region
+  - tags
+  - status
+filters:
+  - 'status == "active"'

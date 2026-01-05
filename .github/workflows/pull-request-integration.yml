@@ -53,6 +53,7 @@ jobs:
           - firewall
           - firewalls_info
           - images_info
+          - inventory_droplets
           - kubernetes_cluster
           - kubernetes_clusters_info
           - load_balancer
@@ -63,6 +64,7 @@ jobs:
           - one_clicks_info
           - project
           - projects_info
+          - project_resources
           - project_resources_info
           - regions_info
           - reserved_ip

@@ -34,7 +34,8 @@ options:
   name:
     description:
       - The name of the tag.
-      - Tags may contain letters, numbers, colons, dashes, and underscores.
+      - Tags may contain letters, numbers, colons (:), dashes (-), and underscores (_).
+      - Dots (.) and other special characters are not allowed.
       - There is a limit of 255 characters per tag.
       - |
         Note: Tag names are case stable, which means the capitalization you use when you first
@@ -117,6 +118,33 @@ class Tag(DigitalOceanCommonModule):
         elif self.state == "absent":
             self.absent()
 
+    @staticmethod
+    def _validate_tag_name(name):
+        """
+        Validate tag name against DigitalOcean requirements.
+
+        Raises ValueError if validation fails.
+        """
+        import re
+
+        # DigitalOcean tag requirements:
+        # - Allowed: letters, numbers, colons, dashes, underscores
+        # - Disallowed: dots, spaces, special chars
+        # - Max length: 255
+        # - Must not be empty
+        if not isinstance(name, str) or not name:
+            raise ValueError("Tag name must be a non-empty string.")
+        if len(name) > 255:
+            raise ValueError("Tag name must be 255 characters or fewer.")
+        if "." in name:
+            raise ValueError(
+                "Tag name contains invalid character: '.' (dots are not allowed)"
+            )
+        if not re.match(r"^[A-Za-z0-9:_\-]+$", name):
+            raise ValueError(
+                "Tag name contains invalid characters. Allowed: letters, numbers, colons, dashes, underscores."
+            )
+
     def get_tags(self):
         try:
             tags = self.client.tags.list()["tags"]
@@ -143,8 +171,21 @@ class Tag(DigitalOceanCommonModule):
             body = {
                 "name": self.name,
             }
-            tag = self.client.tags.create(body=body)["tag"]
+            response = self.client.tags.create(body=body)
 
+            # Handle the case where the API returns an error response without raising an exception
+            if "tag" not in response:
+                # The response might be an error without the expected "tag" key
+                error_msg = response.get("message", "Unknown error creating tag")
+                error = {
+                    "Message": error_msg,
+                    "Status Code": response.get("status_code", "Unknown"),
+                    "Reason": response.get("id", "Unknown"),
+                }
+                self.module.fail_json(changed=False, msg=error_msg, error=error, tag=[])
+                return  # Explicit return for test mocking scenarios
+
+            tag = response["tag"]
             self.module.exit_json(
                 changed=True,
                 msg=f"Created tag {self.name}",
@@ -157,7 +198,15 @@ class Tag(DigitalOceanCommonModule):
                 "Reason": err.reason,
             }
             self.module.fail_json(
-                changed=False, msg=error.get("Message"), error=error, droplet=[]
+                changed=False, msg=error.get("Message"), error=error, tag=[]
+            )
+        except KeyError as err:
+            # Handle unexpected response structure (fallback safety net)
+            self.module.fail_json(
+                changed=False,
+                msg=f"Unexpected response structure from API: missing key {err}",
+                error={"Message": f"KeyError: {err}"},
+                tag=[],
             )
 
     def delete_tag(self, tag):
@@ -239,6 +288,22 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True,
     )
+
+    # Validate tag name before creating Tag object
+    try:
+        Tag._validate_tag_name(module.params["name"])
+    except ValueError as ve:
+        module.fail_json(
+            changed=False,
+            msg=f"Invalid tag name: {ve}",
+            error={
+                "Message": str(ve),
+                "Reason": "InvalidTagName",
+                "Status Code": "400",
+            },
+            tag=[],
+        )
+
     Tag(module)
 
 
