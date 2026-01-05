@@ -28,15 +28,35 @@ jobs:
             python: "3.11"
         module:
           - account_info
+          - actions_info
+          - app
+          - apps_info
           - balance_info
           - billing_history_info
+          - byoip_prefix
+          - byoip_prefixes_info
           - cdn_endpoints # Failing with a 500, marked disabled in aliases
           - cdn_endpoints_info
           - certificate
           - certificates_info
+          - container_registry
           - container_registry_info
+          - database_backups_info
           - database_cluster
           - database_clusters_info
+          - database_config
+          - database_config_info
+          - database_connection_pool
+          - database_connection_pools_info
+          - database_db
+          - database_dbs_info
+          - database_firewall
+          - database_firewall_rules_info
+          - database_maintenance_window
+          - database_replica
+          - database_replicas_info
+          - database_user
+          - database_users_info
           - domain
           - domain_record
           - domain_records_info
@@ -45,36 +65,64 @@ jobs:
           - droplet_action_power
           - droplet_action_resize
           - droplet_action_snapshot
+          - droplet_autoscale_pool
+          - droplet_autoscale_pools_info
+          - droplet_backups_info
+          - droplet_kernels_info
+          - droplet_neighbors_info
+          - droplet_snapshots_info
           - droplets_info
           - firewall
           - firewalls_info
+          - floating_ip
+          - floating_ip_action
+          - floating_ips_info
+          - function_namespace
+          - function_namespaces_info
+          - image
+          - image_action
           - images_info
           - inventory_droplets
+          - invoice_items_info
+          - invoices_info
           - kubernetes_cluster
           - kubernetes_clusters_info
+          - kubernetes_node_pool
+          - kubernetes_node_pools_info
           - load_balancer
           - load_balancers_info
           - monitoring_alert_policies_info
           - monitoring_alert_policy
+          - nfs
+          - nfs_action
+          - nfs_info
           - one_click
           - one_clicks_info
           - project
-          - projects_info
+          - project_resource
           - project_resources
           - project_resources_info
+          - projects_info
           - regions_info
           - reserved_ip
           - reserved_ip_assign
           - reserved_ips_info
+          - reserved_ipv6
+          - reserved_ipv6_action
+          - reserved_ipv6s_info
           - sizes_info
           - snapshot
           - snapshots_info
           - space
           - spaces_info
+          - spaces_key
+          - spaces_keys_info
           - ssh_key
           - ssh_keys_info
           - tag
           - tags_info
+          - uptime_alert
+          - uptime_alerts_info
           - uptime_check
           - uptime_checks_info
           - uptime_checks_state_info
@@ -83,6 +131,10 @@ jobs:
           - volume_snapshot
           - volumes_info
           - vpc
+          - vpc_nat_gateway
+          - vpc_nat_gateways_info
+          - vpc_peering
+          - vpc_peerings_info
           - vpcs_info
     steps:
       - name: Perform testing
