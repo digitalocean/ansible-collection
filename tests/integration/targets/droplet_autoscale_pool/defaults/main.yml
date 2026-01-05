@@ -1,5 +1,4 @@
 ---
-# code: language=ansible
 autoscale_pool_name: "ansible-gh-ci-autoscale-{{ pr_number | default(0, true) }}"
 autoscale_region: nyc3
 autoscale_droplet_size: s-1vcpu-2gb

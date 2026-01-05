@@ -1,5 +1,4 @@
 ---
-# code: language=ansible
 app_name: "ansible-gh-ci-app-{{ pr_number | default(0, true) }}"
 app_region: nyc
 app_service_name: web

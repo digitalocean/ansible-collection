@@ -1,4 +1,3 @@
-# code: language=ansible
 ---
 - name: 99_teardown | Delete Uptime check
   digitalocean.cloud.uptime_check:

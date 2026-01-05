@@ -1,4 +1,3 @@
-# code: language=ansible
 ---
 - name: 01_create_delete | Create VPC NAT Gateway
   digitalocean.cloud.vpc_nat_gateway:

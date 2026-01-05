@@ -1,5 +1,4 @@
 ---
-# code: language=ansible
 image_name: "ansible-gh-ci-image-{{ pr_number | default(0, true) }}"
 image_url: ""
 image_region: nyc3

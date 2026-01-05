@@ -1,5 +1,4 @@
 ---
-# code: language=ansible
 region: nyc3
 size: db-s-1vcpu-2gb
 engine: pg

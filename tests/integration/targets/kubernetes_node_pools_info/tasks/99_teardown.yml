@@ -1,4 +1,3 @@
-# code: language=ansible
 ---
 - name: 99_teardown | Delete Kubernetes cluster
   digitalocean.cloud.kubernetes_cluster:

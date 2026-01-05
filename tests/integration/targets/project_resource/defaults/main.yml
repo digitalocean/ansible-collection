@@ -1,5 +1,4 @@
 ---
-# code: language=ansible
 project_name: "ansible-gh-ci-project-resource-{{ pr_number | default(0, true) }}"
 project_description: "Ansible test project resources"
 project_purpose: "Just for testing"

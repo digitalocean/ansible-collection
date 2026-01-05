@@ -1,4 +1,3 @@
-# code: language=ansible
 ---
 - name: 01_assign_remove | Assign resources
   digitalocean.cloud.project_resource:

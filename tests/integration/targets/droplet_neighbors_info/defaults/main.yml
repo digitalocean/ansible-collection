@@ -1,5 +1,4 @@
 ---
-# code: language=ansible
 droplet_name: "ansible-gh-ci-droplet_neighbors_info-{{ pr_number | default(0, true) }}"
 droplet_region: nyc3
 droplet_size: s-1vcpu-2gb

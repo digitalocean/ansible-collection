@@ -1,5 +1,4 @@
 ---
-# code: language=ansible
 image_action_id: 0
 image_action_type: transfer
 image_action_region: sfo2

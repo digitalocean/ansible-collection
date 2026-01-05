@@ -1,5 +1,4 @@
 ---
-# code: language=ansible
 check:
   name: "ansible-gh-ci-alert-check-{{ pr_number | default(0, true) }}"
   type: ping

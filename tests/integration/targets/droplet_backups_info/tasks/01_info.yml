@@ -1,4 +1,3 @@
-# code: language=ansible
 ---
 - name: 01_info | Get droplet_backups_info
   digitalocean.cloud.droplet_backups_info:
