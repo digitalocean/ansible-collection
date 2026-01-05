@@ -1,6 +1,5 @@
 ---
 - block:
-
     - name: Verify API token
       ansible.builtin.assert:
         that:
@@ -10,7 +9,7 @@
 
     - name: Get droplet_autoscale_pools_info
       digitalocean.cloud.droplet_autoscale_pools_info:
-        token: "{ digitalocean_token }"
+        token: "{{ digitalocean_token }}"
       register: result
 
     - name: Verify droplet_autoscale_pools_info result

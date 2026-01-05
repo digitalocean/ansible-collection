@@ -1,6 +1,5 @@
 ---
 - block:
-
     - name: Verify API token
       ansible.builtin.assert:
         that:
@@ -10,7 +9,7 @@
 
     - name: Get function_namespaces_info
       digitalocean.cloud.function_namespaces_info:
-        token: "{ digitalocean_token }"
+        token: "{{ digitalocean_token }}"
       register: result
 
     - name: Verify function_namespaces_info result

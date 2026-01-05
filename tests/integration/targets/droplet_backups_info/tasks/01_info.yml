@@ -1,7 +1,7 @@
 ---
 - name: 01_info | Get droplet_backups_info
   digitalocean.cloud.droplet_backups_info:
-    token: "{ digitalocean_token }"
+    token: "{{ digitalocean_token }}"
     droplet_id: "{ droplet_id }"
   register: result
 

@@ -1,7 +1,7 @@
 ---
 - name: 01_info | Get database_connection_pools_info
   digitalocean.cloud.database_connection_pools_info:
-    token: "{ digitalocean_token }"
+    token: "{{ digitalocean_token }}"
     cluster_id: "{ database_cluster_id }"
   register: result
 

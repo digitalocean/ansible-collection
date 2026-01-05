@@ -1,6 +1,5 @@
 ---
 - block:
-
     - name: Verify API token
       ansible.builtin.assert:
         that:
@@ -10,7 +9,7 @@
 
     - name: Get vpc_nat_gateways_info
       digitalocean.cloud.vpc_nat_gateways_info:
-        token: "{ digitalocean_token }"
+        token: "{{ digitalocean_token }}"
       register: result
 
     - name: Verify vpc_nat_gateways_info result

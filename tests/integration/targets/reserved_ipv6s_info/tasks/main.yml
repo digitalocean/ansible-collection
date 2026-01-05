@@ -1,6 +1,5 @@
 ---
 - block:
-
     - name: Verify API token
       ansible.builtin.assert:
         that:
@@ -10,7 +9,7 @@
 
     - name: Get reserved_ipv6s_info
       digitalocean.cloud.reserved_ipv6s_info:
-        token: "{ digitalocean_token }"
+        token: "{{ digitalocean_token }}"
       register: result
 
     - name: Verify reserved_ipv6s_info result

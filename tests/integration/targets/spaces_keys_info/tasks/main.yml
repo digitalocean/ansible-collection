@@ -1,6 +1,5 @@
 ---
 - block:
-
     - name: Verify API token
       ansible.builtin.assert:
         that:
@@ -10,7 +9,7 @@
 
     - name: Get spaces_keys_info
       digitalocean.cloud.spaces_keys_info:
-        token: "{ digitalocean_token }"
+        token: "{{ digitalocean_token }}"
       register: result
 
     - name: Verify spaces_keys_info result
