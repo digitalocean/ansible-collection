@@ -42,6 +42,12 @@ options:
       - volume
       - floating_ip
       - reserved_ip
+  limit:
+    description:
+      - Maximum number of actions to retrieve.
+      - If not specified, retrieves all actions (may be slow for accounts with many actions).
+    type: int
+    required: false
 
 extends_documentation_fragment:
   - digitalocean.cloud.common.documentation
@@ -49,14 +55,21 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Get all actions
+- name: Get the 100 most recent actions
   digitalocean.cloud.actions_info:
     token: "{{ token }}"
+    limit: 100
 
-- name: Get Droplet actions
+- name: Get all Droplet actions
   digitalocean.cloud.actions_info:
     token: "{{ token }}"
     resource_type: droplet
+
+- name: Get the 50 most recent Droplet actions
+  digitalocean.cloud.actions_info:
+    token: "{{ token }}"
+    resource_type: droplet
+    limit: 50
 """
 
 
@@ -106,6 +119,7 @@ class ActionsInformation(DigitalOceanCommonModule):
     def __init__(self, module):
         super().__init__(module)
         self.resource_type = module.params.get("resource_type")
+        self.limit = module.params.get("limit")
         self.params = {}
         if self.resource_type:
             self.params["resource_type"] = self.resource_type
@@ -113,14 +127,20 @@ class ActionsInformation(DigitalOceanCommonModule):
             self.present()
 
     def present(self):
-        actions = DigitalOceanFunctions.get_paginated(
-            module=self.module,
-            obj=self.client.actions,
-            meth="list",
-            key="actions",
-            exc=DigitalOceanCommonModule.HttpResponseError,
-            params=self.params if self.params else None,
-        )
+        # If limit is specified, use custom pagination to stop early
+        if self.limit is not None:
+            actions = self._get_limited_actions()
+        else:
+            # No limit - fetch all actions (may be slow)
+            actions = DigitalOceanFunctions.get_paginated(
+                module=self.module,
+                obj=self.client.actions,
+                meth="list",
+                key="actions",
+                exc=DigitalOceanCommonModule.HttpResponseError,
+                params=self.params if self.params else None,
+            )
+
         if actions:
             self.module.exit_json(
                 changed=False,
@@ -128,6 +148,47 @@ class ActionsInformation(DigitalOceanCommonModule):
                 actions=actions,
             )
         self.module.exit_json(changed=False, msg="No actions", actions=[])
+
+    def _get_limited_actions(self):
+        """Fetch actions with early stopping when limit is reached."""
+        actions = []
+        page = 1
+        per_page = min(self.limit, 200)  # Fetch up to 200 per page (API max)
+
+        try:
+            while len(actions) < self.limit:
+                resp = self.client.actions.list(
+                    per_page=per_page,
+                    page=page,
+                    **(self.params if self.params else {}),
+                )
+                page_actions = resp.get("actions", [])
+
+                if not page_actions:
+                    # No more actions available
+                    break
+
+                # Add actions but don't exceed limit
+                remaining = self.limit - len(actions)
+                actions.extend(page_actions[:remaining])
+
+                # Check if there are more pages
+                if "links" not in resp or "pages" not in resp["links"]:
+                    break
+                if "next" not in resp["links"]["pages"]:
+                    break
+
+                page += 1
+
+        except DigitalOceanCommonModule.HttpResponseError as e:
+            error = {
+                "Message": e.error.message,
+                "Status Code": e.status_code,
+                "Reason": e.reason,
+            }
+            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
+
+        return actions
 
 
 def main():
@@ -137,6 +198,10 @@ def main():
             type="str",
             required=False,
             choices=["droplet", "image", "volume", "floating_ip", "reserved_ip"],
+        ),
+        limit=dict(
+            type="int",
+            required=False,
         ),
     )
     module = AnsibleModule(

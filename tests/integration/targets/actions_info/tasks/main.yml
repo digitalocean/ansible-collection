@@ -10,6 +10,7 @@
     - name: Get actions_info
       digitalocean.cloud.actions_info:
         token: "{{ digitalocean_token }}"
+        limit: 100
       register: result
 
     - name: Verify actions_info result
