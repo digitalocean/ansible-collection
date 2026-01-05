@@ -147,7 +147,7 @@ class FloatingIPAction(DigitalOceanCommonModule):
                 "type": "assign",
                 "droplet_id": self.droplet_id,
             }
-            action = self.client.floating_ips_actions.post(
+            action = self.client.reserved_ips_actions.post(
                 floating_ip=self.ip, body=body
             )["action"]
 
@@ -193,7 +193,7 @@ class FloatingIPAction(DigitalOceanCommonModule):
             body = {
                 "type": "unassign",
             }
-            action = self.client.floating_ips_actions.post(
+            action = self.client.reserved_ips_actions.post(
                 floating_ip=self.ip, body=body
             )["action"]
 
@@ -229,7 +229,7 @@ class FloatingIPAction(DigitalOceanCommonModule):
 
     def get_floating_ip_action_by_id(self, action_id):
         try:
-            action = self.client.floating_ips_actions.get(
+            action = self.client.reserved_ips_actions.get(
                 floating_ip=self.ip, action_id=action_id
             )["action"]
             return action

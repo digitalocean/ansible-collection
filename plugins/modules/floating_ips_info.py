@@ -96,16 +96,19 @@ class FloatingIPsInformation(DigitalOceanCommonModule):
 
     def present(self):
         try:
-            floating_ips = DigitalOceanFunctions.get_paginated(
+            # Floating IPs have been renamed to Reserved IPs in the API
+            # This module provides backwards compatibility by calling the
+            # reserved_ips endpoint but returning results as floating_ips
+            reserved_ips = DigitalOceanFunctions.get_paginated(
                 module=self.module,
-                obj=self.client.floating_ips,
+                obj=self.client.reserved_ips,
                 meth="list",
-                key="floating_ips",
+                key="reserved_ips",
                 exc=DigitalOceanCommonModule.HttpResponseError,
             )
-            if floating_ips:
+            if reserved_ips:
                 self.module.exit_json(
-                    changed=False, msg="Current floating IPs", floating_ips=floating_ips
+                    changed=False, msg="Current floating IPs", floating_ips=reserved_ips
                 )
             self.module.exit_json(changed=False, msg="No floating IPs", floating_ips=[])
         except DigitalOceanCommonModule.HttpResponseError as err:

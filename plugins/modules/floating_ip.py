@@ -133,9 +133,9 @@ class FloatingIP(DigitalOceanCommonModule):
         try:
             floating_ips = DigitalOceanFunctions.get_paginated(
                 module=self.module,
-                obj=self.client.floating_ips,
+                obj=self.client.reserved_ips,
                 meth="list",
-                key="floating_ips",
+                key="reserved_ips",
                 exc=DigitalOceanCommonModule.HttpResponseError,
             )
             for floating_ip in floating_ips:
@@ -169,7 +169,7 @@ class FloatingIP(DigitalOceanCommonModule):
                     floating_ip={},
                 )
 
-            floating_ip = self.client.floating_ips.create(body=body)["floating_ip"]
+            floating_ip = self.client.reserved_ips.create(body=body)["reserved_ip"]
 
             self.module.exit_json(
                 changed=True,
@@ -188,7 +188,7 @@ class FloatingIP(DigitalOceanCommonModule):
 
     def delete_floating_ip(self, floating_ip):
         try:
-            self.client.floating_ips.delete(floating_ip=floating_ip["ip"])
+            self.client.reserved_ips.delete(floating_ip=floating_ip["ip"])
             self.module.exit_json(
                 changed=True,
                 msg=f"Deleted floating IP {floating_ip['ip']}",

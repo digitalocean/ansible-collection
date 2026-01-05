@@ -2,7 +2,7 @@
 region: nyc3
 size: db-s-1vcpu-2gb
 engine: pg
-database_name: "ansible-gh-ci-db-{{ pr_number | default(0, true) }}-database_replica"
+database_name: "ansible-gh-ci-db-{{ pr_number | default(0, true) }}-database-replica"
 num_nodes: 1
 replica_name: ansible-gh-ci-replica-{{ pr_number | default(0, true) }}
 replica_size: db-s-1vcpu-2gb

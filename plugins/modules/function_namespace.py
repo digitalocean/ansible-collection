@@ -115,13 +115,9 @@ class FunctionNamespace(DigitalOceanCommonModule):
 
     def get_namespaces(self):
         try:
-            namespaces = DigitalOceanFunctions.get_paginated(
-                module=self.module,
-                obj=self.client.functions,
-                meth="list_namespaces",
-                key="namespaces",
-                exc=DigitalOceanCommonModule.HttpResponseError,
-            )
+            # Functions API doesn't support pagination parameters
+            response = self.client.functions.list_namespaces()
+            namespaces = response.get("namespaces", [])
             found_namespaces = []
             for ns in namespaces:
                 if self.namespace == ns.get("namespace"):

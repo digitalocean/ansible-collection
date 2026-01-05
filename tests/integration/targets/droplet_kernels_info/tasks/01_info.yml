@@ -2,7 +2,7 @@
 - name: 01_info | Get droplet_kernels_info
   digitalocean.cloud.droplet_kernels_info:
     token: "{{ digitalocean_token }}"
-    droplet_id: "{ droplet_id }"
+    droplet_id: "{{ droplet_id }}"
   register: result
 
 - name: 01_info | Verify droplet_kernels_info result

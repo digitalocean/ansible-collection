@@ -86,20 +86,26 @@ class FunctionNamespacesInformation(DigitalOceanCommonModule):
             self.present()
 
     def present(self):
-        namespaces = DigitalOceanFunctions.get_paginated(
-            module=self.module,
-            obj=self.client.functions,
-            meth="list_namespaces",
-            key="namespaces",
-            exc=DigitalOceanCommonModule.HttpResponseError,
-        )
-        if namespaces:
-            self.module.exit_json(
-                changed=False,
-                msg="Current namespaces",
-                namespaces=namespaces,
+        try:
+            # Functions API doesn't support pagination parameters
+            response = self.client.functions.list_namespaces()
+            namespaces = response.get("namespaces", [])
+            if namespaces:
+                self.module.exit_json(
+                    changed=False,
+                    msg="Current namespaces",
+                    namespaces=namespaces,
+                )
+            self.module.exit_json(changed=False, msg="No namespaces", namespaces=[])
+        except DigitalOceanCommonModule.HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            self.module.fail_json(
+                changed=False, msg=error.get("Message"), error=error, namespaces=[]
             )
-        self.module.exit_json(changed=False, msg="No namespaces", namespaces=[])
 
 
 def main():
