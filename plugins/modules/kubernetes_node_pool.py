@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2023, Mark Mercado <mmercado@digitalocean.com>
+# Copyright: (c) 2026, DigitalOcean Engineering <digitalocean-engineering-noreply@digitalocean.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -14,7 +14,7 @@ module: kubernetes_node_pool
 
 short_description: Create, update, or delete Kubernetes node pools
 
-version_added: 0.6.0
+version_added: 1.9.0
 
 description:
   - Create, update, or delete node pools in a Kubernetes cluster.
