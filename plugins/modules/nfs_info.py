@@ -29,15 +29,23 @@ requirements:
   - pydo >= 0.1.3
   - azure-core >= 1.26.1
 
+options:
+  region:
+    description:
+      - The slug identifier for the region to list NFS shares from.
+    type: str
+    required: true
+
 extends_documentation_fragment:
   - digitalocean.cloud.common.documentation
 """
 
 
 EXAMPLES = r"""
-- name: Get NFS shares
+- name: Get NFS shares in nyc3
   digitalocean.cloud.nfs_info:
     token: "{{ token }}"
+    region: nyc3
 """
 
 
@@ -86,28 +94,38 @@ from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
 class NFSInformation(DigitalOceanCommonModule):
     def __init__(self, module):
         super().__init__(module)
+        self.region = module.params.get("region")
         if self.state == "present":
             self.present()
 
     def present(self):
-        nfs_shares = DigitalOceanFunctions.get_paginated(
-            module=self.module,
-            obj=self.client.nfs,
-            meth="list",
-            key="nfs_shares",
-            exc=DigitalOceanCommonModule.HttpResponseError,
-        )
-        if nfs_shares:
-            self.module.exit_json(
-                changed=False,
-                msg="Current NFS shares",
-                nfs_shares=nfs_shares,
+        try:
+            # NFS API doesn't support pagination parameters
+            response = self.client.nfs.list(region=self.region)
+            nfs_shares = response.get("nfs_shares", [])
+            if nfs_shares:
+                self.module.exit_json(
+                    changed=False,
+                    msg="Current NFS shares",
+                    nfs_shares=nfs_shares,
+                )
+            self.module.exit_json(changed=False, msg="No NFS shares", nfs_shares=[])
+        except DigitalOceanCommonModule.HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            self.module.fail_json(
+                changed=False, msg=error.get("Message"), error=error, nfs_shares=[]
             )
-        self.module.exit_json(changed=False, msg="No NFS shares", nfs_shares=[])
 
 
 def main():
     argument_spec = DigitalOceanOptions.argument_spec()
+    argument_spec.update(
+        region=dict(type="str", required=True),
+    )
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
     NFSInformation(module)
 

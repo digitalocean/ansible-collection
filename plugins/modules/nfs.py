@@ -159,13 +159,9 @@ class NFS(DigitalOceanCommonModule):
 
     def get_nfs_shares(self):
         try:
-            nfs_shares = DigitalOceanFunctions.get_paginated(
-                module=self.module,
-                obj=self.client.nfs,
-                meth="list",
-                key="nfs_shares",
-                exc=DigitalOceanCommonModule.HttpResponseError,
-            )
+            # NFS API doesn't support pagination parameters
+            response = self.client.nfs.list(region=self.region)
+            nfs_shares = response.get("nfs_shares", [])
             found_shares = []
             for share in nfs_shares:
                 if self.name == share.get("name"):

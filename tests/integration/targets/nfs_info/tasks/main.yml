@@ -10,6 +10,7 @@
     - name: Get nfs_info
       digitalocean.cloud.nfs_info:
         token: "{{ digitalocean_token }}"
+        region: nyc3
       register: result
 
     - name: Verify nfs_info result
