@@ -2145,13 +2145,13 @@ typing-extensions = ">=4.14.1"
 
 [[package]]
 name = "pydo"
-version = "0.19.0"
+version = "0.23.0"
 description = "The official client for interacting with the DigitalOcean API"
 optional = false
 python-versions = "<4.0.0,>=3.8.0"
 files = [
-    {file = "pydo-0.19.0-py3-none-any.whl", hash = "sha256:8359241f7a7b0ed04b46a817ed8a7ce201d609f009586cf4d859fcc442ab8478"},
-    {file = "pydo-0.19.0.tar.gz", hash = "sha256:8f03b26cef688f99849fb3c40cd2f32b9a41721f7d6b119c5a9a4d6b9d337c76"},
+    {file = "pydo-0.23.0-py3-none-any.whl", hash = "sha256:5f972da46bda1baf519af1ed7003bfdf885b227b7eb97409e48d312527f1631d"},
+    {file = "pydo-0.23.0.tar.gz", hash = "sha256:5313c8aa92526284451db5a6e356d8842f6c5e3bb9e7105df691ae6857ff3021"},
 ]
 
 [package.dependencies]
@@ -3242,4 +3242,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11.11"
-content-hash = "c5d07b34d7ee576a001124adb95309bb2a287f4bae5ceba69fb0642b58e9d2cf"
+content-hash = "f7c87d8d5a04bde0ea52f995c316bcb9eaa668849446833e501f2a9de4739bf1"

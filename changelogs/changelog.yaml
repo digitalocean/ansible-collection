@@ -3,501 +3,661 @@ releases:
   0.1.0:
     changes:
       minor_changes:
-        - add Galaxy publish workflow (https://github.com/digitalocean/ansible-collection/pull/7).
+      - add Galaxy publish workflow (https://github.com/digitalocean/ansible-collection/pull/7).
       release_summary: Initial release of the Collection.
     fragments:
-      - 7-publish.yml
+    - 7-publish.yml
     modules:
-      - description: Show information about the current user account
-        name: account_info
-        namespace: ""
-    release_date: "2023-07-27"
+    - description: Show information about the current user account
+      name: account_info
+      namespace: ''
+    release_date: '2023-07-27'
   0.1.1:
     changes:
       minor_changes:
-        - just bumping the version (https://github.com/digitalocean/ansible-collection/pull/8).
+      - just bumping the version (https://github.com/digitalocean/ansible-collection/pull/8).
       release_summary: Just bumping the version.
     fragments:
-      - 8-bump-version.yml
-    release_date: "2023-07-27"
+    - 8-bump-version.yml
+    release_date: '2023-07-27'
   0.1.2:
     changes:
       bugfixes:
-        - common - ignore C(pydo) module unused (https://github.com/digitalocean/ansible-collection/pull/9).
+      - common - ignore C(pydo) module unused (https://github.com/digitalocean/ansible-collection/pull/9).
       minor_changes:
-        - small Shark-a-Hack iterations (https://github.com/digitalocean/ansible-collection/pull/9).
+      - small Shark-a-Hack iterations (https://github.com/digitalocean/ansible-collection/pull/9).
       release_summary: Small Shark-a-Hack iterations.
     fragments:
-      - 9-common-lint.yml
-      - 9-small-iterations.yaml
-    release_date: "2023-07-28"
+    - 9-common-lint.yml
+    - 9-small-iterations.yaml
+    release_date: '2023-07-28'
   0.2.0:
     changes:
       bugfixes:
-        - integration tests - fix missing C(PR_NUMBER) when run on C(main) (https://github.com/digitalocean/ansible-collection/pull/22).
+      - integration tests - fix missing C(PR_NUMBER) when run on C(main) (https://github.com/digitalocean/ansible-collection/pull/22).
       minor_changes:
-        - add many more modules (https://github.com/digitalocean/ansible-collection/pull/10).
-        - add more modules (https://github.com/digitalocean/ansible-collection/pull/10).
-        - configured ansible-lint to use the production profile (https://github.com/digitalocean/ansible-collection/pull/20).
-        - set up a devcontainer configuration allowing contributors to the project to
-          use GitHub Codespaces or other tools that leverage devcontainer configurations
-          (https://github.com/digitalocean/ansible-collection/pull/18).
-        - updated python dependencies (https://github.com/digitalocean/ansible-collection/pull/18).
-        - updated the pyproject.toml to more loosely define dependency versions, allowing
-          the poetry lockfile to pin explicit versions (https://github.com/digitalocean/ansible-collection/pull/18).
+      - add many more modules (https://github.com/digitalocean/ansible-collection/pull/10).
+      - add more modules (https://github.com/digitalocean/ansible-collection/pull/10).
+      - configured ansible-lint to use the production profile (https://github.com/digitalocean/ansible-collection/pull/20).
+      - set up a devcontainer configuration allowing contributors to the project to
+        use GitHub Codespaces or other tools that leverage devcontainer configurations
+        (https://github.com/digitalocean/ansible-collection/pull/18).
+      - updated python dependencies (https://github.com/digitalocean/ansible-collection/pull/18).
+      - updated the pyproject.toml to more loosely define dependency versions, allowing
+        the poetry lockfile to pin explicit versions (https://github.com/digitalocean/ansible-collection/pull/18).
       release_summary: Add many more modules.
     fragments:
-      - 10-add-many-more-modules.yaml
-      - 10-add-more-modules.yaml
-      - 18-devcontainer.yaml
-      - 20-update-codeowners.yaml
-      - 22-integration-tests-on-main.yaml
-      - 23-update-python-deps.yaml
+    - 10-add-many-more-modules.yaml
+    - 10-add-more-modules.yaml
+    - 18-devcontainer.yaml
+    - 20-update-codeowners.yaml
+    - 22-integration-tests-on-main.yaml
+    - 23-update-python-deps.yaml
     modules:
-      - description: Retrieve the balances on a customer's account
-        name: balance_info
-        namespace: ""
-      - description: Retrieve a list of all billing history entries
-        name: billing_history_info
-        namespace: ""
-      - description: Manage CDN endpoints
-        name: cdn_endpoints
-        namespace: ""
-      - description: List all of the CDN endpoints available on your account
-        name: cdn_endpoints_info
-        namespace: ""
-      - description: Manage certificates
-        name: certificate
-        namespace: ""
-      - description: List all of the certificates available on your account
-        name: certificates_info
-        namespace: ""
-      - description: Create or delete database clusters
-        name: database_cluster
-        namespace: ""
-      - description: List all of the database clusters on your account
-        name: database_clusters_info
-        namespace: ""
-      - description: Manage domains
-        name: domain
-        namespace: ""
-      - description: Manage domain records
-        name: domain_record
-        namespace: ""
-      - description: Retrieve a listing of all of the domain records for a domain
-        name: domain_records_info
-        namespace: ""
-      - description: Retrieve a list of all of the domains in your account
-        name: domains_info
-        namespace: ""
-      - description: Create or delete Droplets
-        name: droplet
-        namespace: ""
-      - description: Perform Droplet actions
-        name: droplet_action
-        namespace: ""
-      - description: List all Droplets in your account
-        name: droplets_info
-        namespace: ""
-      - description: Create or delete firewalls
-        name: firewall
-        namespace: ""
-      - description: List all firewalls on your account
-        name: firewalls_info
-        namespace: ""
-      - description: List all of the images available on your account
-        name: images_info
-        namespace: ""
-      - description: Create or delete Kubernetes clusters
-        name: kubernetes_cluster
-        namespace: ""
-      - description: Retrieve a list of all of the Kubernetes clusters in your account
-        name: kubernetes_clusters_info
-        namespace: ""
-      - description: Create or delete load balancers
-        name: load_balancer
-        namespace: ""
-      - description: Retrieve a list of all of the load balancers in your account
-        name: load_balancers_info
-        namespace: ""
-      - description: Returns all alert policies that are configured for the given account
-        name: monitoring_alert_policies_info
-        namespace: ""
-      - description: Create or delete monitoring alert policy
-        name: monitoring_alert_policy
-        namespace: ""
-      - description: List all available 1-Click applications
-        name: one_clicks_info
-        namespace: ""
-      - description: Create or delete projects
-        name: project
-        namespace: ""
-      - description: Retrieve a list of all of the projects in your account
-        name: projects_info
-        namespace: ""
-      - description: List all of the regions that are available
-        name: regions_info
-        namespace: ""
-      - description: Create or delete reserved IPs
-        name: reserved_ip
-        namespace: ""
-      - description: List all reserved IPs on your account
-        name: reserved_ips_info
-        namespace: ""
-      - description: List all of available Droplet sizes
-        name: sizes_info
-        namespace: ""
-      - description: Delete snapshots
-        name: snapshot
-        namespace: ""
-      - description: Retrieve a list of all of the snapshots in your account
-        name: snapshots_info
-        namespace: ""
-      - description: Create or delete SSH keys
-        name: ssh_key
-        namespace: ""
-      - description: List all of the keys in your account
-        name: ssh_keys_info
-        namespace: ""
-      - description: Create or delete tags
-        name: tag
-        namespace: ""
-      - description: List all of the tags on your account
-        name: tags_info
-        namespace: ""
-      - description: Create or delete volumes
-        name: volume
-        namespace: ""
-      - description: Attach or detach volumes from Droplets
-        name: volume_action
-        namespace: ""
-      - description: Create or delete volume snapshots
-        name: volume_snapshot
-        namespace: ""
-      - description: List all of the block storage volumes available on your account
-        name: volumes_info
-        namespace: ""
-      - description: Create or delete VPCs
-        name: vpc
-        namespace: ""
-      - description: List all of the VPCs on your account
-        name: vpcs_info
-        namespace: ""
-    release_date: "2023-08-04"
+    - description: Retrieve the balances on a customer's account
+      name: balance_info
+      namespace: ''
+    - description: Retrieve a list of all billing history entries
+      name: billing_history_info
+      namespace: ''
+    - description: Manage CDN endpoints
+      name: cdn_endpoints
+      namespace: ''
+    - description: List all of the CDN endpoints available on your account
+      name: cdn_endpoints_info
+      namespace: ''
+    - description: Manage certificates
+      name: certificate
+      namespace: ''
+    - description: List all of the certificates available on your account
+      name: certificates_info
+      namespace: ''
+    - description: Create or delete database clusters
+      name: database_cluster
+      namespace: ''
+    - description: List all of the database clusters on your account
+      name: database_clusters_info
+      namespace: ''
+    - description: Manage domains
+      name: domain
+      namespace: ''
+    - description: Manage domain records
+      name: domain_record
+      namespace: ''
+    - description: Retrieve a listing of all of the domain records for a domain
+      name: domain_records_info
+      namespace: ''
+    - description: Retrieve a list of all of the domains in your account
+      name: domains_info
+      namespace: ''
+    - description: Create or delete Droplets
+      name: droplet
+      namespace: ''
+    - description: Perform Droplet actions
+      name: droplet_action
+      namespace: ''
+    - description: List all Droplets in your account
+      name: droplets_info
+      namespace: ''
+    - description: Create or delete firewalls
+      name: firewall
+      namespace: ''
+    - description: List all firewalls on your account
+      name: firewalls_info
+      namespace: ''
+    - description: List all of the images available on your account
+      name: images_info
+      namespace: ''
+    - description: Create or delete Kubernetes clusters
+      name: kubernetes_cluster
+      namespace: ''
+    - description: Retrieve a list of all of the Kubernetes clusters in your account
+      name: kubernetes_clusters_info
+      namespace: ''
+    - description: Create or delete load balancers
+      name: load_balancer
+      namespace: ''
+    - description: Retrieve a list of all of the load balancers in your account
+      name: load_balancers_info
+      namespace: ''
+    - description: Returns all alert policies that are configured for the given account
+      name: monitoring_alert_policies_info
+      namespace: ''
+    - description: Create or delete monitoring alert policy
+      name: monitoring_alert_policy
+      namespace: ''
+    - description: List all available 1-Click applications
+      name: one_clicks_info
+      namespace: ''
+    - description: Create or delete projects
+      name: project
+      namespace: ''
+    - description: Retrieve a list of all of the projects in your account
+      name: projects_info
+      namespace: ''
+    - description: List all of the regions that are available
+      name: regions_info
+      namespace: ''
+    - description: Create or delete reserved IPs
+      name: reserved_ip
+      namespace: ''
+    - description: List all reserved IPs on your account
+      name: reserved_ips_info
+      namespace: ''
+    - description: List all of available Droplet sizes
+      name: sizes_info
+      namespace: ''
+    - description: Delete snapshots
+      name: snapshot
+      namespace: ''
+    - description: Retrieve a list of all of the snapshots in your account
+      name: snapshots_info
+      namespace: ''
+    - description: Create or delete SSH keys
+      name: ssh_key
+      namespace: ''
+    - description: List all of the keys in your account
+      name: ssh_keys_info
+      namespace: ''
+    - description: Create or delete tags
+      name: tag
+      namespace: ''
+    - description: List all of the tags on your account
+      name: tags_info
+      namespace: ''
+    - description: Create or delete volumes
+      name: volume
+      namespace: ''
+    - description: Attach or detach volumes from Droplets
+      name: volume_action
+      namespace: ''
+    - description: Create or delete volume snapshots
+      name: volume_snapshot
+      namespace: ''
+    - description: List all of the block storage volumes available on your account
+      name: volumes_info
+      namespace: ''
+    - description: Create or delete VPCs
+      name: vpc
+      namespace: ''
+    - description: List all of the VPCs on your account
+      name: vpcs_info
+      namespace: ''
+    release_date: '2023-08-04'
   0.3.0:
     changes:
       breaking_changes:
-        - droplet_action - removed and will be split into individual actions (https://github.com/digitalocean/ansible-collection/pull/44).
+      - droplet_action - removed and will be split into individual actions (https://github.com/digitalocean/ansible-collection/pull/44).
       bugfixes:
-        - integration - do not ignore errors for C(billing_history_information) test
-          (https://github.com/digitalocean/ansible-collection/issues/44).
+      - integration - do not ignore errors for C(billing_history_information) test
+        (https://github.com/digitalocean/ansible-collection/issues/44).
       minor_changes:
-        - common - add C(client_override_options) and C(module_override_options) for
-          experimental or future options (https://github.com/digitalocean/ansible-collection/pull/44).
-        - common - remove region validation from argument_specs to facilitate API test
-          beds (https://github.com/digitalocean/ansible-collection/pull/44).
-        - droplet - add missing C(user_data) parameter (https://github.com/digitalocean/ansible-collection/pull/44).
-        - droplet_action_power - new module for changing power states on Droplets (https://github.com/digitalocean/ansible-collection/pull/44).
-        - droplet_action_resize - new module for resizing Droplets (https://github.com/digitalocean/ansible-collection/pull/44).
-        - droplet_action_snapshot - new module for taking Droplet snapshots (https://github.com/digitalocean/ansible-collection/pull/44).
+      - common - add C(client_override_options) and C(module_override_options) for
+        experimental or future options (https://github.com/digitalocean/ansible-collection/pull/44).
+      - common - remove region validation from argument_specs to facilitate API test
+        beds (https://github.com/digitalocean/ansible-collection/pull/44).
+      - droplet - add missing C(user_data) parameter (https://github.com/digitalocean/ansible-collection/pull/44).
+      - droplet_action_power - new module for changing power states on Droplets (https://github.com/digitalocean/ansible-collection/pull/44).
+      - droplet_action_resize - new module for resizing Droplets (https://github.com/digitalocean/ansible-collection/pull/44).
+      - droplet_action_snapshot - new module for taking Droplet snapshots (https://github.com/digitalocean/ansible-collection/pull/44).
     fragments:
-      - 27-releasing-instructions.yml
-      - 36-run-integration-on-fork-prs.yaml
-      - 42-pr-integration-on-deps.yml
-      - 44-client-and-module-override-options.yml
-      - 53-add-makefile-test-commands.yaml
-      - 57-dependabot-bumps.yml
+    - 27-releasing-instructions.yml
+    - 36-run-integration-on-fork-prs.yaml
+    - 42-pr-integration-on-deps.yml
+    - 44-client-and-module-override-options.yml
+    - 53-add-makefile-test-commands.yaml
+    - 57-dependabot-bumps.yml
     modules:
-      - description: Set power states of a Droplet
-        name: droplet_action_power
-        namespace: ""
-      - description: Resize a Droplet
-        name: droplet_action_resize
-        namespace: ""
-      - description: Take a snapshot of a Droplet
-        name: droplet_action_snapshot
-        namespace: ""
-    release_date: "2023-09-20"
+    - description: Set power states of a Droplet
+      name: droplet_action_power
+      namespace: ''
+    - description: Resize a Droplet
+      name: droplet_action_resize
+      namespace: ''
+    - description: Take a snapshot of a Droplet
+      name: droplet_action_snapshot
+      namespace: ''
+    release_date: '2023-09-20'
   0.4.0:
     changes:
       bugfixes:
-        - database_cluster - fix C(database_cluster) module and reenable integration
-          test (https://github.com/digitalocean/ansible-collection/pull/60).
-        - kubernetes_cluster - fix C(kubernetes_cluster) module polling and refactor
-          integration test (https://github.com/digitalocean/ansible-collection/issues/62).
-        - project - fix C(project) module with API workaround and add integration test
-          (https://github.com/digitalocean/ansible-collection/pull/61).
+      - database_cluster - fix C(database_cluster) module and reenable integration
+        test (https://github.com/digitalocean/ansible-collection/pull/60).
+      - kubernetes_cluster - fix C(kubernetes_cluster) module polling and refactor
+        integration test (https://github.com/digitalocean/ansible-collection/issues/62).
+      - project - fix C(project) module with API workaround and add integration test
+        (https://github.com/digitalocean/ansible-collection/pull/61).
     fragments:
-      - 58-publish-galaxy.yaml
-      - 59-readme-badges.yaml
-      - 60-fix-database-cluster.yaml
-      - 61-fix-project.yaml
-      - 62-fix-kubernetes-cluster.yaml
-      - 66-database-cluster-timeout.yaml
-      - 71-dependabot-bumps.yaml
+    - 58-publish-galaxy.yaml
+    - 59-readme-badges.yaml
+    - 60-fix-database-cluster.yaml
+    - 61-fix-project.yaml
+    - 62-fix-kubernetes-cluster.yaml
+    - 66-database-cluster-timeout.yaml
+    - 71-dependabot-bumps.yaml
     plugins:
       inventory:
-        - description: Droplets dynamic inventory plugin
-          name: droplets
-          namespace: null
-    release_date: "2023-09-25"
+      - description: Droplets dynamic inventory plugin
+        name: droplets
+        namespace: null
+    release_date: '2023-09-25'
   0.5.0:
     changes:
       minor_changes:
-        - ci - configure dependabot for grouped dependency updates (https://github.com/digitalocean/ansible-collection/pull/84).
+      - ci - configure dependabot for grouped dependency updates (https://github.com/digitalocean/ansible-collection/pull/84).
     fragments:
-      - 84-grouped-dependabot.yml
-      - 86-dependabot-bumps.yml
-      - 87-dependency-updates.yml
+    - 84-grouped-dependabot.yml
+    - 86-dependabot-bumps.yml
+    - 87-dependency-updates.yml
     modules:
-      - description: Get information about your container registry
-        name: container_registry_info
-        namespace: ""
-      - description: Install Kubernetes 1-Click applications
-        name: one_click
-        namespace: ""
-      - description: Retrieve a list of all of the project resources in your account
-        name: project_resources_info
-        namespace: ""
-      - description: Manage Spaces
-        name: space
-        namespace: ""
-      - description: List all of the Spaces in your account
-        name: spaces_info
-        namespace: ""
-      - description: Create or delete Uptime checks
-        name: uptime_check
-        namespace: ""
-      - description: List all of the Uptime checks on your account
-        name: uptime_checks_info
-        namespace: ""
-      - description: Get the state of an Uptime check
-        name: uptime_checks_state_info
-        namespace: ""
-    release_date: "2023-10-12"
+    - description: Get information about your container registry
+      name: container_registry_info
+      namespace: ''
+    - description: Install Kubernetes 1-Click applications
+      name: one_click
+      namespace: ''
+    - description: Retrieve a list of all of the project resources in your account
+      name: project_resources_info
+      namespace: ''
+    - description: Manage Spaces
+      name: space
+      namespace: ''
+    - description: List all of the Spaces in your account
+      name: spaces_info
+      namespace: ''
+    - description: Create or delete Uptime checks
+      name: uptime_check
+      namespace: ''
+    - description: List all of the Uptime checks on your account
+      name: uptime_checks_info
+      namespace: ''
+    - description: Get the state of an Uptime check
+      name: uptime_checks_state_info
+      namespace: ''
+    release_date: '2023-10-12'
   0.5.1:
     changes:
       minor_changes:
-        - Bump Kubernetes version in its integration test (https://github.com/digitalocean/ansible-collection/issues/100).
-        - Fix broken links due to Ansible Galaxy NG launch (https://github.com/digitalocean/ansible-collection/pull/91).
-        - Lint tweaked ansible-lint configuration so production profile is now the target
-          for this repo (https://github.com/digitalocean/ansible-collection/pull/104).
+      - Bump Kubernetes version in its integration test (https://github.com/digitalocean/ansible-collection/issues/100).
+      - Fix broken links due to Ansible Galaxy NG launch (https://github.com/digitalocean/ansible-collection/pull/91).
+      - Lint tweaked ansible-lint configuration so production profile is now the target
+        for this repo (https://github.com/digitalocean/ansible-collection/pull/104).
     fragments:
-      - 100-bump-kubernetes-version.yml
-      - 104-ansible-lint.yml
-      - 91-ansible-galaxy-ng.yml
-    release_date: "2023-12-21"
+    - 100-bump-kubernetes-version.yml
+    - 104-ansible-lint.yml
+    - 91-ansible-galaxy-ng.yml
+    release_date: '2023-12-21'
   0.6.0:
     changes:
       minor_changes:
-        - "added an action group 'digitalocean.cloud.all' for use with module defaults:
-          https://docs.ansible.com/ansible/latest/user_guide/playbooks_module_defaults.html
-          (https://github.com/digitalocean/ansible-collection/pull/180)"
+      - 'added an action group ''digitalocean.cloud.all'' for use with module defaults:
+        https://docs.ansible.com/ansible/latest/user_guide/playbooks_module_defaults.html
+        (https://github.com/digitalocean/ansible-collection/pull/180)'
     fragments:
-      - 133-kubernetes-slug.yml
-      - 135-ansible-version.yml
-      - 144-issue-templates.yml
-      - 147-integration-testing-kubernetes-version.yml
-      - 180-add-action_groups.yml
-    release_date: "2024-05-23"
+    - 133-kubernetes-slug.yml
+    - 135-ansible-version.yml
+    - 144-issue-templates.yml
+    - 147-integration-testing-kubernetes-version.yml
+    - 180-add-action_groups.yml
+    release_date: '2024-05-23'
   1.0.0:
     changes:
       bugfixes:
-        - "droplet - add misisng ``droplet_id`` parameter when for ``state: absent``
-          (https://github.com/digitalocean/ansible-collection/issues/229)."
+      - 'droplet - add misisng ``droplet_id`` parameter when for ``state: absent``
+        (https://github.com/digitalocean/ansible-collection/issues/229).'
       minor_changes:
-        - Bump Python to 3.11.11 and Poetry to 1.8.5 (https://github.com/digitalocean/ansible-collection/issues/229).
-        - monitoring_alert_policy - mark integration test as ``disabled`` since it is
-          broken (https://github.com/digitalocean/ansible-collection/issues/229)."
-        - one_click - mark this integration test as ``disabled`` since it is broken
-          (https://github.com/digitalocean/ansible-collection/issues/229)."
-      release_summary:
-        "Bump Python, project-wide, to 3.11.11. Fix ``state: absent``
+      - Bump Python to 3.11.11 and Poetry to 1.8.5 (https://github.com/digitalocean/ansible-collection/issues/229).
+      - monitoring_alert_policy - mark integration test as ``disabled`` since it is
+        broken (https://github.com/digitalocean/ansible-collection/issues/229)."
+      - one_click - mark this integration test as ``disabled`` since it is broken
+        (https://github.com/digitalocean/ansible-collection/issues/229)."
+      release_summary: 'Bump Python, project-wide, to 3.11.11. Fix ``state: absent``
         bug in the Droplet module. Disable integration testing for the ``monitoring_alert_policy``
-        and ``one_click`` modules since they are broken (https://github.com/digitalocean/ansible-collection/pull/234)."
+        and ``one_click`` modules since they are broken (https://github.com/digitalocean/ansible-collection/pull/234).'
     fragments:
-      - 229-bump-python-311.yaml
-      - 229-disable-monitoring-alert-policy-and-one-click-int-tests.yml
-      - 229-droplet-id-absent.yaml
-    release_date: "2025-03-06"
+    - 229-bump-python-311.yaml
+    - 229-disable-monitoring-alert-policy-and-one-click-int-tests.yml
+    - 229-droplet-id-absent.yaml
+    release_date: '2025-03-06'
   1.1.0:
     changes:
       minor_changes:
-        - droplet - Add ``resize`` and ``resize_disk`` functionality (https://github.com/digitalocean/ansible-collection/issues/236).
+      - droplet - Add ``resize`` and ``resize_disk`` functionality (https://github.com/digitalocean/ansible-collection/issues/236).
     fragments:
-      - 236-droplet-resize.yml
-    release_date: "2025-04-28"
+    - 236-droplet-resize.yml
+    release_date: '2025-04-28'
   1.2.0:
     changes:
       bugfixes:
-        - droplet - Fix resize for new Droplets (https://github.com/digitalocean/ansible-collection/issues/239).
+      - droplet - Fix resize for new Droplets (https://github.com/digitalocean/ansible-collection/issues/239).
       major_changes:
-        - database_cluster -  Replace Redis with Valkey (https://github.com/digitalocean/ansible-collection/issues/241).
+      - database_cluster -  Replace Redis with Valkey (https://github.com/digitalocean/ansible-collection/issues/241).
     fragments:
-      - 239-fix-droplet-resize-new-droplets.yml
-      - 241-redis-to-valkey.yml
-    release_date: "2025-04-30"
+    - 239-fix-droplet-resize-new-droplets.yml
+    - 241-redis-to-valkey.yml
+    release_date: '2025-04-30'
   1.2.1:
     changes:
       minor_changes:
-        - droplet - Add more Droplet tests and fix Droplet "noop" resize (https://github.com/digitalocean/ansible-collection/issues/245).
+      - droplet - Add more Droplet tests and fix Droplet "noop" resize (https://github.com/digitalocean/ansible-collection/issues/245).
     fragments:
-      - 245-add-more-droplet-tests.yaml
-    release_date: "2025-05-06"
+    - 245-add-more-droplet-tests.yaml
+    release_date: '2025-05-06'
   1.3.0:
     changes:
       minor_changes:
-        - dependencies - bump aiohttp from 3.9.5 to 3.10.2 (https://github.com/digitalocean/ansible-collection/issues/233).
-        - dependencies - bump certifi from 2024.6.2 to 2024.7.4 (https://github.com/digitalocean/ansible-collection/issues/233).
-        - dependencies - bump cryptography from 42.0.8 to 43.0.1 (https://github.com/digitalocean/ansible-collection/issues/233).
-        - reserved_ip_assign - new module for assigning an existing reserved IP to a
-          Droplet (https://github.com/digitalocean/ansible-collection/issues/233).
+      - dependencies - bump aiohttp from 3.9.5 to 3.10.2 (https://github.com/digitalocean/ansible-collection/issues/233).
+      - dependencies - bump certifi from 2024.6.2 to 2024.7.4 (https://github.com/digitalocean/ansible-collection/issues/233).
+      - dependencies - bump cryptography from 42.0.8 to 43.0.1 (https://github.com/digitalocean/ansible-collection/issues/233).
+      - reserved_ip_assign - new module for assigning an existing reserved IP to a
+        Droplet (https://github.com/digitalocean/ansible-collection/issues/233).
     fragments:
-      - 233-bump-aiohttp-3.10.2.yml
-      - 233-bump-certifi-2024.7.4.yml
-      - 233-bump-cryptography-43.0.1.yml
-      - 233-reserved-ip-assign.yml
+    - 233-bump-aiohttp-3.10.2.yml
+    - 233-bump-certifi-2024.7.4.yml
+    - 233-bump-cryptography-43.0.1.yml
+    - 233-reserved-ip-assign.yml
     modules:
-      - description: Create and/or assign a reserved IP to a Droplet
-        name: reserved_ip_assign
-        namespace: ""
-    release_date: "2025-11-05"
+    - description: Create and/or assign a reserved IP to a Droplet
+      name: reserved_ip_assign
+      namespace: ''
+    release_date: '2025-11-05'
   1.4.0:
     changes:
       bugfixes:
-        - droplet - fix C(unique_name) parameter not working correctly due to API name
-          parameter not being supported. The module now fetches all droplets and filters
-          client-side to properly detect existing droplets and prevent duplicate creation
-          (https://github.com/digitalocean/ansible-collection/issues/250).
+      - droplet - fix C(unique_name) parameter not working correctly due to API name
+        parameter not being supported. The module now fetches all droplets and filters
+        client-side to properly detect existing droplets and prevent duplicate creation
+        (https://github.com/digitalocean/ansible-collection/issues/250).
       minor_changes:
-        - common, droplet_action_power, droplet_action_resize, droplet_action_snapshot
-          - standardized error messages to include droplet IDs when multiple droplets
-          with the same name are found, improving debugging experience. Added comprehensive
-          unit tests for droplet_action modules (https://github.com/digitalocean/ansible-collection/issues/250).
+      - common, droplet_action_power, droplet_action_resize, droplet_action_snapshot
+        - standardized error messages to include droplet IDs when multiple droplets
+        with the same name are found, improving debugging experience. Added comprehensive
+        unit tests for droplet_action modules (https://github.com/digitalocean/ansible-collection/issues/250).
     fragments:
-      - 250-droplet-unique-name.yml
-      - 250-error-message-consistency.yml
-    release_date: "2025-12-08"
+    - 250-droplet-unique-name.yml
+    - 250-error-message-consistency.yml
+    release_date: '2025-12-08'
   1.5.0:
     changes:
       breaking_changes:
-        - droplets inventory plugin - the C(tags) attribute is now automatically renamed
-          to C(do_tags) when included in the C(attributes) list to avoid conflicting
-          with Ansible's reserved C(tags) variable. Users should update their inventory
-          configurations to use C(do_tags) in C(keyed_groups), C(compose), and C(groups)
-          sections (https://github.com/digitalocean/ansible-collection/issues/249).
+      - droplets inventory plugin - the C(tags) attribute is now automatically renamed
+        to C(do_tags) when included in the C(attributes) list to avoid conflicting
+        with Ansible's reserved C(tags) variable. Users should update their inventory
+        configurations to use C(do_tags) in C(keyed_groups), C(compose), and C(groups)
+        sections (https://github.com/digitalocean/ansible-collection/issues/249).
       bugfixes:
-        - droplet_action_resize - fixed to properly capture and poll the action response
-          from the API instead of repeatedly querying the droplet state. The action
-          response is now returned in the module output and used to determine when the
-          resize operation completes (https://github.com/digitalocean/ansible-collection/issues/243).
-        - 'droplets inventory plugin - fixed warning "[WARNING]: Found variable using
-          reserved name ''tags''" by automatically renaming the C(tags) attribute to
-          C(do_tags) to avoid conflicting with Ansible''s reserved variable name (https://github.com/digitalocean/ansible-collection/issues/249).'
-        - ssh_key - module now handles the case where an SSH key with the same public
-          key already exists on the account, making it idempotent instead of failing
-          with a 422 error (https://github.com/digitalocean/ansible-collection/issues/102).
-        - tag - fixed KeyError when tag creation fails due to validation errors. The
-          module now properly catches and reports API error messages instead of showing
-          a cryptic KeyError (https://github.com/digitalocean/ansible-collection/issues/181).
+      - droplet_action_resize - fixed to properly capture and poll the action response
+        from the API instead of repeatedly querying the droplet state. The action
+        response is now returned in the module output and used to determine when the
+        resize operation completes (https://github.com/digitalocean/ansible-collection/issues/243).
+      - 'droplets inventory plugin - fixed warning "[WARNING]: Found variable using
+        reserved name ''tags''" by automatically renaming the C(tags) attribute to
+        C(do_tags) to avoid conflicting with Ansible''s reserved variable name (https://github.com/digitalocean/ansible-collection/issues/249).'
+      - ssh_key - module now handles the case where an SSH key with the same public
+        key already exists on the account, making it idempotent instead of failing
+        with a 422 error (https://github.com/digitalocean/ansible-collection/issues/102).
+      - tag - fixed KeyError when tag creation fails due to validation errors. The
+        module now properly catches and reports API error messages instead of showing
+        a cryptic KeyError (https://github.com/digitalocean/ansible-collection/issues/181).
     fragments:
-      - 102-ssh-key-idempotent.yaml
-      - 181-tag-error-handling.yaml
-      - 243-droplet-action-response.yaml
-      - 249-inventory-tags-reserved-name.yaml
-    release_date: "2025-12-09"
+    - 102-ssh-key-idempotent.yaml
+    - 181-tag-error-handling.yaml
+    - 243-droplet-action-response.yaml
+    - 249-inventory-tags-reserved-name.yaml
+    release_date: '2025-12-09'
   1.6.0:
     changes:
       bugfixes:
-        - monitoring_alert_policy - Fixed idempotency by re-enabling description comparison
-          (https://github.com/digitalocean/ansible-collection/issues/265).
-        - monitoring_alert_policy - Fixed typo 'desciption' to 'description' in API
-          request body (https://github.com/digitalocean/ansible-collection/issues/264).
+      - monitoring_alert_policy - Fixed idempotency by re-enabling description comparison
+        (https://github.com/digitalocean/ansible-collection/issues/265).
+      - monitoring_alert_policy - Fixed typo 'desciption' to 'description' in API
+        request body (https://github.com/digitalocean/ansible-collection/issues/264).
       minor_changes:
-        - Bump dependency versions via Dependabot (https://github.com/digitalocean/ansible-collection/pull/260).
+      - Bump dependency versions via Dependabot (https://github.com/digitalocean/ansible-collection/pull/260).
     fragments:
-      - 264-monitoring-alert-policy-description-typo.yml
-      - dependabot-rollup-2025-12-11.yml
-    release_date: "2025-12-12"
+    - 264-monitoring-alert-policy-description-typo.yml
+    - dependabot-rollup-2025-12-11.yml
+    release_date: '2025-12-12'
   1.7.0:
     changes:
       minor_changes:
-        - droplets inventory plugin - add two-tier filtering system with api_filters
-          for server-side filtering (tag_name, name) and filters for client-side Jinja2
-          template filtering. This addresses performance issues for large infrastructures
-          by reducing API response size and provides granular control for environment
-          isolation.
+      - droplets inventory plugin - add two-tier filtering system with api_filters
+        for server-side filtering (tag_name, name) and filters for client-side Jinja2
+        template filtering. This addresses performance issues for large infrastructures
+        by reducing API response size and provides granular control for environment
+        isolation.
     fragments:
-      - inventory-filters.yml
-    release_date: "2025-12-17"
+    - inventory-filters.yml
+    release_date: '2025-12-17'
   1.8.0:
     changes:
       minor_changes:
-        - project_resources - add new module project_resources to assign resources to
-          a project by project name or ID (https://github.com/digitalocean/ansible-collection/issues/119).
+      - project_resources - add new module project_resources to assign resources to
+        a project by project name or ID (https://github.com/digitalocean/ansible-collection/issues/119).
     fragments:
-      - 119-project_resources.yml
+    - 119-project_resources.yml
     modules:
-      - description: Assign resources to a project
-        name: project_resources
-        namespace: ""
-    release_date: "2025-12-18"
+    - description: Assign resources to a project
+      name: project_resources
+      namespace: ''
+    release_date: '2025-12-18'
   1.9.0:
     changes:
+      bugfixes:
+      - tests - update pydo version from 0.1.7 to 0.23.0 in test requirements to fix
+        CI failures for modules using newer PyDO API attributes.
       minor_changes:
-        - actions_info - new module to list account actions history.
-        - app - new module to manage App Platform applications.
-        - apps_info - new module to list App Platform applications.
-        - byoip_prefix - new module to manage BYOIP prefixes.
-        - byoip_prefixes_info - new module to list BYOIP prefixes.
-        - container_registry - new module to manage container registries.
-        - database_backups_info - new module to list database cluster backups.
-        - database_config - new module to configure database cluster settings.
-        - database_config_info - new module to get database cluster configuration.
-        - database_connection_pool - new module to manage database connection pools.
-        - database_connection_pools_info - new module to list database connection pools.
-        - database_db - new module to manage databases within a cluster.
-        - database_dbs_info - new module to list databases in a cluster.
-        - database_firewall - new module to manage database firewall rules.
-        - database_firewall_rules_info - new module to list database firewall rules.
-        - database_maintenance_window - new module to configure database maintenance
-          windows.
-        - database_replica - new module to manage database read replicas.
-        - database_replicas_info - new module to list database replicas.
-        - database_user - new module to manage database users.
-        - database_users_info - new module to list database users.
-        - droplet_autoscale_pool - new module to manage Droplet autoscale pools.
-        - droplet_autoscale_pools_info - new module to list Droplet autoscale pools.
-        - droplet_backups_info - new module to list Droplet backups.
-        - droplet_kernels_info - new module to list available Droplet kernels.
-        - droplet_neighbors_info - new module to list Droplet neighbors.
-        - droplet_snapshots_info - new module to list Droplet snapshots.
-        - floating_ip - new module to manage floating IPs (legacy compatibility).
-        - floating_ip_action - new module to assign/unassign floating IPs (legacy compatibility).
-        - floating_ips_info - new module to list floating IPs (legacy compatibility).
-        - function_namespace - new module to manage Functions namespaces.
-        - function_namespaces_info - new module to list Functions namespaces.
-        - image - new module to manage custom images.
-        - image_action - new module to perform image actions (transfer, convert).
-        - invoice_items_info - new module to get invoice line items.
-        - invoices_info - new module to list account invoices.
-        - kubernetes_node_pool - new module to manage Kubernetes node pools.
-        - kubernetes_node_pools_info - new module to list Kubernetes node pools.
-        - nfs - new module to manage NFS file systems.
-        - nfs_action - new module to perform NFS actions (resize).
-        - nfs_info - new module to list NFS file systems.
-        - project_resource - new module to assign resources to projects.
-        - reserved_ipv6 - new module to manage reserved IPv6 addresses.
-        - reserved_ipv6_action - new module to assign/unassign reserved IPv6.
-        - reserved_ipv6s_info - new module to list reserved IPv6 addresses.
-        - spaces_key - new module to manage Spaces access keys.
-        - spaces_keys_info - new module to list Spaces access keys.
-        - uptime_alert - new module to manage uptime check alerts.
-        - uptime_alerts_info - new module to list uptime check alerts.
-        - vpc_nat_gateway - new module to manage VPC NAT gateways.
-        - vpc_nat_gateways_info - new module to list VPC NAT gateways.
-        - vpc_peering - new module to manage VPC peerings.
-        - vpc_peerings_info - new module to list VPC peerings.
+      - actions_info - new module to list account actions history.
+      - app - new module to manage App Platform applications.
+      - apps_info - new module to list App Platform applications.
+      - byoip_prefix - new module to manage BYOIP prefixes.
+      - byoip_prefixes_info - new module to list BYOIP prefixes.
+      - container_registry - new module to manage container registries.
+      - database_backups_info - new module to list database cluster backups.
+      - database_config - new module to configure database cluster settings.
+      - database_config_info - new module to get database cluster configuration.
+      - database_connection_pool - new module to manage database connection pools.
+      - database_connection_pools_info - new module to list database connection pools.
+      - database_db - new module to manage databases within a cluster.
+      - database_dbs_info - new module to list databases in a cluster.
+      - database_firewall - new module to manage database firewall rules.
+      - database_firewall_rules_info - new module to list database firewall rules.
+      - database_maintenance_window - new module to configure database maintenance
+        windows.
+      - database_replica - new module to manage database read replicas.
+      - database_replicas_info - new module to list database replicas.
+      - database_user - new module to manage database users.
+      - database_users_info - new module to list database users.
+      - droplet_autoscale_pool - new module to manage Droplet autoscale pools.
+      - droplet_autoscale_pools_info - new module to list Droplet autoscale pools.
+      - droplet_backups_info - new module to list Droplet backups.
+      - droplet_kernels_info - new module to list available Droplet kernels.
+      - droplet_neighbors_info - new module to list Droplet neighbors.
+      - droplet_snapshots_info - new module to list Droplet snapshots.
+      - floating_ip - new module to manage floating IPs (legacy compatibility).
+      - floating_ip_action - new module to assign/unassign floating IPs (legacy compatibility).
+      - floating_ips_info - new module to list floating IPs (legacy compatibility).
+      - function_namespace - new module to manage Functions namespaces.
+      - function_namespaces_info - new module to list Functions namespaces.
+      - image - new module to manage custom images.
+      - image_action - new module to perform image actions (transfer, convert).
+      - invoice_items_info - new module to get invoice line items.
+      - invoices_info - new module to list account invoices.
+      - kubernetes_node_pool - new module to manage Kubernetes node pools.
+      - kubernetes_node_pools_info - new module to list Kubernetes node pools.
+      - nfs - new module to manage NFS file systems.
+      - nfs_action - new module to perform NFS actions (resize).
+      - nfs_info - new module to list NFS file systems.
+      - project_resource - new module to assign resources to projects.
+      - reserved_ipv6 - new module to manage reserved IPv6 addresses.
+      - reserved_ipv6_action - new module to assign/unassign reserved IPv6.
+      - reserved_ipv6s_info - new module to list reserved IPv6 addresses.
+      - spaces_key - new module to manage Spaces access keys.
+      - spaces_keys_info - new module to list Spaces access keys.
+      - uptime_alert - new module to manage uptime check alerts.
+      - uptime_alerts_info - new module to list uptime check alerts.
+      - vpc_nat_gateway - new module to manage VPC NAT gateways.
+      - vpc_nat_gateways_info - new module to list VPC NAT gateways.
+      - vpc_peering - new module to manage VPC peerings.
+      - vpc_peerings_info - new module to list VPC peerings.
     fragments:
-      - add-api-coverage-modules.yml
-    release_date: "2026-01-05"
+    - add-api-coverage-modules.yml
+    - fix-pydo-version.yml
+    modules:
+    - description: List all actions that have been executed on your account
+      name: actions_info
+      namespace: ''
+    - description: Create or delete App Platform applications
+      name: app
+      namespace: ''
+    - description: List all App Platform applications on your account
+      name: apps_info
+      namespace: ''
+    - description: Manage Bring Your Own IP (BYOIP) prefixes
+      name: byoip_prefix
+      namespace: ''
+    - description: List all BYOIP prefixes on your account
+      name: byoip_prefixes_info
+      namespace: ''
+    - description: Create or delete container registry
+      name: container_registry
+      namespace: ''
+    - description: List all backups for a database cluster
+      name: database_backups_info
+      namespace: ''
+    - description: Configure database cluster settings
+      name: database_config
+      namespace: ''
+    - description: Get database cluster configuration
+      name: database_config_info
+      namespace: ''
+    - description: Create or delete database connection pools
+      name: database_connection_pool
+      namespace: ''
+    - description: List all connection pools for a database cluster
+      name: database_connection_pools_info
+      namespace: ''
+    - description: Create or delete databases within a cluster
+      name: database_db
+      namespace: ''
+    - description: List all databases within a cluster
+      name: database_dbs_info
+      namespace: ''
+    - description: Manage database cluster firewall rules
+      name: database_firewall
+      namespace: ''
+    - description: List database cluster firewall rules
+      name: database_firewall_rules_info
+      namespace: ''
+    - description: Configure database cluster maintenance window
+      name: database_maintenance_window
+      namespace: ''
+    - description: Create or delete database read-only replicas
+      name: database_replica
+      namespace: ''
+    - description: List all read-only replicas for a database cluster
+      name: database_replicas_info
+      namespace: ''
+    - description: Create or delete database users
+      name: database_user
+      namespace: ''
+    - description: List all database users in a cluster
+      name: database_users_info
+      namespace: ''
+    - description: Create or delete Droplet Autoscale Pools
+      name: droplet_autoscale_pool
+      namespace: ''
+    - description: List all Droplet Autoscale Pools on your account
+      name: droplet_autoscale_pools_info
+      namespace: ''
+    - description: List backups for a Droplet
+      name: droplet_backups_info
+      namespace: ''
+    - description: List available kernels for a Droplet
+      name: droplet_kernels_info
+      namespace: ''
+    - description: List Droplet neighbors
+      name: droplet_neighbors_info
+      namespace: ''
+    - description: List snapshots for a Droplet
+      name: droplet_snapshots_info
+      namespace: ''
+    - description: Create or delete floating IPs (legacy)
+      name: floating_ip
+      namespace: ''
+    - description: Assign or unassign a floating IP to a Droplet (legacy)
+      name: floating_ip_action
+      namespace: ''
+    - description: List all floating IPs on your account (legacy)
+      name: floating_ips_info
+      namespace: ''
+    - description: Create or delete Functions namespaces
+      name: function_namespace
+      namespace: ''
+    - description: List all Functions namespaces on your account
+      name: function_namespaces_info
+      namespace: ''
+    - description: Manage custom images
+      name: image
+      namespace: ''
+    - description: Perform actions on images
+      name: image_action
+      namespace: ''
+    - description: Get invoice items by UUID
+      name: invoice_items_info
+      namespace: ''
+    - description: List account invoices
+      name: invoices_info
+      namespace: ''
+    - description: Create, update, or delete Kubernetes node pools
+      name: kubernetes_node_pool
+      namespace: ''
+    - description: List all node pools in a Kubernetes cluster
+      name: kubernetes_node_pools_info
+      namespace: ''
+    - description: Create or delete NFS file shares
+      name: nfs
+      namespace: ''
+    - description: Perform actions on NFS file shares
+      name: nfs_action
+      namespace: ''
+    - description: List all NFS file shares on your account
+      name: nfs_info
+      namespace: ''
+    - description: Assign or remove resources from a project
+      name: project_resource
+      namespace: ''
+    - description: Create or delete reserved IPv6 addresses
+      name: reserved_ipv6
+      namespace: ''
+    - description: Assign or unassign a reserved IPv6 address to a Droplet
+      name: reserved_ipv6_action
+      namespace: ''
+    - description: List all reserved IPv6 addresses on your account
+      name: reserved_ipv6s_info
+      namespace: ''
+    - description: Create or delete Spaces access keys
+      name: spaces_key
+      namespace: ''
+    - description: List all Spaces access keys on your account
+      name: spaces_keys_info
+      namespace: ''
+    - description: Create or delete uptime check alerts
+      name: uptime_alert
+      namespace: ''
+    - description: List all alerts for an uptime check
+      name: uptime_alerts_info
+      namespace: ''
+    - description: Create or delete VPC NAT Gateways
+      name: vpc_nat_gateway
+      namespace: ''
+    - description: List all VPC NAT Gateways on your account
+      name: vpc_nat_gateways_info
+      namespace: ''
+    - description: Create or delete VPC Peerings
+      name: vpc_peering
+      namespace: ''
+    - description: List all VPC Peerings on your account
+      name: vpc_peerings_info
+      namespace: ''
+    release_date: '2026-01-05'

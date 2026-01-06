@@ -63,6 +63,67 @@ Minor Changes
 - vpc_peering - new module to manage VPC peerings.
 - vpc_peerings_info - new module to list VPC peerings.
 
+Bugfixes
+--------
+
+- tests - update pydo version from 0.1.7 to 0.23.0 in test requirements to fix CI failures for modules using newer PyDO API attributes.
+
+New Modules
+-----------
+
+- actions_info - List all actions that have been executed on your account
+- app - Create or delete App Platform applications
+- apps_info - List all App Platform applications on your account
+- byoip_prefix - Manage Bring Your Own IP (BYOIP) prefixes
+- byoip_prefixes_info - List all BYOIP prefixes on your account
+- container_registry - Create or delete container registry
+- database_backups_info - List all backups for a database cluster
+- database_config - Configure database cluster settings
+- database_config_info - Get database cluster configuration
+- database_connection_pool - Create or delete database connection pools
+- database_connection_pools_info - List all connection pools for a database cluster
+- database_db - Create or delete databases within a cluster
+- database_dbs_info - List all databases within a cluster
+- database_firewall - Manage database cluster firewall rules
+- database_firewall_rules_info - List database cluster firewall rules
+- database_maintenance_window - Configure database cluster maintenance window
+- database_replica - Create or delete database read-only replicas
+- database_replicas_info - List all read-only replicas for a database cluster
+- database_user - Create or delete database users
+- database_users_info - List all database users in a cluster
+- droplet_autoscale_pool - Create or delete Droplet Autoscale Pools
+- droplet_autoscale_pools_info - List all Droplet Autoscale Pools on your account
+- droplet_backups_info - List backups for a Droplet
+- droplet_kernels_info - List available kernels for a Droplet
+- droplet_neighbors_info - List Droplet neighbors
+- droplet_snapshots_info - List snapshots for a Droplet
+- floating_ip - Create or delete floating IPs (legacy)
+- floating_ip_action - Assign or unassign a floating IP to a Droplet (legacy)
+- floating_ips_info - List all floating IPs on your account (legacy)
+- function_namespace - Create or delete Functions namespaces
+- function_namespaces_info - List all Functions namespaces on your account
+- image - Manage custom images
+- image_action - Perform actions on images
+- invoice_items_info - Get invoice items by UUID
+- invoices_info - List account invoices
+- kubernetes_node_pool - Create, update, or delete Kubernetes node pools
+- kubernetes_node_pools_info - List all node pools in a Kubernetes cluster
+- nfs - Create or delete NFS file shares
+- nfs_action - Perform actions on NFS file shares
+- nfs_info - List all NFS file shares on your account
+- project_resource - Assign or remove resources from a project
+- reserved_ipv6 - Create or delete reserved IPv6 addresses
+- reserved_ipv6_action - Assign or unassign a reserved IPv6 address to a Droplet
+- reserved_ipv6s_info - List all reserved IPv6 addresses on your account
+- spaces_key - Create or delete Spaces access keys
+- spaces_keys_info - List all Spaces access keys on your account
+- uptime_alert - Create or delete uptime check alerts
+- uptime_alerts_info - List all alerts for an uptime check
+- vpc_nat_gateway - Create or delete VPC NAT Gateways
+- vpc_nat_gateways_info - List all VPC NAT Gateways on your account
+- vpc_peering - Create or delete VPC Peerings
+- vpc_peerings_info - List all VPC Peerings on your account
+
 v1.8.0
 ======
 
