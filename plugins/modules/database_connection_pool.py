@@ -105,12 +105,12 @@ pool:
     db: defaultdb
     user: doadmin
     connection:
-      uri: postgres://doadmin:wv78n3zpz42xezdk@...
+      uri: postgres://doadmin:example-password@...
       database: my_pool
       host: host.db.ondigitalocean.com
       port: 25061
       user: doadmin
-      password: wv78n3zpz42xezdk
+      password: example-password
       ssl: true
 error:
   description: DigitalOcean API error.

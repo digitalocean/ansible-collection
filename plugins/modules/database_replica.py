@@ -92,11 +92,11 @@ replica:
     status: online
     created_at: '2020-03-13T19:20:47.442049222Z'
     connection:
-      uri: postgres://doadmin:wv78n3zpz42xezdk@...
+      uri: postgres://doadmin:example-password@...
       host: read-replica-nyc1.db.ondigitalocean.com
       port: 25060
       user: doadmin
-      password: wv78n3zpz42xezdk
+      password: example-password
       ssl: true
 error:
   description: DigitalOcean API error.

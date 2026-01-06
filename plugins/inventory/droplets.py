@@ -93,7 +93,7 @@ cache_timeout: 300
 #  DIGITALOCEAN_ACCESS_TOKEN, DIGITALOCEAN_TOKEN, DO_API_TOKEN, DO_API_KEY, DO_OAUTH_TOKEN, OAUTH_TOKEN
 #
 #  The API token can also be set statically (but please, avoid committing secrets):
-#  token: hunter2
+#  token: example-password
 #
 #  Or, lookup plugins can be used:
 #  token: "{{ lookup('ansible.builtin.pipe', '/script/which/echoes/token.sh') }}"

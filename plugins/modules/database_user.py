@@ -95,7 +95,7 @@ user:
   sample:
     name: app_user
     role: normal
-    password: wv78n3zpz42xezdk
+    password: example-password
     mysql_settings:
       auth_plugin: caching_sha2_password
 error:

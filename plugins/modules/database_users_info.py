@@ -55,7 +55,7 @@ users:
   sample:
     - name: doadmin
       role: primary
-      password: wv78n3zpz42xezdk
+      password: example-password
     - name: app_user
       role: normal
       password: abc123xyz789
