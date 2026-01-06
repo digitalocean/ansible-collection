@@ -66,7 +66,7 @@ Minor Changes
 Bugfixes
 --------
 
-- tests - update pydo version from 0.1.7 to 0.23.0 in test requirements to fix CI failures for modules using newer PyDO API attributes.
+- tests - update pydo version from 0.1.7 to 0.23.0 and azure-core from 1.26.1 to 1.36.0 in test requirements to fix CI failures for modules using newer PyDO API attributes.
 
 New Modules
 -----------
