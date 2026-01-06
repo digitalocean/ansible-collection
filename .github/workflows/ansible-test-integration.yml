@@ -1,7 +1,7 @@
 name: Integration tests
 on:
   push:
-    branches: [main]
+    branches: [main, add-modules]
   workflow_dispatch:
 
 env:
@@ -35,7 +35,7 @@ jobs:
           - billing_history_info
           - byoip_prefix
           - byoip_prefixes_info
-          - cdn_endpoints # Failing with a 500, marked disabled in aliases
+          - cdn_endpoints
           - cdn_endpoints_info
           - certificate
           - certificates_info
