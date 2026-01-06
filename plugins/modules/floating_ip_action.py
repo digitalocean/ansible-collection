@@ -148,7 +148,7 @@ class FloatingIPAction(DigitalOceanCommonModule):
                 "droplet_id": self.droplet_id,
             }
             action = self.client.reserved_ips_actions.post(
-                floating_ip=self.ip, body=body
+                reserved_ip=self.ip, body=body
             )["action"]
 
             end_time = time.monotonic() + self.timeout
@@ -194,7 +194,7 @@ class FloatingIPAction(DigitalOceanCommonModule):
                 "type": "unassign",
             }
             action = self.client.reserved_ips_actions.post(
-                floating_ip=self.ip, body=body
+                reserved_ip=self.ip, body=body
             )["action"]
 
             end_time = time.monotonic() + self.timeout
@@ -230,7 +230,7 @@ class FloatingIPAction(DigitalOceanCommonModule):
     def get_floating_ip_action_by_id(self, action_id):
         try:
             action = self.client.reserved_ips_actions.get(
-                floating_ip=self.ip, action_id=action_id
+                reserved_ip=self.ip, action_id=action_id
             )["action"]
             return action
         except DigitalOceanCommonModule.HttpResponseError as err:

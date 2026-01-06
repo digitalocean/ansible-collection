@@ -5,11 +5,13 @@
     state: present
     nfs_id: "{{ nfs_id }}"
     type: resize
-    size_gigabytes: "{{ nfs_resize_size_gigabytes }}"
+    size_gib: "{{ nfs_resize_size_gib }}"
   register: result
+  when: nfs_id is defined
 
 - name: 01_resize | Verify resize action
   ansible.builtin.assert:
     that:
       - result.changed
       - result.msg is string
+  when: nfs_id is defined

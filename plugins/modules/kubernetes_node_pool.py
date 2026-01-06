@@ -191,6 +191,7 @@ class KubernetesNodePool(DigitalOceanCommonModule):
         self.min_nodes = module.params.get("min_nodes")
         self.max_nodes = module.params.get("max_nodes")
         self.id = module.params.get("id")
+        self.timeout = module.params.get("timeout")
 
         if self.state == "present":
             self.present()

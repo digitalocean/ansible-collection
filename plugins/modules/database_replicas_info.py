@@ -90,9 +90,10 @@ class DatabaseReplicasInformation(DigitalOceanCommonModule):
 
     def present(self):
         try:
-            replicas = self.client.databases.list_replicas(
+            response = self.client.databases.list_replicas(
                 database_cluster_uuid=self.cluster_id
-            ).get("replicas", [])
+            )
+            replicas = response.get("replicas", []) if response else []
             if replicas:
                 self.module.exit_json(
                     changed=False,

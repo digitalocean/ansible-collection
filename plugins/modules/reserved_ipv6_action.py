@@ -132,8 +132,9 @@ class ReservedIPv6Action(DigitalOceanCommonModule):
                     )
                 body["droplet_id"] = self.droplet_id
 
+            # API parameter is "reserved_ipv6" not "reserved_ip"
             action = self.client.reserved_ipv6_actions.post(
-                reserved_ip=self.ip, body=body
+                reserved_ipv6=self.ip, body=body
             )["action"]
 
             # Wait for the action to complete

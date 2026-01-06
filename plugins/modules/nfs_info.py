@@ -50,7 +50,7 @@ EXAMPLES = r"""
 
 
 RETURN = r"""
-nfs_shares:
+shares:
   description: NFS file shares.
   returned: always
   type: list
@@ -58,14 +58,14 @@ nfs_shares:
   sample:
     - id: 5a4981aa-9653-4bd1-bef5-d6bff52042e4
       name: my-nfs-share
-      region: nyc1
-      size_gigabytes: 100
-      droplet_ids:
-        - 12345678
-        - 87654321
+      region: nyc3
+      size_gib: 100
+      vpc_ids:
+        - "5a4981aa-9653-4bd1-bef5-d6bff52042e4"
       created_at: '2020-03-13T19:20:47.442049222Z'
-      status: active
+      status: ACTIVE
       mount_path: /mnt/nfs-share
+      host: 10.132.0.2
 error:
   description: DigitalOcean API error.
   returned: failure
@@ -87,7 +87,6 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonModule,
     DigitalOceanOptions,
-    DigitalOceanFunctions,
 )
 
 
@@ -100,16 +99,16 @@ class NFSInformation(DigitalOceanCommonModule):
 
     def present(self):
         try:
-            # NFS API doesn't support pagination parameters
+            # NFS API returns "shares" key, not "nfs_shares"
             response = self.client.nfs.list(region=self.region)
-            nfs_shares = response.get("nfs_shares", [])
-            if nfs_shares:
+            shares = response.get("shares", [])
+            if shares:
                 self.module.exit_json(
                     changed=False,
                     msg="Current NFS shares",
-                    nfs_shares=nfs_shares,
+                    shares=shares,
                 )
-            self.module.exit_json(changed=False, msg="No NFS shares", nfs_shares=[])
+            self.module.exit_json(changed=False, msg="No NFS shares", shares=[])
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message,
@@ -117,7 +116,7 @@ class NFSInformation(DigitalOceanCommonModule):
                 "Reason": err.reason,
             }
             self.module.fail_json(
-                changed=False, msg=error.get("Message"), error=error, nfs_shares=[]
+                changed=False, msg=error.get("Message"), error=error, shares=[]
             )
 
 

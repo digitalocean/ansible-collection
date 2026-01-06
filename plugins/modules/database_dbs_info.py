@@ -88,9 +88,9 @@ class DatabaseDBsInformation(DigitalOceanCommonModule):
 
     def present(self):
         try:
-            dbs = self.client.databases.list_dbs(
-                database_cluster_uuid=self.cluster_id
-            ).get("dbs", [])
+            dbs = self.client.databases.list(database_cluster_uuid=self.cluster_id).get(
+                "dbs", []
+            )
             if dbs:
                 self.module.exit_json(
                     changed=False,

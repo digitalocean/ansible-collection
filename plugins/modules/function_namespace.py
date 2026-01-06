@@ -98,7 +98,6 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonModule,
     DigitalOceanOptions,
-    DigitalOceanFunctions,
 )
 
 
@@ -117,7 +116,11 @@ class FunctionNamespace(DigitalOceanCommonModule):
         try:
             # Functions API doesn't support pagination parameters
             response = self.client.functions.list_namespaces()
+            if response is None:
+                return []
             namespaces = response.get("namespaces", [])
+            if namespaces is None:
+                return []
             found_namespaces = []
             for ns in namespaces:
                 if self.namespace == ns.get("namespace"):
@@ -139,7 +142,7 @@ class FunctionNamespace(DigitalOceanCommonModule):
     def create_namespace(self):
         try:
             body = {
-                "namespace": self.namespace,
+                "label": self.namespace,
                 "region": self.region,
             }
             namespace = self.client.functions.create_namespace(body=body)["namespace"]

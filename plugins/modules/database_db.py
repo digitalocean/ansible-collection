@@ -107,9 +107,9 @@ class DatabaseDB(DigitalOceanCommonModule):
 
     def get_db(self):
         try:
-            dbs = self.client.databases.list_dbs(
-                database_cluster_uuid=self.cluster_id
-            ).get("dbs", [])
+            dbs = self.client.databases.list(database_cluster_uuid=self.cluster_id).get(
+                "dbs", []
+            )
             for db in dbs:
                 if db.get("name") == self.name:
                     return db

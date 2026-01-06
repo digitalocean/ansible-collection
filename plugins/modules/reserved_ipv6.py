@@ -143,8 +143,9 @@ class ReservedIPv6(DigitalOceanCommonModule):
 
     def create_reserved_ipv6(self):
         try:
+            # API expects "region_slug" not "region"
             body = {
-                "region": self.region,
+                "region_slug": self.region,
             }
             reserved_ipv6 = self.client.reserved_ipv6.create(body=body)["reserved_ipv6"]
 
@@ -165,7 +166,8 @@ class ReservedIPv6(DigitalOceanCommonModule):
 
     def delete_reserved_ipv6(self, reserved_ipv6):
         try:
-            self.client.reserved_ipv6.delete(reserved_ip=reserved_ipv6["ip"])
+            # API parameter is "reserved_ipv6" not "reserved_ip"
+            self.client.reserved_ipv6.delete(reserved_ipv6=reserved_ipv6["ip"])
             self.module.exit_json(
                 changed=True,
                 msg=f"Deleted reserved IPv6 {reserved_ipv6['ip']}",

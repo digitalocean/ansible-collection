@@ -39,21 +39,15 @@ options:
     description:
       - The slug identifier for the region where the NFS share will be created.
     type: str
-    required: false
-  size_gigabytes:
+    required: true
+  size_gib:
     description:
-      - The size of the NFS share in GiB.
+      - The size of the NFS share in GiB (Gibibytes). Must be >= 50.
     type: int
     required: false
-  droplet_ids:
+  vpc_ids:
     description:
-      - An array of Droplet IDs that should have access to the NFS share.
-    type: list
-    elements: int
-    required: false
-  tags:
-    description:
-      - A list of tags to apply to the NFS share.
+      - List of VPC IDs that should be able to access the share.
     type: list
     elements: str
     required: false
@@ -75,23 +69,24 @@ EXAMPLES = r"""
     token: "{{ token }}"
     state: present
     name: my-nfs-share
-    region: nyc1
-    size_gigabytes: 100
-    droplet_ids:
-      - 12345678
-      - 87654321
+    region: nyc3
+    size_gib: 100
+    vpc_ids:
+      - "5a4981aa-9653-4bd1-bef5-d6bff52042e4"
 
 - name: Delete NFS share by name
   digitalocean.cloud.nfs:
     token: "{{ token }}"
     state: absent
     name: my-nfs-share
+    region: nyc3
 
 - name: Delete NFS share by ID
   digitalocean.cloud.nfs:
     token: "{{ token }}"
     state: absent
     name: my-nfs-share
+    region: nyc3
     id: 5a4981aa-9653-4bd1-bef5-d6bff52042e4
 """
 
@@ -104,14 +99,14 @@ nfs:
   sample:
     id: 5a4981aa-9653-4bd1-bef5-d6bff52042e4
     name: my-nfs-share
-    region: nyc1
-    size_gigabytes: 100
-    droplet_ids:
-      - 12345678
-      - 87654321
+    region: nyc3
+    size_gib: 100
+    vpc_ids:
+      - "5a4981aa-9653-4bd1-bef5-d6bff52042e4"
     created_at: '2020-03-13T19:20:47.442049222Z'
-    status: active
+    status: ACTIVE
     mount_path: /mnt/nfs-share
+    host: 10.132.0.2
 error:
   description: DigitalOcean API error.
   returned: failure
@@ -137,7 +132,6 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonModule,
     DigitalOceanOptions,
-    DigitalOceanFunctions,
     DigitalOceanConstants,
 )
 
@@ -147,9 +141,8 @@ class NFS(DigitalOceanCommonModule):
         super().__init__(module)
         self.name = module.params.get("name")
         self.region = module.params.get("region")
-        self.size_gigabytes = module.params.get("size_gigabytes")
-        self.droplet_ids = module.params.get("droplet_ids")
-        self.tags = module.params.get("tags")
+        self.size_gib = module.params.get("size_gib")
+        self.vpc_ids = module.params.get("vpc_ids")
         self.id = module.params.get("id")
 
         if self.state == "present":
@@ -159,11 +152,11 @@ class NFS(DigitalOceanCommonModule):
 
     def get_nfs_shares(self):
         try:
-            # NFS API doesn't support pagination parameters
+            # NFS API returns "shares" key, not "nfs_shares"
             response = self.client.nfs.list(region=self.region)
-            nfs_shares = response.get("nfs_shares", [])
+            shares = response.get("shares", [])
             found_shares = []
-            for share in nfs_shares:
+            for share in shares:
                 if self.name == share.get("name"):
                     found_shares.append(share)
                 elif self.id and self.id == share.get("id"):
@@ -179,34 +172,35 @@ class NFS(DigitalOceanCommonModule):
                 changed=False,
                 msg=error.get("Message"),
                 error=error,
-                nfs=[],
+                nfs={},
             )
 
     def create_nfs_share(self):
         try:
             body = {
                 "name": self.name,
+                "region": self.region,
             }
-            if self.region:
-                body["region"] = self.region
-            if self.size_gigabytes:
-                body["size_gigabytes"] = self.size_gigabytes
-            if self.droplet_ids:
-                body["droplet_ids"] = self.droplet_ids
-            if self.tags:
-                body["tags"] = self.tags
+            if self.size_gib:
+                body["size_gib"] = self.size_gib
+            if self.vpc_ids:
+                body["vpc_ids"] = self.vpc_ids
 
-            nfs_share = self.client.nfs.create(body=body)["nfs_share"]
+            # API returns "share" key, not "nfs_share"
+            nfs_share = self.client.nfs.create(body=body)["share"]
 
             # Wait for the NFS share to become active
             end_time = time.monotonic() + self.timeout
             while time.monotonic() < end_time:
-                status = nfs_share.get("status", "").lower()
-                if status == "active":
+                status = nfs_share.get("status", "").upper()
+                if status == "ACTIVE":
                     break
                 time.sleep(DigitalOceanConstants.SLEEP)
                 try:
-                    nfs_share = self.client.nfs.get(nfs_id=nfs_share["id"])["nfs_share"]
+                    # get() requires region parameter
+                    nfs_share = self.client.nfs.get(
+                        nfs_id=nfs_share["id"], region=self.region
+                    )["share"]
                 except DigitalOceanCommonModule.HttpResponseError:
                     pass
 
@@ -225,12 +219,13 @@ class NFS(DigitalOceanCommonModule):
                 changed=False,
                 msg=error.get("Message"),
                 error=error,
-                nfs=[],
+                nfs={},
             )
 
     def delete_nfs_share(self, nfs_share):
         try:
-            self.client.nfs.delete(nfs_id=nfs_share["id"])
+            # delete() requires region parameter
+            self.client.nfs.delete(nfs_id=nfs_share["id"], region=self.region)
             self.module.exit_json(
                 changed=True,
                 msg=f"Deleted NFS share {self.name} ({nfs_share['id']})",
@@ -246,7 +241,7 @@ class NFS(DigitalOceanCommonModule):
                 changed=False,
                 msg=error.get("Message"),
                 error=error,
-                nfs=[],
+                nfs={},
             )
 
     def present(self):
@@ -256,7 +251,7 @@ class NFS(DigitalOceanCommonModule):
                 self.module.exit_json(
                     changed=True,
                     msg=f"NFS share {self.name} would be created",
-                    nfs=[],
+                    nfs={},
                 )
             else:
                 self.create_nfs_share()
@@ -270,7 +265,7 @@ class NFS(DigitalOceanCommonModule):
             self.module.exit_json(
                 changed=False,
                 msg=f"There are currently {len(nfs_shares)} NFS shares named {self.name}",
-                nfs=[],
+                nfs={},
             )
 
     def absent(self):
@@ -279,7 +274,7 @@ class NFS(DigitalOceanCommonModule):
             self.module.exit_json(
                 changed=False,
                 msg=f"NFS share {self.name} does not exist",
-                nfs=[],
+                nfs={},
             )
         elif len(nfs_shares) == 1:
             if self.module.check_mode:
@@ -294,7 +289,7 @@ class NFS(DigitalOceanCommonModule):
             self.module.exit_json(
                 changed=False,
                 msg=f"There are currently {len(nfs_shares)} NFS shares named {self.name}",
-                nfs=[],
+                nfs={},
             )
 
 
@@ -302,10 +297,9 @@ def main():
     argument_spec = DigitalOceanOptions.argument_spec()
     argument_spec.update(
         name=dict(type="str", required=True),
-        region=dict(type="str", required=False),
-        size_gigabytes=dict(type="int", required=False),
-        droplet_ids=dict(type="list", elements="int", required=False),
-        tags=dict(type="list", elements="str", required=False),
+        region=dict(type="str", required=True),
+        size_gib=dict(type="int", required=False),
+        vpc_ids=dict(type="list", elements="str", required=False),
         id=dict(type="str", required=False),
     )
     module = AnsibleModule(

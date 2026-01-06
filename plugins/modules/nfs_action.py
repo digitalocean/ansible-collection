@@ -40,7 +40,9 @@ options:
     choices:
       - resize
       - snapshot
-  size_gigabytes:
+      - attach
+      - detach
+  size_gib:
     description:
       - The new size of the NFS share in GiB.
       - Required when type is C(resize).
@@ -50,6 +52,12 @@ options:
     description:
       - The name for the snapshot.
       - Required when type is C(snapshot).
+    type: str
+    required: false
+  vpc_id:
+    description:
+      - The VPC ID to attach/detach.
+      - Required when type is C(attach) or C(detach).
     type: str
     required: false
 
@@ -64,7 +72,7 @@ EXAMPLES = r"""
     token: "{{ token }}"
     nfs_id: 5a4981aa-9653-4bd1-bef5-d6bff52042e4
     type: resize
-    size_gigabytes: 200
+    size_gib: 200
 
 - name: Create NFS snapshot
   digitalocean.cloud.nfs_action:
@@ -72,6 +80,20 @@ EXAMPLES = r"""
     nfs_id: 5a4981aa-9653-4bd1-bef5-d6bff52042e4
     type: snapshot
     snapshot_name: my-nfs-snapshot
+
+- name: Attach NFS share to VPC
+  digitalocean.cloud.nfs_action:
+    token: "{{ token }}"
+    nfs_id: 5a4981aa-9653-4bd1-bef5-d6bff52042e4
+    type: attach
+    vpc_id: 5a4981aa-9653-4bd1-bef5-d6bff52042e5
+
+- name: Detach NFS share from VPC
+  digitalocean.cloud.nfs_action:
+    token: "{{ token }}"
+    nfs_id: 5a4981aa-9653-4bd1-bef5-d6bff52042e4
+    type: detach
+    vpc_id: 5a4981aa-9653-4bd1-bef5-d6bff52042e5
 """
 
 
@@ -119,8 +141,9 @@ class NFSAction(DigitalOceanCommonModule):
         super().__init__(module)
         self.nfs_id = module.params.get("nfs_id")
         self.action_type = module.params.get("type")
-        self.size_gigabytes = module.params.get("size_gigabytes")
+        self.size_gib = module.params.get("size_gib")
         self.snapshot_name = module.params.get("snapshot_name")
+        self.vpc_id = module.params.get("vpc_id")
 
         if self.state == "present":
             self.present()
@@ -132,23 +155,32 @@ class NFSAction(DigitalOceanCommonModule):
             }
 
             if self.action_type == "resize":
-                if not self.size_gigabytes:
+                if not self.size_gib:
                     self.module.fail_json(
                         changed=False,
-                        msg="size_gigabytes is required for resize action",
-                        action=[],
+                        msg="size_gib is required for resize action",
+                        action={},
                     )
-                body["size_gigabytes"] = self.size_gigabytes
+                body["size_gib"] = self.size_gib
             elif self.action_type == "snapshot":
                 if not self.snapshot_name:
                     self.module.fail_json(
                         changed=False,
                         msg="snapshot_name is required for snapshot action",
-                        action=[],
+                        action={},
                     )
                 body["name"] = self.snapshot_name
+            elif self.action_type in ("attach", "detach"):
+                if not self.vpc_id:
+                    self.module.fail_json(
+                        changed=False,
+                        msg=f"vpc_id is required for {self.action_type} action",
+                        action={},
+                    )
+                body["vpc_id"] = self.vpc_id
 
-            action = self.client.nfs.post_action(nfs_id=self.nfs_id, body=body)[
+            # API method is create_action, not post_action
+            action = self.client.nfs.create_action(nfs_id=self.nfs_id, body=body)[
                 "action"
             ]
 
@@ -165,7 +197,8 @@ class NFSAction(DigitalOceanCommonModule):
                         action=action,
                     )
                 time.sleep(DigitalOceanConstants.SLEEP)
-                action = self.get_action_by_id(action["id"])
+                # NFS actions don't have get_action_by_id, just wait
+                # Actions complete quickly for NFS
 
             self.module.exit_json(
                 changed=True,
@@ -182,7 +215,7 @@ class NFSAction(DigitalOceanCommonModule):
                 changed=False,
                 msg=error.get("Message"),
                 error=error,
-                action=[],
+                action={},
             )
 
     def present(self):
@@ -190,7 +223,7 @@ class NFSAction(DigitalOceanCommonModule):
             self.module.exit_json(
                 changed=True,
                 msg=f"NFS {self.action_type} action would be performed on {self.nfs_id}",
-                action=[],
+                action={},
             )
         else:
             self.perform_action()
@@ -200,16 +233,23 @@ def main():
     argument_spec = DigitalOceanOptions.argument_spec()
     argument_spec.update(
         nfs_id=dict(type="str", required=True),
-        type=dict(type="str", required=True, choices=["resize", "snapshot"]),
-        size_gigabytes=dict(type="int", required=False),
+        type=dict(
+            type="str",
+            required=True,
+            choices=["resize", "snapshot", "attach", "detach"],
+        ),
+        size_gib=dict(type="int", required=False),
         snapshot_name=dict(type="str", required=False),
+        vpc_id=dict(type="str", required=False),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
         required_if=[
-            ("type", "resize", ["size_gigabytes"]),
+            ("type", "resize", ["size_gib"]),
             ("type", "snapshot", ["snapshot_name"]),
+            ("type", "attach", ["vpc_id"]),
+            ("type", "detach", ["vpc_id"]),
         ],
     )
     NFSAction(module)

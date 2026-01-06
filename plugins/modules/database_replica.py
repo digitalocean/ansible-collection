@@ -135,6 +135,7 @@ class DatabaseReplica(DigitalOceanCommonModule):
         self.region = module.params.get("region")
         self.size = module.params.get("size")
         self.tags = module.params.get("tags")
+        self.timeout = module.params.get("timeout")
 
         if self.state == "present":
             self.present()
@@ -143,9 +144,14 @@ class DatabaseReplica(DigitalOceanCommonModule):
 
     def get_replica(self):
         try:
-            replicas = self.client.databases.list_replicas(
+            response = self.client.databases.list_replicas(
                 database_cluster_uuid=self.cluster_id
-            ).get("replicas", [])
+            )
+            if response is None:
+                return None
+            replicas = response.get("replicas", [])
+            if replicas is None:
+                return None
             for replica in replicas:
                 if replica.get("name") == self.name:
                     return replica

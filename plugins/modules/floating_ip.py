@@ -188,7 +188,7 @@ class FloatingIP(DigitalOceanCommonModule):
 
     def delete_floating_ip(self, floating_ip):
         try:
-            self.client.reserved_ips.delete(floating_ip=floating_ip["ip"])
+            self.client.reserved_ips.delete(reserved_ip=floating_ip["ip"])
             self.module.exit_json(
                 changed=True,
                 msg=f"Deleted floating IP {floating_ip['ip']}",
