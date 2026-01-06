@@ -143,7 +143,7 @@ class SpacesKey(DigitalOceanCommonModule):
         try:
             spaces_keys = DigitalOceanFunctions.get_paginated(
                 module=self.module,
-                obj=self.client.spaces_keys,
+                obj=self.client.spaces_key,
                 meth="list",
                 key="keys",
                 exc=DigitalOceanCommonModule.HttpResponseError,
@@ -176,7 +176,7 @@ class SpacesKey(DigitalOceanCommonModule):
             if self.grants:
                 body["grants"] = self.grants
 
-            spaces_key = self.client.spaces_keys.create(body=body)["key"]
+            spaces_key = self.client.spaces_key.create(body=body)["key"]
 
             self.module.exit_json(
                 changed=True,
@@ -195,7 +195,7 @@ class SpacesKey(DigitalOceanCommonModule):
 
     def delete_spaces_key(self, spaces_key):
         try:
-            self.client.spaces_keys.delete(access_key=spaces_key["access_key"])
+            self.client.spaces_key.delete(access_key=spaces_key["access_key"])
             self.module.exit_json(
                 changed=True,
                 msg=f"Deleted Spaces access key {self.name}",

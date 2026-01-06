@@ -88,7 +88,7 @@ class SpacesKeysInformation(DigitalOceanCommonModule):
     def present(self):
         spaces_keys = DigitalOceanFunctions.get_paginated(
             module=self.module,
-            obj=self.client.spaces_keys,
+            obj=self.client.spaces_key,
             meth="list",
             key="keys",
             exc=DigitalOceanCommonModule.HttpResponseError,
