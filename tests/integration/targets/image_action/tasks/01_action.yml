@@ -1,11 +1,12 @@
 ---
-- name: 01_action | Perform image action
+- name: 01_action | Transfer image to another region
   digitalocean.cloud.image_action:
     token: "{{ digitalocean_token }}"
     state: present
-    image_id: "{{ image_action_id }}"
-    type: "{{ image_action_type }}"
-    region: "{{ image_action_region if image_action_type == 'transfer' else omit }}"
+    image_id: "{{ image_id }}"
+    type: transfer
+    region: "{{ image_action_region }}"
+    timeout: 600
   register: result
 
 - name: 01_action | Verify image action
