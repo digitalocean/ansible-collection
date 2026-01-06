@@ -204,8 +204,8 @@ class DropletAutoscalePool(DigitalOceanCommonModule):
         try:
             autoscale_pools = DigitalOceanFunctions.get_paginated(
                 module=self.module,
-                obj=self.client.droplets,
-                meth="list_autoscale_pools",
+                obj=self.client.autoscalepools,
+                meth="list",
                 key="autoscale_pools",
                 exc=DigitalOceanCommonModule.HttpResponseError,
             )
@@ -239,9 +239,7 @@ class DropletAutoscalePool(DigitalOceanCommonModule):
             if self.droplet_template:
                 body["droplet_template"] = self.droplet_template
 
-            pool = self.client.droplets.create_autoscale_pool(body=body)[
-                "autoscale_pool"
-            ]
+            pool = self.client.autoscalepools.create(body=body)["autoscale_pool"]
 
             # Wait for the pool to become active
             end_time = time.monotonic() + self.timeout
@@ -251,9 +249,9 @@ class DropletAutoscalePool(DigitalOceanCommonModule):
                     break
                 time.sleep(DigitalOceanConstants.SLEEP)
                 try:
-                    pool = self.client.droplets.get_autoscale_pool(
-                        autoscale_pool_id=pool["id"]
-                    )["autoscale_pool"]
+                    pool = self.client.autoscalepools.get(autoscale_pool_id=pool["id"])[
+                        "autoscale_pool"
+                    ]
                 except DigitalOceanCommonModule.HttpResponseError:
                     pass
 
@@ -277,7 +275,7 @@ class DropletAutoscalePool(DigitalOceanCommonModule):
 
     def delete_autoscale_pool(self, pool):
         try:
-            self.client.droplets.delete_autoscale_pool(autoscale_pool_id=pool["id"])
+            self.client.autoscalepools.delete(autoscale_pool_id=pool["id"])
             self.module.exit_json(
                 changed=True,
                 msg=f"Deleted Droplet Autoscale Pool {self.name} ({pool['id']})",

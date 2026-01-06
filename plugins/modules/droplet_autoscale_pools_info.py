@@ -98,8 +98,8 @@ class DropletAutoscalePoolsInformation(DigitalOceanCommonModule):
     def present(self):
         autoscale_pools = DigitalOceanFunctions.get_paginated(
             module=self.module,
-            obj=self.client.droplets,
-            meth="list_autoscale_pools",
+            obj=self.client.autoscalepools,
+            meth="list",
             key="autoscale_pools",
             exc=DigitalOceanCommonModule.HttpResponseError,
         )
