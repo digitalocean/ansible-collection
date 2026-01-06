@@ -155,7 +155,7 @@ class VPCNATGateway(DigitalOceanCommonModule):
         try:
             vpc_nat_gateways = DigitalOceanFunctions.get_paginated(
                 module=self.module,
-                obj=self.client.vpc_nat_gateways,
+                obj=self.client.vpcnatgateways,
                 meth="list",
                 key="nat_gateways",
                 exc=DigitalOceanCommonModule.HttpResponseError,
@@ -191,7 +191,7 @@ class VPCNATGateway(DigitalOceanCommonModule):
             if self.size:
                 body["size"] = self.size
 
-            vpc_nat_gateway = self.client.vpc_nat_gateways.create(body=body)[
+            vpc_nat_gateway = self.client.vpcnatgateways.create(body=body)[
                 "nat_gateway"
             ]
 
@@ -203,7 +203,7 @@ class VPCNATGateway(DigitalOceanCommonModule):
                     break
                 time.sleep(DigitalOceanConstants.SLEEP)
                 try:
-                    vpc_nat_gateway = self.client.vpc_nat_gateways.get(
+                    vpc_nat_gateway = self.client.vpcnatgateways.get(
                         id=vpc_nat_gateway["id"]
                     )["nat_gateway"]
                 except DigitalOceanCommonModule.HttpResponseError:
@@ -229,7 +229,7 @@ class VPCNATGateway(DigitalOceanCommonModule):
 
     def delete_vpc_nat_gateway(self, vpc_nat_gateway):
         try:
-            self.client.vpc_nat_gateways.delete(id=vpc_nat_gateway["id"])
+            self.client.vpcnatgateways.delete(id=vpc_nat_gateway["id"])
             self.module.exit_json(
                 changed=True,
                 msg=f"Deleted VPC NAT Gateway {self.name} ({vpc_nat_gateway['id']})",

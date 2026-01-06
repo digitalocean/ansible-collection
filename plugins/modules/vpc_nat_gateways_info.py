@@ -90,7 +90,7 @@ class VPCNATGatewaysInformation(DigitalOceanCommonModule):
     def present(self):
         vpc_nat_gateways = DigitalOceanFunctions.get_paginated(
             module=self.module,
-            obj=self.client.vpc_nat_gateways,
+            obj=self.client.vpcnatgateways,
             meth="list",
             key="nat_gateways",
             exc=DigitalOceanCommonModule.HttpResponseError,
