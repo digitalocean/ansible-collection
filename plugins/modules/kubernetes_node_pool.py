@@ -211,7 +211,7 @@ class KubernetesNodePool(DigitalOceanCommonModule):
             return None
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
-                "Message": err.error.message,
+                "Message": err.error.message if err.error else str(err),
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
@@ -265,7 +265,7 @@ class KubernetesNodePool(DigitalOceanCommonModule):
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
-                "Message": err.error.message,
+                "Message": err.error.message if err.error else str(err),
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
@@ -297,6 +297,20 @@ class KubernetesNodePool(DigitalOceanCommonModule):
                 cluster_id=self.cluster_id, node_pool_id=node_pool["id"], body=body
             )["node_pool"]
 
+            # Wait for nodes to be ready after update
+            end_time = time.monotonic() + self.timeout
+            while time.monotonic() < end_time:
+                current_pool = self.get_node_pool()
+                if current_pool:
+                    nodes = current_pool.get("nodes", [])
+                    all_running = all(
+                        n.get("status", {}).get("state") == "running" for n in nodes
+                    )
+                    if all_running and len(nodes) > 0:
+                        updated_pool = current_pool
+                        break
+                time.sleep(DigitalOceanConstants.SLEEP)
+
             self.module.exit_json(
                 changed=True,
                 msg=f"Updated node pool {self.name}",
@@ -304,7 +318,7 @@ class KubernetesNodePool(DigitalOceanCommonModule):
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
-                "Message": err.error.message,
+                "Message": err.error.message if err.error else str(err),
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
@@ -324,7 +338,7 @@ class KubernetesNodePool(DigitalOceanCommonModule):
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
-                "Message": err.error.message,
+                "Message": err.error.message if err.error else str(err),
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }

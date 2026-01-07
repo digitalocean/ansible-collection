@@ -164,7 +164,7 @@ class NFS(DigitalOceanCommonModule):
             return found_shares
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
-                "Message": err.error.message,
+                "Message": err.error.message if err.error else str(err),
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
@@ -237,7 +237,7 @@ class NFS(DigitalOceanCommonModule):
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
-                "Message": err.error.message,
+                "Message": err.error.message if err.error else str(err),
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
@@ -259,7 +259,7 @@ class NFS(DigitalOceanCommonModule):
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
-                "Message": err.error.message,
+                "Message": err.error.message if err.error else str(err),
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
@@ -282,10 +282,26 @@ class NFS(DigitalOceanCommonModule):
             else:
                 self.create_nfs_share()
         elif len(nfs_shares) == 1:
+            nfs_share = nfs_shares[0]
+            nfs_id = nfs_share.get("id")
+
+            # Wait for the NFS share to become active if it's still creating
+            end_time = time.monotonic() + self.timeout
+            while time.monotonic() < end_time:
+                status = nfs_share.get("status", "").upper()
+                if status == "ACTIVE":
+                    break
+                time.sleep(DigitalOceanConstants.SLEEP)
+                try:
+                    response = self.client.nfs.get(nfs_id=nfs_id, region=self.region)
+                    nfs_share = response.get("share", response)
+                except DigitalOceanCommonModule.HttpResponseError:
+                    pass
+
             self.module.exit_json(
                 changed=False,
-                msg=f"NFS share {self.name} ({nfs_shares[0]['id']}) exists",
-                nfs=nfs_shares[0],
+                msg=f"NFS share {self.name} ({nfs_id}) exists",
+                nfs=nfs_share,
             )
         else:
             self.module.exit_json(

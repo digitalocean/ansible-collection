@@ -123,12 +123,12 @@ class FunctionNamespace(DigitalOceanCommonModule):
                 return []
             found_namespaces = []
             for ns in namespaces:
-                if self.namespace == ns.get("namespace"):
+                if self.namespace == ns.get("label"):
                     found_namespaces.append(ns)
             return found_namespaces
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
-                "Message": err.error.message,
+                "Message": err.error.message if err.error else str(err),
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
@@ -185,7 +185,7 @@ class FunctionNamespace(DigitalOceanCommonModule):
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
-                "Message": err.error.message,
+                "Message": err.error.message if err.error else str(err),
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
@@ -195,7 +195,9 @@ class FunctionNamespace(DigitalOceanCommonModule):
 
     def delete_namespace(self, namespace):
         try:
-            self.client.functions.delete_namespace(namespace_id=namespace["uuid"])
+            # Use 'namespace' field (the fn-xxx ID) instead of 'uuid' for deletion
+            namespace_id = namespace.get("namespace") or namespace.get("uuid")
+            self.client.functions.delete_namespace(namespace_id=namespace_id)
             self.module.exit_json(
                 changed=True,
                 msg=f"Deleted namespace {self.namespace}",
@@ -203,7 +205,7 @@ class FunctionNamespace(DigitalOceanCommonModule):
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
-                "Message": err.error.message,
+                "Message": err.error.message if err.error else str(err),
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
