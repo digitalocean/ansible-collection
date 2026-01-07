@@ -32,6 +32,11 @@ options:
       - The unique identifier of the NFS share.
     type: str
     required: true
+  region:
+    description:
+      - The slug identifier for the region where the NFS share is located.
+    type: str
+    required: true
   type:
     description:
       - The type of action to perform.
@@ -71,6 +76,7 @@ EXAMPLES = r"""
   digitalocean.cloud.nfs_action:
     token: "{{ token }}"
     nfs_id: 5a4981aa-9653-4bd1-bef5-d6bff52042e4
+    region: nyc3
     type: resize
     size_gib: 200
 
@@ -78,6 +84,7 @@ EXAMPLES = r"""
   digitalocean.cloud.nfs_action:
     token: "{{ token }}"
     nfs_id: 5a4981aa-9653-4bd1-bef5-d6bff52042e4
+    region: nyc3
     type: snapshot
     snapshot_name: my-nfs-snapshot
 
@@ -85,6 +92,7 @@ EXAMPLES = r"""
   digitalocean.cloud.nfs_action:
     token: "{{ token }}"
     nfs_id: 5a4981aa-9653-4bd1-bef5-d6bff52042e4
+    region: nyc3
     type: attach
     vpc_id: 5a4981aa-9653-4bd1-bef5-d6bff52042e5
 
@@ -92,6 +100,7 @@ EXAMPLES = r"""
   digitalocean.cloud.nfs_action:
     token: "{{ token }}"
     nfs_id: 5a4981aa-9653-4bd1-bef5-d6bff52042e4
+    region: nyc3
     type: detach
     vpc_id: 5a4981aa-9653-4bd1-bef5-d6bff52042e5
 """
@@ -140,6 +149,7 @@ class NFSAction(DigitalOceanCommonModule):
     def __init__(self, module):
         super().__init__(module)
         self.nfs_id = module.params.get("nfs_id")
+        self.region = module.params.get("region")
         self.action_type = module.params.get("type")
         self.size_gib = module.params.get("size_gib")
         self.snapshot_name = module.params.get("snapshot_name")
@@ -152,6 +162,7 @@ class NFSAction(DigitalOceanCommonModule):
         try:
             body = {
                 "type": self.action_type,
+                "region": self.region,
             }
 
             if self.action_type == "resize":
@@ -255,6 +266,7 @@ def main():
     argument_spec = DigitalOceanOptions.argument_spec()
     argument_spec.update(
         nfs_id=dict(type="str", required=True),
+        region=dict(type="str", required=True),
         type=dict(
             type="str",
             required=True,
