@@ -146,6 +146,20 @@ class FunctionNamespace(DigitalOceanCommonModule):
                 "region": self.region,
             }
             response = self.client.functions.create_namespace(body=body)
+
+            # Check if the response contains an error (API returns 200 with error payload)
+            if response.get("id") and response.get("message"):
+                self.module.fail_json(
+                    changed=False,
+                    msg=response.get("message"),
+                    error={
+                        "Message": response.get("message"),
+                        "id": response.get("id"),
+                        "request_id": response.get("request_id"),
+                    },
+                    namespace={},
+                )
+
             namespace = response.get("namespace", response)
 
             self.module.exit_json(

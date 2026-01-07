@@ -294,23 +294,23 @@ class KubernetesCluster(DigitalOceanCommonModule):
             kubernetes_cluster = response.get("kubernetes_cluster", response)
 
             end_time = time.monotonic() + self.timeout
-            while (
-                time.monotonic() < end_time
-                and kubernetes_cluster["status"]["state"] != "running"
-            ):
+            status = kubernetes_cluster.get("status", {})
+            state = status.get("state", "unknown")
+            while time.monotonic() < end_time and state != "running":
                 time.sleep(DigitalOceanConstants.SLEEP)
-                kubernetes_cluster["status"]["state"] = (
-                    self.get_kubernetes_cluster_by_id(kubernetes_cluster["id"])[
-                        "status"
-                    ]["state"]
+                refreshed_cluster = self.get_kubernetes_cluster_by_id(
+                    kubernetes_cluster["id"]
                 )
+                status = refreshed_cluster.get("status", {})
+                state = status.get("state", "unknown")
+                kubernetes_cluster = refreshed_cluster
 
-            if kubernetes_cluster["status"]["state"] != "running":
+            if state != "running":
                 self.module.fail_json(
                     changed=True,
                     msg=(
                         f"Created Kubernetes cluster {self.name} ({kubernetes_cluster['id']}) in {self.region}"
-                        f" is not 'running', it is '{kubernetes_cluster['status']['state']}'"
+                        f" is not 'running', it is '{state}'"
                     ),
                     kubernetes_cluster=kubernetes_cluster,
                 )

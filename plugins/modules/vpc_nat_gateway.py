@@ -211,6 +211,15 @@ class VPCNATGateway(DigitalOceanCommonModule):
                 vpc_nat_gateway=vpc_nat_gateway,
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
+            # Handle 409 Conflict - NAT Gateway already exists
+            if err.status_code == 409:
+                existing_gateways = self.get_vpc_nat_gateways()
+                if len(existing_gateways) == 1:
+                    self.module.exit_json(
+                        changed=False,
+                        msg=f"VPC NAT Gateway {self.name} ({existing_gateways[0]['id']}) exists",
+                        vpc_nat_gateway=existing_gateways[0],
+                    )
             error = {
                 "Message": err.error.message,
                 "Status Code": err.status_code,
