@@ -161,7 +161,7 @@ class NFSAction(DigitalOceanCommonModule):
                         msg="size_gib is required for resize action",
                         action={},
                     )
-                body["size_gib"] = self.size_gib
+                body["params"] = {"size_gib": self.size_gib}
             elif self.action_type == "snapshot":
                 if not self.snapshot_name:
                     self.module.fail_json(
@@ -169,7 +169,7 @@ class NFSAction(DigitalOceanCommonModule):
                         msg="snapshot_name is required for snapshot action",
                         action={},
                     )
-                body["name"] = self.snapshot_name
+                body["params"] = {"name": self.snapshot_name}
             elif self.action_type in ("attach", "detach"):
                 if not self.vpc_id:
                     self.module.fail_json(
@@ -177,7 +177,7 @@ class NFSAction(DigitalOceanCommonModule):
                         msg=f"vpc_id is required for {self.action_type} action",
                         action={},
                     )
-                body["vpc_id"] = self.vpc_id
+                body["params"] = {"vpc_id": self.vpc_id}
 
             # API method is create_action, not post_action
             response = self.client.nfs.create_action(nfs_id=self.nfs_id, body=body)
