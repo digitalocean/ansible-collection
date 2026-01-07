@@ -1,1 +1,3 @@
+# Disabled: Spaces deletion can take up to 3 weeks to complete,
+# making automated testing impractical in CI environments.
 disabled
