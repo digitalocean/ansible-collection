@@ -190,17 +190,16 @@ class NFS(DigitalOceanCommonModule):
             response = self.client.nfs.create(body=body)
 
             # Check if the response contains an error (API returns 200 with error payload)
-            if (
-                response.get("id")
-                and response.get("message")
-                and not response.get("share")
-            ):
+            # Some APIs use "id" + "message", others use "code" + "message"
+            error_id = response.get("id") or response.get("code")
+            error_msg = response.get("message")
+            if error_id and error_msg and not response.get("share"):
                 self.module.fail_json(
                     changed=False,
-                    msg=response.get("message"),
+                    msg=error_msg,
                     error={
-                        "Message": response.get("message"),
-                        "id": response.get("id"),
+                        "Message": error_msg,
+                        "id": error_id,
                         "request_id": response.get("request_id"),
                     },
                     nfs={},

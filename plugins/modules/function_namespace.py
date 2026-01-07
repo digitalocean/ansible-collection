@@ -149,11 +149,27 @@ class FunctionNamespace(DigitalOceanCommonModule):
 
             # Check if the response contains an error (API returns 200 with error payload)
             if response.get("id") and response.get("message"):
+                error_msg = response.get("message", "")
+                # Handle "already in use" as idempotent success
+                if "already in use" in error_msg:
+                    existing_namespaces = self.get_namespaces()
+                    if len(existing_namespaces) >= 1:
+                        self.module.exit_json(
+                            changed=False,
+                            msg=f"Namespace {self.namespace} exists",
+                            namespace=existing_namespaces[0],
+                        )
+                    # Namespace exists but not found in list (different region?)
+                    self.module.exit_json(
+                        changed=False,
+                        msg=f"Namespace {self.namespace} already exists",
+                        namespace={},
+                    )
                 self.module.fail_json(
                     changed=False,
-                    msg=response.get("message"),
+                    msg=error_msg,
                     error={
-                        "Message": response.get("message"),
+                        "Message": error_msg,
                         "id": response.get("id"),
                         "request_id": response.get("request_id"),
                     },

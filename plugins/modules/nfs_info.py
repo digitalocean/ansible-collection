@@ -111,7 +111,7 @@ class NFSInformation(DigitalOceanCommonModule):
             self.module.exit_json(changed=False, msg="No NFS shares", shares=[])
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
-                "Message": err.error.message,
+                "Message": err.error.message if err.error else str(err),
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }

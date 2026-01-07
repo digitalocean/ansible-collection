@@ -180,9 +180,31 @@ class NFSAction(DigitalOceanCommonModule):
                 body["vpc_id"] = self.vpc_id
 
             # API method is create_action, not post_action
-            action = self.client.nfs.create_action(nfs_id=self.nfs_id, body=body)[
-                "action"
-            ]
+            response = self.client.nfs.create_action(nfs_id=self.nfs_id, body=body)
+
+            # Check if the response contains an error (API returns 200 with error payload)
+            error_id = response.get("id") or response.get("code")
+            error_msg = response.get("message")
+            if error_id and error_msg and not response.get("action"):
+                self.module.fail_json(
+                    changed=False,
+                    msg=error_msg,
+                    error={
+                        "Message": error_msg,
+                        "id": error_id,
+                        "request_id": response.get("request_id"),
+                    },
+                    action={},
+                )
+
+            action = response.get("action", response)
+            if not action.get("id") and not action.get("status"):
+                self.module.fail_json(
+                    changed=False,
+                    msg="API response missing expected action fields",
+                    error={"Message": "Unexpected API response structure"},
+                    action=action,
+                )
 
             # Wait for the action to complete
             end_time = time.monotonic() + self.timeout
@@ -207,7 +229,7 @@ class NFSAction(DigitalOceanCommonModule):
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
-                "Message": err.error.message,
+                "Message": err.error.message if err.error else str(err),
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }

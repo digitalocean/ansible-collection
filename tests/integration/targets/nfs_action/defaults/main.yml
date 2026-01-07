@@ -1,5 +1,5 @@
 ---
 nfs_name: "ansible-gh-ci-nfs-action-{{ pr_number | default(0, true) }}"
 nfs_region: nyc3
-nfs_size_gib: 1
-nfs_resize_size_gib: 5
+nfs_size_gib: 50
+nfs_resize_size_gib: 100
