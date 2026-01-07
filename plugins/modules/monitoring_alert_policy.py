@@ -34,7 +34,7 @@ options:
     required: true
   compare:
     description:
-      - Comparision.
+      - Comparison.
     type: str
     required: true
     choices: ["GreaterThan", "LessThan"]
