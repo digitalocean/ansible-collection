@@ -145,7 +145,8 @@ class FunctionNamespace(DigitalOceanCommonModule):
                 "label": self.namespace,
                 "region": self.region,
             }
-            namespace = self.client.functions.create_namespace(body=body)["namespace"]
+            response = self.client.functions.create_namespace(body=body)
+            namespace = response.get("namespace", response)
 
             self.module.exit_json(
                 changed=True,

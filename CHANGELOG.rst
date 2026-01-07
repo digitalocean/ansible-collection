@@ -66,7 +66,12 @@ Minor Changes
 Bugfixes
 --------
 
+- droplet_autoscale_pool - integration test now creates an SSH key and includes it in the droplet_template.ssh_keys parameter, fixing the "ssh_keys is required" API error (https://github.com/digitalocean/ansible-collection/issues/280).
+- function_namespace - fixed KeyError when creating a namespace by using defensive response handling for the API response structure (https://github.com/digitalocean/ansible-collection/issues/281).
+- kubernetes_cluster - fixed KeyError when creating or getting a cluster by using defensive response handling for the API response structure (https://github.com/digitalocean/ansible-collection/issues/282).
+- nfs - fixed KeyError when creating or getting an NFS share by using defensive response handling for the API response structure (https://github.com/digitalocean/ansible-collection/issues/283).
 - tests - update pydo version from 0.1.7 to 0.23.0 and azure-core from 1.26.1 to 1.36.0 in test requirements to fix CI failures for modules using newer PyDO API attributes.
+- vpc_nat_gateway - fixed API request body structure to match current DigitalOcean API. The vpc_uuid is now sent in a vpcs array, type is set to PUBLIC, and size is now an integer instead of a string (https://github.com/digitalocean/ansible-collection/issues/284).
 
 New Modules
 -----------

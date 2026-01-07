@@ -187,7 +187,8 @@ class NFS(DigitalOceanCommonModule):
                 body["vpc_ids"] = self.vpc_ids
 
             # API returns "share" key, not "nfs_share"
-            nfs_share = self.client.nfs.create(body=body)["share"]
+            response = self.client.nfs.create(body=body)
+            nfs_share = response.get("share", response)
 
             # Wait for the NFS share to become active
             end_time = time.monotonic() + self.timeout
@@ -198,9 +199,10 @@ class NFS(DigitalOceanCommonModule):
                 time.sleep(DigitalOceanConstants.SLEEP)
                 try:
                     # get() requires region parameter
-                    nfs_share = self.client.nfs.get(
+                    response = self.client.nfs.get(
                         nfs_id=nfs_share["id"], region=self.region
-                    )["share"]
+                    )
+                    nfs_share = response.get("share", response)
                 except DigitalOceanCommonModule.HttpResponseError:
                     pass
 

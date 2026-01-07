@@ -9,5 +9,4 @@ alert_name: "ansible-gh-ci-alert-{{ pr_number | default(0, true) }}"
 alert_type: latency
 alert_threshold: 500
 alert_comparison: greater_than
-alert_email: alerts@example.com
 alert_period: 5m

@@ -1,5 +1,19 @@
 ---
 - block:
+    - name: Create SSH key for autoscale pool
+      digitalocean.cloud.ssh_key:
+        token: "{{ digitalocean_token }}"
+        state: present
+        public_key: "{{ autoscale_ssh_public_key }}"
+        name: "{{ autoscale_ssh_key_name }}"
+      register: ssh_key_result
+
+    - name: Verify SSH key created
+      ansible.builtin.assert:
+        that:
+          - ssh_key_result.changed
+          - ssh_key_result.ssh_key.id is defined
+
     - name: Create Droplet autoscale pool
       digitalocean.cloud.droplet_autoscale_pool:
         token: "{{ digitalocean_token }}"
@@ -14,6 +28,8 @@
           size: "{{ autoscale_droplet_size }}"
           region: "{{ autoscale_region }}"
           image: "{{ autoscale_image }}"
+          ssh_keys:
+            - "{{ ssh_key_result.ssh_key.id }}"
       register: result
 
     - name: Verify create Droplet autoscale pool
@@ -41,4 +57,12 @@
         token: "{{ digitalocean_token }}"
         state: absent
         name: "{{ autoscale_pool_name }}"
+      ignore_errors: true
+
+    - name: Cleanup SSH key
+      digitalocean.cloud.ssh_key:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        public_key: "{{ autoscale_ssh_public_key }}"
+        name: "{{ autoscale_ssh_key_name }}"
       ignore_errors: true

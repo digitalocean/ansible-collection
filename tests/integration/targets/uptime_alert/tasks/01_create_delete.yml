@@ -10,7 +10,7 @@
     comparison: "{{ alert_comparison }}"
     notifications:
       email:
-        - "{{ alert_email }}"
+        - "{{ account_email }}"
     period: "{{ alert_period }}"
   register: result
 

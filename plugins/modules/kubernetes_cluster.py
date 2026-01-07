@@ -260,9 +260,8 @@ class KubernetesCluster(DigitalOceanCommonModule):
 
     def get_kubernetes_cluster_by_id(self, id):
         try:
-            kubernetes_cluster = self.client.kubernetes.get_cluster(cluster_id=id)[
-                "kubernetes_cluster"
-            ]
+            response = self.client.kubernetes.get_cluster(cluster_id=id)
+            kubernetes_cluster = response.get("kubernetes_cluster", response)
             return kubernetes_cluster
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
@@ -291,9 +290,8 @@ class KubernetesCluster(DigitalOceanCommonModule):
                 "surge_upgrade": self.surge_upgrade,
                 "ha": self.ha,
             }
-            kubernetes_cluster = self.client.kubernetes.create_cluster(body=body)[
-                "kubernetes_cluster"
-            ]
+            response = self.client.kubernetes.create_cluster(body=body)
+            kubernetes_cluster = response.get("kubernetes_cluster", response)
 
             end_time = time.monotonic() + self.timeout
             while (

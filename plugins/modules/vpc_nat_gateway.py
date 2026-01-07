@@ -49,13 +49,10 @@ options:
     required: false
   size:
     description:
-      - The size of the NAT Gateway.
-    type: str
+      - The size of the NAT Gateway (number of vCPUs).
+      - Common values are 1 (small), 2 (medium), 4 (large).
+    type: int
     required: false
-    choices:
-      - small
-      - medium
-      - large
   id:
     description:
       - The unique identifier of the VPC NAT Gateway.
@@ -76,7 +73,7 @@ EXAMPLES = r"""
     name: my-nat-gateway
     vpc_uuid: 5a4981aa-9653-4bd1-bef5-d6bff52042e4
     region: nyc1
-    size: small
+    size: 1
 
 - name: Delete VPC NAT Gateway by name
   digitalocean.cloud.vpc_nat_gateway:
@@ -184,16 +181,16 @@ class VPCNATGateway(DigitalOceanCommonModule):
         try:
             body = {
                 "name": self.name,
-                "vpc_uuid": self.vpc_uuid,
+                "type": "PUBLIC",
+                "vpcs": [{"vpc_uuid": self.vpc_uuid}],
             }
             if self.region:
                 body["region"] = self.region
             if self.size:
                 body["size"] = self.size
 
-            vpc_nat_gateway = self.client.vpcnatgateways.create(body=body)[
-                "nat_gateway"
-            ]
+            response = self.client.vpcnatgateways.create(body=body)
+            vpc_nat_gateway = response.get("vpc_nat_gateway", response)
 
             # Wait for the NAT Gateway to become active
             end_time = time.monotonic() + self.timeout
@@ -203,9 +200,8 @@ class VPCNATGateway(DigitalOceanCommonModule):
                     break
                 time.sleep(DigitalOceanConstants.SLEEP)
                 try:
-                    vpc_nat_gateway = self.client.vpcnatgateways.get(
-                        id=vpc_nat_gateway["id"]
-                    )["nat_gateway"]
+                    response = self.client.vpcnatgateways.get(id=vpc_nat_gateway["id"])
+                    vpc_nat_gateway = response.get("vpc_nat_gateway", response)
                 except DigitalOceanCommonModule.HttpResponseError:
                     pass
 
@@ -309,7 +305,7 @@ def main():
         name=dict(type="str", required=True),
         vpc_uuid=dict(type="str", required=False),
         region=dict(type="str", required=False),
-        size=dict(type="str", required=False, choices=["small", "medium", "large"]),
+        size=dict(type="int", required=False),
         id=dict(type="str", required=False),
     )
     module = AnsibleModule(

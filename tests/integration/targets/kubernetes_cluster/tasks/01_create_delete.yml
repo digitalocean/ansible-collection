@@ -8,7 +8,7 @@
         token: "{{ digitalocean_token }}"
         name: "{{ kubernetes_cluster.name }}"
         region: "{{ kubernetes_cluster.region }}"
-        version: "{{ kubernetes_version }}"
+        version: "{{ kubernetes_cluster.version }}"
         node_pools: "{{ kubernetes_cluster.node_pools }}"
         timeout: 600
       register: result
@@ -26,7 +26,7 @@
         token: "{{ digitalocean_token }}"
         name: "{{ kubernetes_cluster.name }}"
         region: "{{ kubernetes_cluster.region }}"
-        version: "{{ kubernetes_version }}"
+        version: "{{ kubernetes_cluster.version }}"
         node_pools: "{{ kubernetes_cluster.node_pools }}"
       register: result
 

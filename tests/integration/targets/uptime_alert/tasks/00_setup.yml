@@ -1,4 +1,13 @@
 ---
+- name: 00_setup | Get account information for email
+  digitalocean.cloud.account_info:
+    token: "{{ digitalocean_token }}"
+  register: account_result
+
+- name: 00_setup | Set account email
+  ansible.builtin.set_fact:
+    account_email: "{{ account_result.account.email }}"
+
 - name: 00_setup | Create Uptime check
   digitalocean.cloud.uptime_check:
     state: present
