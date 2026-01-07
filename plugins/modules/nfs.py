@@ -188,7 +188,34 @@ class NFS(DigitalOceanCommonModule):
 
             # API returns "share" key, not "nfs_share"
             response = self.client.nfs.create(body=body)
+
+            # Check if the response contains an error (API returns 200 with error payload)
+            if (
+                response.get("id")
+                and response.get("message")
+                and not response.get("share")
+            ):
+                self.module.fail_json(
+                    changed=False,
+                    msg=response.get("message"),
+                    error={
+                        "Message": response.get("message"),
+                        "id": response.get("id"),
+                        "request_id": response.get("request_id"),
+                    },
+                    nfs={},
+                )
+
             nfs_share = response.get("share", response)
+            nfs_id = nfs_share.get("id")
+
+            if not nfs_id:
+                self.module.fail_json(
+                    changed=False,
+                    msg="API response missing 'id' field",
+                    error={"Message": "Unexpected API response structure"},
+                    nfs=nfs_share,
+                )
 
             # Wait for the NFS share to become active
             end_time = time.monotonic() + self.timeout
@@ -199,16 +226,14 @@ class NFS(DigitalOceanCommonModule):
                 time.sleep(DigitalOceanConstants.SLEEP)
                 try:
                     # get() requires region parameter
-                    response = self.client.nfs.get(
-                        nfs_id=nfs_share["id"], region=self.region
-                    )
+                    response = self.client.nfs.get(nfs_id=nfs_id, region=self.region)
                     nfs_share = response.get("share", response)
                 except DigitalOceanCommonModule.HttpResponseError:
                     pass
 
             self.module.exit_json(
                 changed=True,
-                msg=f"Created NFS share {self.name} ({nfs_share['id']})",
+                msg=f"Created NFS share {self.name} ({nfs_id})",
                 nfs=nfs_share,
             )
         except DigitalOceanCommonModule.HttpResponseError as err:

@@ -14,4 +14,4 @@
 
 - name: 00_setup | Set cluster ID
   ansible.builtin.set_fact:
-    kubernetes_cluster_id: "{{ cluster_result.cluster.id }}"
+    kubernetes_cluster_id: "{{ cluster_result.kubernetes_cluster.id }}"

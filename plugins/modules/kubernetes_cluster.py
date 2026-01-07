@@ -291,16 +291,41 @@ class KubernetesCluster(DigitalOceanCommonModule):
                 "ha": self.ha,
             }
             response = self.client.kubernetes.create_cluster(body=body)
+
+            # Check if the response contains an error (API returns 200 with error payload)
+            if (
+                response.get("id")
+                and response.get("message")
+                and not response.get("kubernetes_cluster")
+            ):
+                self.module.fail_json(
+                    changed=False,
+                    msg=response.get("message"),
+                    error={
+                        "Message": response.get("message"),
+                        "id": response.get("id"),
+                        "request_id": response.get("request_id"),
+                    },
+                    kubernetes_cluster={},
+                )
+
             kubernetes_cluster = response.get("kubernetes_cluster", response)
+            cluster_id = kubernetes_cluster.get("id")
+
+            if not cluster_id:
+                self.module.fail_json(
+                    changed=False,
+                    msg="API response missing 'id' field",
+                    error={"Message": "Unexpected API response structure"},
+                    kubernetes_cluster=kubernetes_cluster,
+                )
 
             end_time = time.monotonic() + self.timeout
             status = kubernetes_cluster.get("status", {})
             state = status.get("state", "unknown")
             while time.monotonic() < end_time and state != "running":
                 time.sleep(DigitalOceanConstants.SLEEP)
-                refreshed_cluster = self.get_kubernetes_cluster_by_id(
-                    kubernetes_cluster["id"]
-                )
+                refreshed_cluster = self.get_kubernetes_cluster_by_id(cluster_id)
                 status = refreshed_cluster.get("status", {})
                 state = status.get("state", "unknown")
                 kubernetes_cluster = refreshed_cluster
@@ -309,7 +334,7 @@ class KubernetesCluster(DigitalOceanCommonModule):
                 self.module.fail_json(
                     changed=True,
                     msg=(
-                        f"Created Kubernetes cluster {self.name} ({kubernetes_cluster['id']}) in {self.region}"
+                        f"Created Kubernetes cluster {self.name} ({cluster_id}) in {self.region}"
                         f" is not 'running', it is '{state}'"
                     ),
                     kubernetes_cluster=kubernetes_cluster,
@@ -317,7 +342,7 @@ class KubernetesCluster(DigitalOceanCommonModule):
 
             self.module.exit_json(
                 changed=True,
-                msg=f"Created Kubernetes cluster {self.name} ({kubernetes_cluster['id']}) in {self.region}",
+                msg=f"Created Kubernetes cluster {self.name} ({cluster_id}) in {self.region}",
                 kubernetes_cluster=kubernetes_cluster,
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
