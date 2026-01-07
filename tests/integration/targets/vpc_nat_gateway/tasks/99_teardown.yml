@@ -6,6 +6,10 @@
     name: "{{ nat_gateway_name }}"
   ignore_errors: true
 
+- name: 99_teardown | Wait for NAT Gateway deletion to complete
+  ansible.builtin.pause:
+    seconds: 30
+
 - name: 99_teardown | Delete VPC
   digitalocean.cloud.vpc:
     token: "{{ digitalocean_token }}"
