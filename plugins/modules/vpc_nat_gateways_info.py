@@ -92,7 +92,7 @@ class VPCNATGatewaysInformation(DigitalOceanCommonModule):
             module=self.module,
             obj=self.client.vpcnatgateways,
             meth="list",
-            key="nat_gateways",
+            key="vpc_nat_gateways",
             exc=DigitalOceanCommonModule.HttpResponseError,
         )
         if vpc_nat_gateways:

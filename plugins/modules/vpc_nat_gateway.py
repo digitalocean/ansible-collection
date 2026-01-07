@@ -125,6 +125,7 @@ msg:
 """
 
 import time
+import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonModule,
@@ -154,7 +155,7 @@ class VPCNATGateway(DigitalOceanCommonModule):
                 module=self.module,
                 obj=self.client.vpcnatgateways,
                 meth="list",
-                key="nat_gateways",
+                key="vpc_nat_gateways",
                 exc=DigitalOceanCommonModule.HttpResponseError,
             )
             found_vpc_nat_gateways = []
@@ -166,7 +167,7 @@ class VPCNATGateway(DigitalOceanCommonModule):
             return found_vpc_nat_gateways
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
-                "Message": err.error.message,
+                "Message": err.error.message if err.error else str(err),
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
@@ -211,6 +212,42 @@ class VPCNATGateway(DigitalOceanCommonModule):
                 vpc_nat_gateway=vpc_nat_gateway,
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
+            # Handle 200 OK that PyDO incorrectly treats as an error
+            # This happens when the API returns 200 instead of expected 201
+            if err.status_code == 200:
+                error_msg = str(err)
+                # Try to extract the JSON response from the error message
+                if "Content:" in error_msg:
+                    try:
+                        json_start = error_msg.index("Content:") + len("Content:")
+                        json_str = error_msg[json_start:].strip()
+                        parsed = json.loads(json_str)
+                        vpc_nat_gateway = parsed.get("vpc_nat_gateway", parsed)
+                        if vpc_nat_gateway.get("id"):
+                            # Wait for the NAT Gateway to become active
+                            end_time = time.monotonic() + self.timeout
+                            while time.monotonic() < end_time:
+                                state = vpc_nat_gateway.get("state", "").upper()
+                                if state == "ACTIVE":
+                                    break
+                                time.sleep(DigitalOceanConstants.SLEEP)
+                                try:
+                                    response = self.client.vpcnatgateways.get(
+                                        id=vpc_nat_gateway["id"]
+                                    )
+                                    vpc_nat_gateway = response.get(
+                                        "vpc_nat_gateway", response
+                                    )
+                                except DigitalOceanCommonModule.HttpResponseError:
+                                    pass
+                            self.module.exit_json(
+                                changed=True,
+                                msg=f"Created VPC NAT Gateway {self.name} ({vpc_nat_gateway['id']})",
+                                vpc_nat_gateway=vpc_nat_gateway,
+                            )
+                    except (json.JSONDecodeError, ValueError, KeyError):
+                        pass  # Fall through to error handling
+
             # Handle 409 Conflict - NAT Gateway already exists
             if err.status_code == 409:
                 existing_gateways = self.get_vpc_nat_gateways()
@@ -220,49 +257,19 @@ class VPCNATGateway(DigitalOceanCommonModule):
                         msg=f"VPC NAT Gateway {self.name} ({existing_gateways[0]['id']}) exists",
                         vpc_nat_gateway=existing_gateways[0],
                     )
-                # Gateway exists per 409 but list didn't find it - return success anyway
-                self.module.exit_json(
+                # Gateway name already taken globally but not in our account's list
+                # This typically means another account owns this name
+                error_msg = err.error.message if err.error else str(err)
+                self.module.fail_json(
                     changed=False,
-                    msg=f"VPC NAT Gateway {self.name} already exists",
+                    msg=f"Cannot create NAT Gateway: {error_msg}. The name may be globally reserved or owned by another account.",
+                    error={
+                        "Message": error_msg,
+                        "Status Code": err.status_code,
+                        "Reason": err.reason,
+                    },
                     vpc_nat_gateway={},
                 )
-            error = {
-                "Message": err.error.message,
-                "Status Code": err.status_code,
-                "Reason": err.reason,
-            }
-            self.module.fail_json(
-                changed=False,
-                msg=error.get("Message"),
-                error=error,
-                vpc_nat_gateway=[],
-            )
-
-    def delete_vpc_nat_gateway(self, vpc_nat_gateway):
-        try:
-            gateway_id = vpc_nat_gateway["id"]
-            self.client.vpcnatgateways.delete(id=gateway_id)
-
-            # Wait for the NAT Gateway to be fully deleted
-            end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time:
-                try:
-                    self.client.vpcnatgateways.get(id=gateway_id)
-                    # Gateway still exists, keep waiting
-                    time.sleep(DigitalOceanConstants.SLEEP)
-                except DigitalOceanCommonModule.HttpResponseError as err:
-                    if err.status_code == 404:
-                        # Gateway is fully deleted
-                        break
-                    # Other error, keep waiting
-                    time.sleep(DigitalOceanConstants.SLEEP)
-
-            self.module.exit_json(
-                changed=True,
-                msg=f"Deleted VPC NAT Gateway {self.name} ({gateway_id})",
-                vpc_nat_gateway=vpc_nat_gateway,
-            )
-        except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
                 "Message": err.error.message if err.error else str(err),
                 "Status Code": err.status_code,
@@ -274,6 +281,46 @@ class VPCNATGateway(DigitalOceanCommonModule):
                 error=error,
                 vpc_nat_gateway=[],
             )
+
+    def delete_vpc_nat_gateway(self, vpc_nat_gateway):
+        gateway_id = vpc_nat_gateway["id"]
+        try:
+            self.client.vpcnatgateways.delete(id=gateway_id)
+        except DigitalOceanCommonModule.HttpResponseError as err:
+            # Handle 204 No Content that PyDO incorrectly treats as an error
+            # This is the expected success response for delete operations
+            if err.status_code != 204:
+                error = {
+                    "Message": err.error.message if err.error else str(err),
+                    "Status Code": err.status_code,
+                    "Reason": err.reason,
+                }
+                self.module.fail_json(
+                    changed=False,
+                    msg=error.get("Message"),
+                    error=error,
+                    vpc_nat_gateway=[],
+                )
+
+        # Wait for the NAT Gateway to be fully deleted
+        end_time = time.monotonic() + self.timeout
+        while time.monotonic() < end_time:
+            try:
+                self.client.vpcnatgateways.get(id=gateway_id)
+                # Gateway still exists, keep waiting
+                time.sleep(DigitalOceanConstants.SLEEP)
+            except DigitalOceanCommonModule.HttpResponseError as err:
+                if err.status_code == 404:
+                    # Gateway is fully deleted
+                    break
+                # Other error, keep waiting
+                time.sleep(DigitalOceanConstants.SLEEP)
+
+        self.module.exit_json(
+            changed=True,
+            msg=f"Deleted VPC NAT Gateway {self.name} ({gateway_id})",
+            vpc_nat_gateway=vpc_nat_gateway,
+        )
 
     def present(self):
         vpc_nat_gateways = self.get_vpc_nat_gateways()
