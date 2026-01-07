@@ -240,15 +240,31 @@ class VPCNATGateway(DigitalOceanCommonModule):
 
     def delete_vpc_nat_gateway(self, vpc_nat_gateway):
         try:
-            self.client.vpcnatgateways.delete(id=vpc_nat_gateway["id"])
+            gateway_id = vpc_nat_gateway["id"]
+            self.client.vpcnatgateways.delete(id=gateway_id)
+
+            # Wait for the NAT Gateway to be fully deleted
+            end_time = time.monotonic() + self.timeout
+            while time.monotonic() < end_time:
+                try:
+                    self.client.vpcnatgateways.get(id=gateway_id)
+                    # Gateway still exists, keep waiting
+                    time.sleep(DigitalOceanConstants.SLEEP)
+                except DigitalOceanCommonModule.HttpResponseError as err:
+                    if err.status_code == 404:
+                        # Gateway is fully deleted
+                        break
+                    # Other error, keep waiting
+                    time.sleep(DigitalOceanConstants.SLEEP)
+
             self.module.exit_json(
                 changed=True,
-                msg=f"Deleted VPC NAT Gateway {self.name} ({vpc_nat_gateway['id']})",
+                msg=f"Deleted VPC NAT Gateway {self.name} ({gateway_id})",
                 vpc_nat_gateway=vpc_nat_gateway,
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
-                "Message": err.error.message,
+                "Message": err.error.message if err.error else str(err),
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
