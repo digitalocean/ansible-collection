@@ -291,11 +291,13 @@ class NFS(DigitalOceanCommonModule):
                 status = nfs_share.get("status", "").upper()
                 if status == "ACTIVE":
                     break
+                # Sleep before fetching updated status
                 time.sleep(DigitalOceanConstants.SLEEP)
                 try:
                     response = self.client.nfs.get(nfs_id=nfs_id, region=self.region)
                     nfs_share = response.get("share", response)
                 except DigitalOceanCommonModule.HttpResponseError:
+                    # If get fails, keep using existing data
                     pass
 
             self.module.exit_json(

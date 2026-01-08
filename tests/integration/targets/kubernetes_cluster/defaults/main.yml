@@ -1,8 +1,7 @@
-kubernetes_cluster:
-  name: "ansible-gh-ci-k8s-{{ pr_number | default(0, true) }}"
-  region: nyc3
-  version: "1.34.1-do.2"
-  node_pools:
-    - size: s-2vcpu-4gb
-      name: ansible-gh-ci-k8s-pool-0
-      count: 1
+---
+kubernetes_cluster_name: "ansible-gh-ci-k8s-cluster-{{ pr_number | default(0, true) }}"
+kubernetes_region: nyc3
+kubernetes_version: "1.34.1-do.2"
+kubernetes_default_pool_name: "ansible-gh-ci-k8s-cluster-pool-0"
+kubernetes_default_pool_size: s-2vcpu-4gb
+kubernetes_default_pool_count: 1

@@ -11,5 +11,5 @@
     - name: 00_setup | Ensure Kubernetes version
       ansible.builtin.assert:
         that:
-          - kubernetes_cluster.version is string
-          - kubernetes_cluster.version | length
+          - kubernetes_version is string
+          - kubernetes_version | length

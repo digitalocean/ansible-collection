@@ -6,10 +6,13 @@
       digitalocean.cloud.kubernetes_cluster:
         state: present
         token: "{{ digitalocean_token }}"
-        name: "{{ kubernetes_cluster.name }}"
-        region: "{{ kubernetes_cluster.region }}"
-        version: "{{ kubernetes_cluster.version }}"
-        node_pools: "{{ kubernetes_cluster.node_pools }}"
+        name: "{{ kubernetes_cluster_name }}"
+        region: "{{ kubernetes_region }}"
+        version: "{{ kubernetes_version }}"
+        node_pools:
+          - size: "{{ kubernetes_default_pool_size }}"
+            name: "{{ kubernetes_default_pool_name }}"
+            count: "{{ kubernetes_default_pool_count }}"
         timeout: 600
       register: result
 
@@ -17,52 +20,55 @@
       ansible.builtin.assert:
         that:
           - result.changed
-          - result.msg == "Created Kubernetes cluster " ~ kubernetes_cluster.name
-            ~ " (" ~ result.kubernetes_cluster.id ~ ") in " ~ kubernetes_cluster.region
+          - result.msg == "Created Kubernetes cluster " ~ kubernetes_cluster_name
+            ~ " (" ~ result.kubernetes_cluster.id ~ ") in " ~ kubernetes_region
 
     - name: 01_create_delete | Create Kubernetes cluster again
       digitalocean.cloud.kubernetes_cluster:
         state: present
         token: "{{ digitalocean_token }}"
-        name: "{{ kubernetes_cluster.name }}"
-        region: "{{ kubernetes_cluster.region }}"
-        version: "{{ kubernetes_cluster.version }}"
-        node_pools: "{{ kubernetes_cluster.node_pools }}"
+        name: "{{ kubernetes_cluster_name }}"
+        region: "{{ kubernetes_region }}"
+        version: "{{ kubernetes_version }}"
+        node_pools:
+          - size: "{{ kubernetes_default_pool_size }}"
+            name: "{{ kubernetes_default_pool_name }}"
+            count: "{{ kubernetes_default_pool_count }}"
       register: result
 
     - name: 01_create_delete | Verify create Kubernetes cluster idempotency
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.msg == "Kubernetes cluster " ~ kubernetes_cluster.name
-            ~ " (" ~ result.kubernetes_cluster.id ~ ") in " ~ kubernetes_cluster.region ~ " exists"
+          - result.msg == "Kubernetes cluster " ~ kubernetes_cluster_name
+            ~ " (" ~ result.kubernetes_cluster.id ~ ") in " ~ kubernetes_region ~ " exists"
 
     - name: 01_create_delete | Delete Kubernetes cluster
       digitalocean.cloud.kubernetes_cluster:
         state: absent
         token: "{{ digitalocean_token }}"
-        name: "{{ kubernetes_cluster.name }}"
-        region: "{{ kubernetes_cluster.region }}"
+        name: "{{ kubernetes_cluster_name }}"
+        region: "{{ kubernetes_region }}"
       register: result
 
     - name: 01_create_delete | Verify delete Kubernetes cluster
       ansible.builtin.assert:
         that:
           - result.changed
-          - result.msg == "Deleted Kubernetes cluster " ~ kubernetes_cluster.name
-            ~ " (" ~ result.kubernetes_cluster.id ~ ") in " ~ kubernetes_cluster.region
+          - result.msg == "Deleted Kubernetes cluster " ~ kubernetes_cluster_name
+            ~ " (" ~ result.kubernetes_cluster.id ~ ") in " ~ kubernetes_region
 
     - name: 01_create_delete | Delete Kubernetes cluster again
       digitalocean.cloud.kubernetes_cluster:
         state: absent
         token: "{{ digitalocean_token }}"
-        name: "{{ kubernetes_cluster.name }}"
-        region: "{{ kubernetes_cluster.region }}"
+        name: "{{ kubernetes_cluster_name }}"
+        region: "{{ kubernetes_region }}"
       register: result
 
     - name: 01_create_delete | Verify delete Kubernetes cluster idempotency
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.msg == "Kubernetes cluster " ~ kubernetes_cluster.name ~ " in "
-            ~ kubernetes_cluster.region ~ " does not exist"
+          - result.msg == "Kubernetes cluster " ~ kubernetes_cluster_name ~ " in "
+            ~ kubernetes_region ~ " does not exist"
