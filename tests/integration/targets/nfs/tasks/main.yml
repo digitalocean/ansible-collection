@@ -1,11 +1,4 @@
 ---
-# NFS integration tests are currently disabled due to extremely slow provisioning times
-# (30+ minutes to hours) and resources getting stuck in CREATING state indefinitely.
-# The module code has been improved with proper timeout handling and error detection,
-# but the tests cannot run reliably until the DigitalOcean NFS backend is more stable.
-#
-# See aliases file for disabled status.
-
 - name: Test nfs | Cleanup any leftover resources
   ansible.builtin.include_tasks:
     file: 99_teardown.yml

@@ -1,12 +1,4 @@
 ---
-# NFS action integration tests are currently disabled due to dependency on NFS shares,
-# which have extremely slow provisioning times (30+ minutes to hours) and frequently
-# get stuck in CREATING state indefinitely. The nfs_action module code has been fixed
-# with proper parameter handling, but tests cannot run reliably until the DigitalOcean
-# NFS backend is more stable.
-#
-# See aliases file for disabled status.
-
 - block:
 
     - name: Verify API token
