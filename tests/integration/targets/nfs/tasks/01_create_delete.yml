@@ -1,17 +1,7 @@
 ---
-- block:
-    # NFS requires VPCs - get first VPC in the region
-    - name: Get VPCs
-      digitalocean.cloud.vpcs_info:
-        token: "{{ digitalocean_token }}"
-      register: vpcs_result
-
-    - name: Set VPC ID for NFS region
-      ansible.builtin.set_fact:
-        nfs_vpc_id: "{{ vpcs_result.vpcs | selectattr('region', 'equalto', nfs_region) | map(attribute='id') | first }}"
-      when: vpcs_result.vpcs | selectattr('region', 'equalto', nfs_region) | list | length > 0
-
-    - name: Create NFS share
+- name: 01_create_delete | Testing block
+  block:
+    - name: 01_create_delete | Create NFS share
       digitalocean.cloud.nfs:
         token: "{{ digitalocean_token }}"
         state: present
@@ -23,7 +13,7 @@
       register: result
       when: nfs_vpc_id is defined
 
-    - name: Verify create NFS share
+    - name: 01_create_delete | Verify create NFS share
       ansible.builtin.assert:
         that:
           - result.changed
@@ -31,7 +21,7 @@
           - result.nfs.id is string
       when: nfs_vpc_id is defined
 
-    - name: Delete NFS share
+    - name: 01_create_delete | Delete NFS share
       digitalocean.cloud.nfs:
         token: "{{ digitalocean_token }}"
         state: absent
@@ -41,20 +31,9 @@
       register: delete_result
       when: nfs_vpc_id is defined and result is defined and result.nfs is defined
 
-    - name: Verify delete NFS share
+    - name: 01_create_delete | Verify delete NFS share
       ansible.builtin.assert:
         that:
           - delete_result.changed
           - delete_result.msg is string
       when: nfs_vpc_id is defined and delete_result is defined
-
-  always:
-    - name: Cleanup NFS share
-      digitalocean.cloud.nfs:
-        token: "{{ digitalocean_token }}"
-        state: absent
-        name: "{{ nfs_name }}"
-        region: "{{ nfs_region }}"
-        id: "{{ result.nfs.id | default('') }}"
-      when: result is defined and result.nfs is defined
-      ignore_errors: true

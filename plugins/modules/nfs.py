@@ -222,13 +222,30 @@ class NFS(DigitalOceanCommonModule):
                 status = nfs_share.get("status", "").upper()
                 if status == "ACTIVE":
                     break
+                if status == "ERROR":
+                    self.module.fail_json(
+                        changed=True,
+                        msg=f"NFS share {self.name} ({nfs_id}) entered ERROR state",
+                        nfs=nfs_share,
+                    )
                 time.sleep(DigitalOceanConstants.SLEEP)
                 try:
                     # get() requires region parameter
                     response = self.client.nfs.get(nfs_id=nfs_id, region=self.region)
                     nfs_share = response.get("share", response)
-                except DigitalOceanCommonModule.HttpResponseError:
-                    pass
+                except DigitalOceanCommonModule.HttpResponseError as err:
+                    # If get fails, log warning but continue polling
+                    error_msg = err.error.message if err.error else str(err)
+                    self.module.warn(f"Failed to fetch NFS share status: {error_msg}")
+
+            # Check final status after timeout
+            final_status = nfs_share.get("status", "").upper()
+            if final_status != "ACTIVE":
+                self.module.fail_json(
+                    changed=True,
+                    msg=f"NFS share {self.name} ({nfs_id}) did not become ACTIVE within {self.timeout} seconds (current status: {final_status})",
+                    nfs=nfs_share,
+                )
 
             self.module.exit_json(
                 changed=True,
@@ -291,14 +308,30 @@ class NFS(DigitalOceanCommonModule):
                 status = nfs_share.get("status", "").upper()
                 if status == "ACTIVE":
                     break
+                if status == "ERROR":
+                    self.module.fail_json(
+                        changed=False,
+                        msg=f"NFS share {self.name} ({nfs_id}) is in ERROR state",
+                        nfs=nfs_share,
+                    )
                 # Sleep before fetching updated status
                 time.sleep(DigitalOceanConstants.SLEEP)
                 try:
                     response = self.client.nfs.get(nfs_id=nfs_id, region=self.region)
                     nfs_share = response.get("share", response)
-                except DigitalOceanCommonModule.HttpResponseError:
-                    # If get fails, keep using existing data
-                    pass
+                except DigitalOceanCommonModule.HttpResponseError as err:
+                    # If get fails, log warning but continue polling
+                    error_msg = err.error.message if err.error else str(err)
+                    self.module.warn(f"Failed to fetch NFS share status: {error_msg}")
+
+            # Check final status after timeout
+            final_status = nfs_share.get("status", "").upper()
+            if final_status != "ACTIVE":
+                self.module.fail_json(
+                    changed=False,
+                    msg=f"NFS share {self.name} ({nfs_id}) did not become ACTIVE within {self.timeout} seconds (current status: {final_status})",
+                    nfs=nfs_share,
+                )
 
             self.module.exit_json(
                 changed=False,
