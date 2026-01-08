@@ -275,10 +275,18 @@ class DropletAutoscalePool(DigitalOceanCommonModule):
 
     def delete_autoscale_pool(self, pool):
         try:
-            self.client.autoscalepools.delete(autoscale_pool_id=pool["id"])
+            pool_id = pool["id"]
+            self.client.autoscalepools.delete(autoscale_pool_id=pool_id)
+
+            # Wait a short period to allow the deletion to propagate
+            # Deleting an autoscale pool with active Droplets triggers asynchronous cleanup
+            # of child resources, which can take considerable time (5-10+ minutes).
+            # We sleep briefly to allow the deletion to register, then return.
+            time.sleep(DigitalOceanConstants.SLEEP * 2)
+
             self.module.exit_json(
                 changed=True,
-                msg=f"Deleted Droplet Autoscale Pool {self.name} ({pool['id']})",
+                msg=f"Deleted Droplet Autoscale Pool {self.name} ({pool_id})",
                 droplet_autoscale_pool=pool,
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
