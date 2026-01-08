@@ -20,8 +20,8 @@
         state: present
         name: "{{ autoscale_pool_name }}"
         config:
-          min_instances: "{{ autoscale_min_instances | int }}"
-          max_instances: "{{ autoscale_max_instances | int }}"
+          min_instances: "{{ autoscale_min_instances }}"
+          max_instances: "{{ autoscale_max_instances }}"
           target_cpu_utilization: 0.5
           cooldown_minutes: 5
         droplet_template:

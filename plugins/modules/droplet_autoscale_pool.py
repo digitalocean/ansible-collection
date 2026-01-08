@@ -347,8 +347,30 @@ def main():
     argument_spec = DigitalOceanOptions.argument_spec()
     argument_spec.update(
         name=dict(type="str", required=True),
-        config=dict(type="dict", required=False),
-        droplet_template=dict(type="dict", required=False),
+        config=dict(
+            type="dict",
+            required=False,
+            options=dict(
+                min_instances=dict(type="int", required=False),
+                max_instances=dict(type="int", required=False),
+                target_cpu_utilization=dict(type="float", required=False),
+                target_memory_utilization=dict(type="float", required=False),
+                cooldown_minutes=dict(type="int", required=False),
+            ),
+        ),
+        droplet_template=dict(
+            type="dict",
+            required=False,
+            options=dict(
+                size=dict(type="str", required=False),
+                region=dict(type="str", required=False),
+                image=dict(type="str", required=False),
+                ssh_keys=dict(type="list", elements="str", required=False),
+                vpc_uuid=dict(type="str", required=False),
+                tags=dict(type="list", elements="str", required=False),
+                user_data=dict(type="str", required=False),
+            ),
+        ),
         id=dict(type="str", required=False),
     )
     module = AnsibleModule(
