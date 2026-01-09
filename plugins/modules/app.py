@@ -227,6 +227,8 @@ class App(DigitalOceanCommonModule):
             }
             app = self.client.apps.create(body=body)["app"]
 
+            app_id = app["id"]
+
             # Wait for the app to be deployed
             end_time = time.monotonic() + self.timeout
             while time.monotonic() < end_time:
@@ -242,11 +244,22 @@ class App(DigitalOceanCommonModule):
                     )
                 time.sleep(DigitalOceanConstants.SLEEP)
                 try:
-                    app = self.client.apps.get(id=app["id"])["app"]
+                    app = self.client.apps.get(id=app_id)["app"]
                 except DigitalOceanCommonModule.HttpResponseError:
                     pass
 
-            app_name = app.get("spec", {}).get("name", app["id"])
+            app_name = app.get("spec", {}).get("name", app_id)
+            final_phase = app.get("active_deployment", {}).get("phase", "").upper()
+            if final_phase != "ACTIVE":
+                self.module.fail_json(
+                    changed=True,
+                    msg=(
+                        f"App {app_name} did not become 'ACTIVE' "
+                        f"within {self.timeout} seconds (current phase: {final_phase})"
+                    ),
+                    app=app,
+                )
+
             self.module.exit_json(
                 changed=True,
                 msg=f"Created app {app_name}",

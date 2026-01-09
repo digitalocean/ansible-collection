@@ -194,6 +194,16 @@ class DatabaseReplica(DigitalOceanCommonModule):
                 time.sleep(DigitalOceanConstants.SLEEP)
                 replica = self.get_replica() or replica
 
+            if replica.get("status", "").lower() != "online":
+                self.module.fail_json(
+                    changed=True,
+                    msg=(
+                        f"Database replica {self.name} did not become 'online' "
+                        f"within {self.timeout} seconds (current status: {replica.get('status')})"
+                    ),
+                    replica=replica,
+                )
+
             self.module.exit_json(
                 changed=True,
                 msg=f"Created database replica {self.name}",

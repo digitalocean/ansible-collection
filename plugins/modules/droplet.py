@@ -430,18 +430,23 @@ class Droplet(DigitalOceanCommonModule):
                 body.update(self.module_override_options)
 
             droplet = self.client.droplets.create(body=body)["droplet"]
+            droplet_id = droplet["id"]
 
+            # Wait for the droplet to become active
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and droplet["status"] != "active":
+            while time.monotonic() < end_time:
+                status = droplet.get("status", "").lower()
+                if status == "active":
+                    break
                 time.sleep(DigitalOceanConstants.SLEEP)
-                droplet["status"] = self.get_droplet_by_id(droplet["id"])["status"]
+                droplet = self.get_droplet_by_id(droplet_id)
 
-            if droplet["status"] != "active":
+            if droplet.get("status", "").lower() != "active":
                 self.module.fail_json(
                     changed=True,
                     msg=(
-                        f"Created Droplet {droplet['name']} ({droplet['id']}) in {droplet['region']['slug']}"
-                        f" is not 'active', it is '{droplet['status']}'"
+                        f"Droplet {droplet['name']} ({droplet['id']}) in {droplet['region']['slug']}"
+                        f" did not become 'active' within {self.timeout} seconds (current status: {droplet['status']})"
                     ),
                     droplet=droplet,
                 )

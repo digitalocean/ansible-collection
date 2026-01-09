@@ -150,16 +150,27 @@ class FloatingIPAction(DigitalOceanCommonModule):
             action = self.client.reserved_ips_actions.post(
                 reserved_ip=self.ip, body=body
             )["action"]
+            action_id = action["id"]
 
+            # Wait for the action to complete
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and action["status"] != "completed":
+            while time.monotonic() < end_time:
+                status = action.get("status", "").lower()
+                if status == "completed":
+                    break
+                if status == "errored":
+                    self.module.fail_json(
+                        changed=True,
+                        msg=f"Floating IP {self.ip} assign action failed",
+                        action=action,
+                    )
                 time.sleep(DigitalOceanConstants.SLEEP)
-                action = self.get_floating_ip_action_by_id(action_id=action["id"])
+                action = self.get_floating_ip_action_by_id(action_id=action_id)
 
-            if action["status"] != "completed":
+            if action.get("status", "").lower() != "completed":
                 self.module.fail_json(
                     changed=True,
-                    msg=f"Floating IP {self.ip} assigned to Droplet {self.droplet_id} but action has not completed, status is '{action['status']}'",
+                    msg=f"Floating IP {self.ip} assign action did not complete within {self.timeout} seconds (current status: {action['status']})",
                     action=action,
                 )
 
@@ -196,16 +207,27 @@ class FloatingIPAction(DigitalOceanCommonModule):
             action = self.client.reserved_ips_actions.post(
                 reserved_ip=self.ip, body=body
             )["action"]
+            action_id = action["id"]
 
+            # Wait for the action to complete
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and action["status"] != "completed":
+            while time.monotonic() < end_time:
+                status = action.get("status", "").lower()
+                if status == "completed":
+                    break
+                if status == "errored":
+                    self.module.fail_json(
+                        changed=True,
+                        msg=f"Floating IP {self.ip} unassign action failed",
+                        action=action,
+                    )
                 time.sleep(DigitalOceanConstants.SLEEP)
-                action = self.get_floating_ip_action_by_id(action_id=action["id"])
+                action = self.get_floating_ip_action_by_id(action_id=action_id)
 
-            if action["status"] != "completed":
+            if action.get("status", "").lower() != "completed":
                 self.module.fail_json(
                     changed=True,
-                    msg=f"Floating IP {self.ip} unassigned but action has not completed, status is '{action['status']}'",
+                    msg=f"Floating IP {self.ip} unassign action did not complete within {self.timeout} seconds (current status: {action['status']})",
                     action=action,
                 )
 

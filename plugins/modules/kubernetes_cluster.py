@@ -320,22 +320,29 @@ class KubernetesCluster(DigitalOceanCommonModule):
                     kubernetes_cluster=kubernetes_cluster,
                 )
 
+            # Wait for the cluster to become running
             end_time = time.monotonic() + self.timeout
-            status = kubernetes_cluster.get("status", {})
-            state = status.get("state", "unknown")
-            while time.monotonic() < end_time and state != "running":
+            while time.monotonic() < end_time:
+                status = kubernetes_cluster.get("status", {})
+                state = status.get("state", "").lower()
+                if state == "running":
+                    break
+                if state in ("error", "degraded"):
+                    self.module.fail_json(
+                        changed=True,
+                        msg=f"Kubernetes cluster {self.name} ({cluster_id}) entered {state} state",
+                        kubernetes_cluster=kubernetes_cluster,
+                    )
                 time.sleep(DigitalOceanConstants.SLEEP)
-                refreshed_cluster = self.get_kubernetes_cluster_by_id(cluster_id)
-                status = refreshed_cluster.get("status", {})
-                state = status.get("state", "unknown")
-                kubernetes_cluster = refreshed_cluster
+                kubernetes_cluster = self.get_kubernetes_cluster_by_id(cluster_id)
 
-            if state != "running":
+            final_state = kubernetes_cluster.get("status", {}).get("state", "").lower()
+            if final_state != "running":
                 self.module.fail_json(
                     changed=True,
                     msg=(
-                        f"Created Kubernetes cluster {self.name} ({cluster_id}) in {self.region}"
-                        f" is not 'running', it is '{state}'"
+                        f"Kubernetes cluster {self.name} ({cluster_id}) in {self.region}"
+                        f" did not become 'running' within {self.timeout} seconds (current state: {final_state})"
                     ),
                     kubernetes_cluster=kubernetes_cluster,
                 )
