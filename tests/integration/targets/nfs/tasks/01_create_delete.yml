@@ -10,6 +10,7 @@
         size_gib: "{{ nfs_size_gib }}"
         vpc_ids:
           - "{{ nfs_vpc_id }}"
+        timeout: 600
       register: result
       when: nfs_vpc_id is defined
 
