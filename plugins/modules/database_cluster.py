@@ -284,20 +284,23 @@ class DatabaseCluster(DigitalOceanCommonModule):
                 "backup_restore": self.backup_restore,
             }
             database = self.client.databases.create_cluster(body=body)["database"]
+            database_id = database["id"]
 
+            # Wait for the database cluster to become online
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and database["status"] != "online":
+            while time.monotonic() < end_time:
+                status = database.get("status", "").lower()
+                if status == "online":
+                    break
                 time.sleep(DigitalOceanConstants.SLEEP)
-                database["status"] = self.get_database_cluster_by_id(database["id"])[
-                    "status"
-                ]
+                database = self.get_database_cluster_by_id(database_id)
 
-            if database["status"] != "online":
+            if database.get("status", "").lower() != "online":
                 self.module.fail_json(
                     changed=True,
                     msg=(
-                        f"Created database cluster {database['name']} ({database['id']}) in {database['region']}"
-                        f" is not 'online', it is '{database['status']}'"
+                        f"Database cluster {database['name']} ({database['id']}) in {database['region']}"
+                        f" did not become 'online' within {self.timeout} seconds (current status: {database['status']})"
                     ),
                     database=database,
                 )
