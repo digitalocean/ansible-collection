@@ -217,7 +217,9 @@ class NFS(DigitalOceanCommonModule):
                 )
 
             # Wait for the NFS share to become active
+            # NFS API has eventual consistency - share may not be queryable immediately
             end_time = time.monotonic() + self.timeout
+            last_valid_share = nfs_share  # Keep track of last valid share response
             while time.monotonic() < end_time:
                 status = nfs_share.get("status", "").upper()
                 if status == "ACTIVE":
@@ -232,13 +234,25 @@ class NFS(DigitalOceanCommonModule):
                 try:
                     # get() requires region parameter
                     response = self.client.nfs.get(nfs_id=nfs_id, region=self.region)
+                    # Check if response is an error (API may return 200 with error payload)
+                    if (
+                        response.get("code")
+                        or response.get("message") == "share not found"
+                    ):
+                        self.module.warn(
+                            f"NFS share {nfs_id} not found during polling, continuing..."
+                        )
+                        # Don't update nfs_share - keep last valid response
+                        continue
                     nfs_share = response.get("share", response)
+                    last_valid_share = nfs_share
                 except DigitalOceanCommonModule.HttpResponseError as err:
                     # If get fails, log warning but continue polling
                     error_msg = err.error.message if err.error else str(err)
                     self.module.warn(f"Failed to fetch NFS share status: {error_msg}")
 
-            # Check final status after timeout
+            # Use last valid share for final status check
+            nfs_share = last_valid_share
             final_status = nfs_share.get("status", "").upper()
             if final_status != "ACTIVE":
                 self.module.fail_json(
@@ -303,7 +317,9 @@ class NFS(DigitalOceanCommonModule):
             nfs_id = nfs_share.get("id")
 
             # Wait for the NFS share to become active if it's still creating
+            # NFS API has eventual consistency - share may not be queryable immediately
             end_time = time.monotonic() + self.timeout
+            last_valid_share = nfs_share  # Keep track of last valid share response
             while time.monotonic() < end_time:
                 status = nfs_share.get("status", "").upper()
                 if status == "ACTIVE":
@@ -318,13 +334,25 @@ class NFS(DigitalOceanCommonModule):
                 time.sleep(DigitalOceanConstants.SLEEP)
                 try:
                     response = self.client.nfs.get(nfs_id=nfs_id, region=self.region)
+                    # Check if response is an error (API may return 200 with error payload)
+                    if (
+                        response.get("code")
+                        or response.get("message") == "share not found"
+                    ):
+                        self.module.warn(
+                            f"NFS share {nfs_id} not found during polling, continuing..."
+                        )
+                        # Don't update nfs_share - keep last valid response
+                        continue
                     nfs_share = response.get("share", response)
+                    last_valid_share = nfs_share
                 except DigitalOceanCommonModule.HttpResponseError as err:
                     # If get fails, log warning but continue polling
                     error_msg = err.error.message if err.error else str(err)
                     self.module.warn(f"Failed to fetch NFS share status: {error_msg}")
 
-            # Check final status after timeout
+            # Use last valid share for final status check
+            nfs_share = last_valid_share
             final_status = nfs_share.get("status", "").upper()
             if final_status != "ACTIVE":
                 self.module.fail_json(
