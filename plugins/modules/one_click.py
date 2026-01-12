@@ -113,7 +113,7 @@ class OneClickApplication(DigitalOceanCommonModule):
             )
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
-                "Message": err.error.message,
+                "Message": err.error.message if err.error else str(err),
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }

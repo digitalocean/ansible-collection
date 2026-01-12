@@ -1,0 +1,12 @@
+---
+- name: 01_info | Get database_connection_pools_info
+  digitalocean.cloud.database_connection_pools_info:
+    token: "{{ digitalocean_token }}"
+    cluster_id: "{ database_cluster_id }"
+  register: result
+
+- name: 01_info | Verify database_connection_pools_info result
+  ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.msg is string

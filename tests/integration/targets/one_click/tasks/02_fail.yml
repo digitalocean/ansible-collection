@@ -16,8 +16,7 @@
         that:
           - not result.changed
           - result.failed
-          # NOTE: It feels like the DO API should be a bit more helpful when the cluster UUID is not found
-          - result.msg == "Server Error"
-          - result.error.Message == "Server Error"
-          - result.error.Reason == "Internal Server Error"
-          - result["error"]["Status Code"] == 500
+          - result.msg is search("could not find cluster")
+          - result.error.Message is search("could not find cluster")
+          - result.error.Reason == "Not Found"
+          - result["error"]["Status Code"] == 404

@@ -1,0 +1,37 @@
+---
+- block:
+    - name: Create floating IP
+      digitalocean.cloud.floating_ip:
+        token: "{{ digitalocean_token }}"
+        state: present
+        region: "{{ floating_ip_region }}"
+      register: result
+
+    - name: Verify create floating IP
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+          - result.floating_ip.ip is string
+
+    - name: Delete floating IP
+      digitalocean.cloud.floating_ip:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        ip: "{{ result.floating_ip.ip }}"
+      register: delete_result
+
+    - name: Verify delete floating IP
+      ansible.builtin.assert:
+        that:
+          - delete_result.changed
+          - delete_result.msg is string
+
+  always:
+    - name: Cleanup floating IP
+      digitalocean.cloud.floating_ip:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        ip: "{{ result.floating_ip.ip | default('') }}"
+      when: result is defined and result.floating_ip is defined
+      ignore_errors: true

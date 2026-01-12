@@ -253,18 +253,29 @@ class DropletActionPower(DigitalOceanCommonModule):
             action = self.client.droplet_actions.post(
                 droplet_id=self.droplet["id"], body=body
             )["action"]
+            action_id = action["id"]
 
+            # Wait for the action to complete
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and action["status"] != "completed":
+            while time.monotonic() < end_time:
+                status = action.get("status", "").lower()
+                if status == "completed":
+                    break
+                if status == "errored":
+                    self.module.fail_json(
+                        changed=True,
+                        msg=f"Droplet {self.droplet['name']} ({self.droplet['id']}) power_off action failed",
+                        action=action,
+                    )
                 time.sleep(DigitalOceanConstants.SLEEP)
-                action = self.get_action_by_id(action_id=action["id"])
+                action = self.get_action_by_id(action_id=action_id)
 
-            if action["status"] != "completed":
+            if action.get("status", "").lower() != "completed":
                 self.module.fail_json(
                     changed=True,
                     msg=(
                         f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']}"
-                        f" sent action '{self.type}' and it has not completed, status is '{action['status']}'"
+                        f" action '{self.type}' did not complete within {self.timeout} seconds (current status: {action['status']})"
                     ),
                     action=action,
                 )
@@ -292,18 +303,29 @@ class DropletActionPower(DigitalOceanCommonModule):
             action = self.client.droplet_actions.post(
                 droplet_id=self.droplet["id"], body=body
             )["action"]
+            action_id = action["id"]
 
+            # Wait for the action to complete
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and action["status"] != "completed":
+            while time.monotonic() < end_time:
+                status = action.get("status", "").lower()
+                if status == "completed":
+                    break
+                if status == "errored":
+                    self.module.fail_json(
+                        changed=True,
+                        msg=f"Droplet {self.droplet['name']} ({self.droplet['id']}) power_on action failed",
+                        action=action,
+                    )
                 time.sleep(DigitalOceanConstants.SLEEP)
-                action = self.get_action_by_id(action_id=action["id"])
+                action = self.get_action_by_id(action_id=action_id)
 
-            if action["status"] != "completed":
+            if action.get("status", "").lower() != "completed":
                 self.module.fail_json(
                     changed=True,
                     msg=(
                         f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']}"
-                        f" sent action '{self.type}' and it has not completed, status is '{action['status']}'"
+                        f" action '{self.type}' did not complete within {self.timeout} seconds (current status: {action['status']})"
                     ),
                     action=action,
                 )
@@ -331,13 +353,24 @@ class DropletActionPower(DigitalOceanCommonModule):
             action = self.client.droplet_actions.post(
                 droplet_id=self.droplet["id"], body=body
             )["action"]
+            action_id = action["id"]
 
+            # Wait for the action to complete
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and action["status"] != "completed":
+            while time.monotonic() < end_time:
+                status = action.get("status", "").lower()
+                if status == "completed":
+                    break
+                if status == "errored":
+                    self.module.fail_json(
+                        changed=True,
+                        msg=f"Droplet {self.droplet['name']} ({self.droplet['id']}) shutdown action failed",
+                        action=action,
+                    )
                 time.sleep(DigitalOceanConstants.SLEEP)
-                action = self.get_action_by_id(action_id=action["id"])
+                action = self.get_action_by_id(action_id=action_id)
 
-            if action["status"] != "completed":
+            if action.get("status", "").lower() != "completed":
                 if self.force_power_off:
                     self.power_off()
 
@@ -345,7 +378,7 @@ class DropletActionPower(DigitalOceanCommonModule):
                     changed=True,
                     msg=(
                         f"Droplet {self.droplet['name']} ({self.droplet['id']}) in {self.droplet['region']['slug']}"
-                        f" sent action '{self.type}' and it has not completed, status is '{action['status']}'"
+                        f" action '{self.type}' did not complete within {self.timeout} seconds (current status: {action['status']})"
                     ),
                     action=action,
                 )

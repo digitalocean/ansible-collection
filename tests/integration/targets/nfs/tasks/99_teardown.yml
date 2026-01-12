@@ -1,0 +1,10 @@
+---
+- name: 99_teardown | Testing block
+  block:
+    - name: 99_teardown | Cleanup NFS share | Leftover from unexpected failure
+      digitalocean.cloud.nfs:
+        state: absent
+        token: "{{ digitalocean_token }}"
+        name: "{{ nfs_name }}"
+        region: "{{ nfs_region }}"
+      ignore_errors: true  # noqa ignore-errors

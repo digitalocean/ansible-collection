@@ -303,6 +303,7 @@ class DigitalOceanCommonModule(DigitalOceanReqs):
             self.client_options.update(**self.client_override_options)
         self.client = DigitalOceanReqs.Client(**self.client_options)
         self.state = module.params.get("state")
+        self.timeout = module.params.get("timeout")
 
     def get_action_by_id(self, action_id):
         """Get an action by its ID from the DigitalOcean API."""

@@ -1,0 +1,12 @@
+---
+- name: 00_setup | Create VPC
+  digitalocean.cloud.vpc:
+    token: "{{ digitalocean_token }}"
+    state: present
+    name: "{{ vpc_name }}"
+    region: "{{ vpc_region }}"
+  register: vpc_result
+
+- name: 00_setup | Set VPC UUID
+  ansible.builtin.set_fact:
+    vpc_uuid: "{{ vpc_result.vpc.id }}"

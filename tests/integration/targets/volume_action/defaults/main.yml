@@ -1,8 +1,8 @@
-volume_name: "ansible-gh-ci-volume-5-{{ pr_number }}"
+volume_name: "ansible-gh-ci-volume-5-{{ pr_number | default(0, true) }}"
 volume_region: nyc3
 volume_size_gigabytes: 1
 
-droplet_name: "ansible-gh-ci-droplet-5-{{ pr_number }}"
+droplet_name: "ansible-gh-ci-droplet-5-{{ pr_number | default(0, true) }}"
 droplet_region: nyc3
 droplet_size: s-1vcpu-2gb
 droplet_image: ubuntu-22-04-x64

@@ -1,0 +1,27 @@
+---
+- name: 01_create_delete | Create VPC peering
+  digitalocean.cloud.vpc_peering:
+    token: "{{ digitalocean_token }}"
+    state: present
+    name: "{{ vpc_peering_name }}"
+    vpc_ids: "{{ vpc_ids }}"
+  register: result
+
+- name: 01_create_delete | Verify create VPC peering
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string
+
+- name: 01_create_delete | Delete VPC peering
+  digitalocean.cloud.vpc_peering:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    name: "{{ vpc_peering_name }}"
+  register: result
+
+- name: 01_create_delete | Verify delete VPC peering
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string

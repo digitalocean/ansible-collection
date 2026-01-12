@@ -1,0 +1,8 @@
+---
+- name: 99_teardown | Delete Kubernetes cluster
+  digitalocean.cloud.kubernetes_cluster:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    name: "{{ kubernetes_cluster_name }}"
+    region: "{{ kubernetes_region }}"
+  ignore_errors: true

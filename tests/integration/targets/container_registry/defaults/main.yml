@@ -1,0 +1,4 @@
+---
+registry_name: "ansible-gh-ci-registry-{{ pr_number | default(0, true) }}"
+registry_tier: basic
+registry_region: nyc3

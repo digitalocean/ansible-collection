@@ -1,0 +1,44 @@
+---
+- block:
+    - name: Verify API token
+      ansible.builtin.assert:
+        that:
+          - digitalocean_token is string
+          - digitalocean_token | length > 0
+        fail_msg: digitalocean_token should be defined in tests/integration/integration_config.yml
+
+    - name: Create custom image for action test
+      digitalocean.cloud.image:
+        token: "{{ digitalocean_token }}"
+        state: present
+        name: "{{ image_name }}"
+        url: "{{ image_url }}"
+        region: "{{ image_region }}"
+        distribution: "{{ image_distribution }}"
+        description: "{{ image_description }}"
+        timeout: 600
+      register: image_result
+
+    - name: Verify image created
+      ansible.builtin.assert:
+        that:
+          - image_result.changed or not image_result.changed
+          - image_result.image.id is defined
+
+    - name: Set image ID
+      ansible.builtin.set_fact:
+        image_id: "{{ image_result.image.id }}"
+
+    - name: Test image action | Transfer image
+      ansible.builtin.include_tasks:
+        file: 01_action.yml
+
+  always:
+    - name: Cleanup custom image
+      digitalocean.cloud.image:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        name: "{{ image_name }}"
+        id: "{{ image_id | default(0) }}"
+      when: image_id is defined
+      ignore_errors: true

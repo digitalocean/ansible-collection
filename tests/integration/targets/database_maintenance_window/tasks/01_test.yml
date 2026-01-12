@@ -1,0 +1,15 @@
+---
+- name: 01_test | Update maintenance window
+  digitalocean.cloud.database_maintenance_window:
+    token: "{{ digitalocean_token }}"
+    state: present
+    cluster_id: "{{ database_cluster_id }}"
+    day: sunday
+    hour: "03:00"
+  register: result
+
+- name: 01_test | Verify maintenance window update
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg == "Updated database maintenance window"

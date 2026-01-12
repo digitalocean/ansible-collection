@@ -1,2 +1,6 @@
-endpoint: ansible-gh-ci-space-0.nyc3.cdn.digitaloceanspaces.com
-origin: ansible-gh-ci-space-0.nyc3.digitaloceanspaces.com
+---
+spaces_tld: digitaloceanspaces.com
+space_name: "ansible-gh-ci-cdn-space-{{ pr_number | default(0, true) }}"
+space_region: nyc3
+origin: "{{ space_name }}.{{ space_region }}.{{ spaces_tld }}"
+endpoint: "{{ space_name }}.{{ space_region }}.cdn.{{ spaces_tld }}"

@@ -1,0 +1,29 @@
+---
+- name: 01_assign_unassign | Assign reserved IPv6
+  digitalocean.cloud.reserved_ipv6_action:
+    token: "{{ digitalocean_token }}"
+    state: present
+    ip: "{{ reserved_ipv6 }}"
+    type: assign
+    droplet_id: "{{ droplet_id }}"
+  register: result
+
+- name: 01_assign_unassign | Verify assign
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string
+
+- name: 01_assign_unassign | Unassign reserved IPv6
+  digitalocean.cloud.reserved_ipv6_action:
+    token: "{{ digitalocean_token }}"
+    state: present
+    ip: "{{ reserved_ipv6 }}"
+    type: unassign
+  register: result
+
+- name: 01_assign_unassign | Verify unassign
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string

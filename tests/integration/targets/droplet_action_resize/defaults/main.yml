@@ -1,4 +1,4 @@
-droplet_name: "ansible-gh-ci-droplet-8-{{ pr_number }}"
+droplet_name: "ansible-gh-ci-droplet-8-{{ pr_number | default(0, true) }}"
 droplet_region: nyc3
 droplet_size: s-1vcpu-2gb
 droplet_bigger_size: s-2vcpu-4gb

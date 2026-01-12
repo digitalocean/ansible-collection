@@ -6,6 +6,6 @@
       digitalocean.cloud.kubernetes_cluster:
         state: absent
         token: "{{ digitalocean_token }}"
-        name: "{{ kubernetes_cluster.name }}"
-        region: "{{ kubernetes_cluster.region }}"
+        name: "{{ kubernetes_cluster_name }}"
+        region: "{{ kubernetes_region }}"
       ignore_errors: true  # noqa ignore-errors

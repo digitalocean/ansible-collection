@@ -1,0 +1,5 @@
+---
+vpc_name: "ansible-gh-ci-vpc-nat-{{ pr_number | default(0, true) }}"
+vpc_region: nyc3
+nat_gateway_name: "ansible-gh-ci-nat-{{ pr_number | default(0, true) }}"
+nat_gateway_size: 1

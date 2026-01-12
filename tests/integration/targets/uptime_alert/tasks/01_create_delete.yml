@@ -1,0 +1,35 @@
+---
+- name: 01_create_delete | Create uptime alert
+  digitalocean.cloud.uptime_alert:
+    token: "{{ digitalocean_token }}"
+    state: present
+    check_id: "{{ check_id }}"
+    name: "{{ alert_name }}"
+    type: "{{ alert_type }}"
+    threshold: "{{ alert_threshold }}"
+    comparison: "{{ alert_comparison }}"
+    notifications:
+      email:
+        - "{{ account_email }}"
+    period: "{{ alert_period }}"
+  register: result
+
+- name: 01_create_delete | Verify create alert
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string
+
+- name: 01_create_delete | Delete uptime alert
+  digitalocean.cloud.uptime_alert:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    check_id: "{{ check_id }}"
+    name: "{{ alert_name }}"
+  register: result
+
+- name: 01_create_delete | Verify delete alert
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string

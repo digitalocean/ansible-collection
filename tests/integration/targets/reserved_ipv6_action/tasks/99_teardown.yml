@@ -1,0 +1,18 @@
+---
+- name: 99_teardown | Delete reserved IPv6
+  digitalocean.cloud.reserved_ipv6:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    region: "{{ droplet_region }}"
+    ip: "{{ reserved_ipv6 | default('') }}"
+  when: reserved_ipv6 is defined
+  ignore_errors: true
+
+- name: 99_teardown | Delete Droplet
+  digitalocean.cloud.droplet:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    name: "{{ droplet_name }}"
+    region: "{{ droplet_region }}"
+    unique_name: true
+  ignore_errors: true

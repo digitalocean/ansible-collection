@@ -1,0 +1,16 @@
+---
+- name: 99_teardown | Delete Droplet
+  digitalocean.cloud.droplet:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    name: "{{ droplet_name }}"
+    region: "{{ droplet_region }}"
+    unique_name: true
+  ignore_errors: true
+
+- name: 99_teardown | Delete project
+  digitalocean.cloud.project:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    name: "{{ project_name }}"
+  ignore_errors: true

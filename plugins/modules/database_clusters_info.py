@@ -56,25 +56,25 @@ databases:
       engine: pg
       version: 10
       connection:
-        uri: 'postgres://doadmin:wv78n3zpz42xezdk@backend-do-user-19081923-0.db.ondigitalocean.com:25060/defaultdb?sslmode=require'
+        uri: 'postgres://doadmin:example-password@backend-do-user-19081923-0.db.ondigitalocean.com:25060/defaultdb?sslmode=require'
         database: ""
         host: backend-do-user-19081923-0.db.ondigitalocean.com
         port: 25060,
         user: doadmin
-        password: wv78n3zpz42xezdk
+        password: example-password
         ssl: true
       private_connection:
-        uri: 'postgres://doadmin:wv78n3zpz42xezdk@private-backend-do-user-19081923-0.db.ondigitalocean.com:25060/defaultdb?sslmode=require'
+        uri: 'postgres://doadmin:example-password@private-backend-do-user-19081923-0.db.ondigitalocean.com:25060/defaultdb?sslmode=require'
         database: ""
         host: private-backend-do-user-19081923-0.db.ondigitalocean.com
         port: 25060
         user: doadmin
-        password: wv78n3zpz42xezdk
+        password: example-password
         ssl: true
       users:
         - name: doadmin
           role: primary
-          password: wv78n3zpz42xezdk
+          password: example-password
       db_names:
         - defaultdb
       num_nodes: 1

@@ -1,0 +1,22 @@
+---
+- name: 00_setup | Create VPC A
+  digitalocean.cloud.vpc:
+    token: "{{ digitalocean_token }}"
+    state: present
+    name: "{{ vpc_name_a }}"
+    region: "{{ vpc_region }}"
+  register: vpc_a_result
+
+- name: 00_setup | Create VPC B
+  digitalocean.cloud.vpc:
+    token: "{{ digitalocean_token }}"
+    state: present
+    name: "{{ vpc_name_b }}"
+    region: "{{ vpc_region }}"
+  register: vpc_b_result
+
+- name: 00_setup | Set VPC IDs
+  ansible.builtin.set_fact:
+    vpc_ids:
+      - "{{ vpc_a_result.vpc.id }}"
+      - "{{ vpc_b_result.vpc.id }}"

@@ -1,0 +1,17 @@
+---
+- name: 00_setup | Verify API token
+  ansible.builtin.assert:
+    that:
+      - digitalocean_token is string
+      - digitalocean_token | length > 0
+    fail_msg: digitalocean_token should be defined in tests/integration/integration_config.yml
+
+- name: 00_setup | Get VPCs
+  digitalocean.cloud.vpcs_info:
+    token: "{{ digitalocean_token }}"
+  register: vpcs_result
+
+- name: 00_setup | Set VPC ID for NFS region
+  ansible.builtin.set_fact:
+    nfs_vpc_id: "{{ vpcs_result.vpcs | selectattr('region', 'equalto', nfs_region) | map(attribute='id') | first }}"
+  when: vpcs_result.vpcs | selectattr('region', 'equalto', nfs_region) | list | length > 0

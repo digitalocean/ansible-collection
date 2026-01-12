@@ -1,0 +1,19 @@
+---
+- name: 01_resize | Resize NFS share
+  digitalocean.cloud.nfs_action:
+    token: "{{ digitalocean_token }}"
+    state: present
+    nfs_id: "{{ nfs_id }}"
+    region: "{{ nfs_region }}"
+    type: resize
+    size_gib: "{{ nfs_resize_size_gib }}"
+    timeout: 900
+  register: result
+  when: nfs_id is defined
+
+- name: 01_resize | Verify resize action
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string
+  when: nfs_id is defined

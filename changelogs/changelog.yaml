@@ -441,3 +441,242 @@ releases:
       name: project_resources
       namespace: ''
     release_date: '2025-12-18'
+  1.9.0:
+    changes:
+      bugfixes:
+      - droplet_autoscale_pool - integration test now creates an SSH key and includes
+        it in the droplet_template.ssh_keys parameter, fixing the "ssh_keys is required"
+        API error (https://github.com/digitalocean/ansible-collection/issues/280).
+      - function_namespace - fixed KeyError when creating a namespace by using defensive
+        response handling for the API response structure (https://github.com/digitalocean/ansible-collection/issues/281).
+      - kubernetes_cluster - fixed KeyError when creating or getting a cluster by
+        using defensive response handling for the API response structure (https://github.com/digitalocean/ansible-collection/issues/282).
+      - nfs - fixed KeyError when creating or getting an NFS share by using defensive
+        response handling for the API response structure (https://github.com/digitalocean/ansible-collection/issues/283).
+      - tests - update pydo version from 0.1.7 to 0.23.0 and azure-core from 1.26.1
+        to 1.36.0 in test requirements to fix CI failures for modules using newer
+        PyDO API attributes.
+      - tests - update pydo version from 0.1.7 to 0.23.0 in test requirements to fix
+      - vpc_nat_gateway - fixed API request body structure to match current DigitalOcean
+        API. The vpc_uuid is now sent in a vpcs array, type is set to PUBLIC, and
+        size is now an integer instead of a string (https://github.com/digitalocean/ansible-collection/issues/284).
+      minor_changes:
+      - actions_info - new module to list account actions history.
+      - app - new module to manage App Platform applications.
+      - apps_info - new module to list App Platform applications.
+      - byoip_prefix - new module to manage BYOIP prefixes.
+      - byoip_prefixes_info - new module to list BYOIP prefixes.
+      - container_registry - new module to manage container registries.
+      - database_backups_info - new module to list database cluster backups.
+      - database_config - new module to configure database cluster settings.
+      - database_config_info - new module to get database cluster configuration.
+      - database_connection_pool - new module to manage database connection pools.
+      - database_connection_pools_info - new module to list database connection pools.
+      - database_db - new module to manage databases within a cluster.
+      - database_dbs_info - new module to list databases in a cluster.
+      - database_firewall - new module to manage database firewall rules.
+      - database_firewall_rules_info - new module to list database firewall rules.
+      - database_maintenance_window - new module to configure database maintenance
+        windows.
+      - database_replica - new module to manage database read replicas.
+      - database_replicas_info - new module to list database replicas.
+      - database_user - new module to manage database users.
+      - database_users_info - new module to list database users.
+      - droplet_autoscale_pool - new module to manage Droplet autoscale pools.
+      - droplet_autoscale_pools_info - new module to list Droplet autoscale pools.
+      - droplet_backups_info - new module to list Droplet backups.
+      - droplet_kernels_info - new module to list available Droplet kernels.
+      - droplet_neighbors_info - new module to list Droplet neighbors.
+      - droplet_snapshots_info - new module to list Droplet snapshots.
+      - floating_ip - new module to manage floating IPs (legacy compatibility).
+      - floating_ip_action - new module to assign/unassign floating IPs (legacy compatibility).
+      - floating_ips_info - new module to list floating IPs (legacy compatibility).
+      - function_namespace - new module to manage Functions namespaces.
+      - function_namespaces_info - new module to list Functions namespaces.
+      - image - new module to manage custom images.
+      - image_action - new module to perform image actions (transfer, convert).
+      - invoice_items_info - new module to get invoice line items.
+      - invoices_info - new module to list account invoices.
+      - kubernetes_node_pool - new module to manage Kubernetes node pools.
+      - kubernetes_node_pools_info - new module to list Kubernetes node pools.
+      - nfs - new module to manage NFS file systems.
+      - nfs_action - new module to perform NFS actions (resize).
+      - nfs_info - new module to list NFS file systems.
+      - project_resource - new module to assign resources to projects.
+      - reserved_ipv6 - new module to manage reserved IPv6 addresses.
+      - reserved_ipv6_action - new module to assign/unassign reserved IPv6.
+      - reserved_ipv6s_info - new module to list reserved IPv6 addresses.
+      - spaces_key - new module to manage Spaces access keys.
+      - spaces_keys_info - new module to list Spaces access keys.
+      - uptime_alert - new module to manage uptime check alerts.
+      - uptime_alerts_info - new module to list uptime check alerts.
+      - vpc_nat_gateway - new module to manage VPC NAT gateways.
+      - vpc_nat_gateways_info - new module to list VPC NAT gateways.
+      - vpc_peering - new module to manage VPC peerings.
+      - vpc_peerings_info - new module to list VPC peerings.
+    fragments:
+    - add-api-coverage-modules.yml
+    - droplet-autoscale-pool-integration-test-ssh-keys.yml
+    - fix-pydo-version.yml
+    - function-namespace-keyerror.yml
+    - kubernetes-cluster-keyerror.yml
+    - nfs-keyerror.yml
+    - vpc-nat-gateway-api-fix.yml
+    modules:
+    - description: List all actions that have been executed on your account
+      name: actions_info
+      namespace: ''
+    - description: Create or delete App Platform applications
+      name: app
+      namespace: ''
+    - description: List all App Platform applications on your account
+      name: apps_info
+      namespace: ''
+    - description: Manage Bring Your Own IP (BYOIP) prefixes
+      name: byoip_prefix
+      namespace: ''
+    - description: List all BYOIP prefixes on your account
+      name: byoip_prefixes_info
+      namespace: ''
+    - description: Create or delete container registry
+      name: container_registry
+      namespace: ''
+    - description: List all backups for a database cluster
+      name: database_backups_info
+      namespace: ''
+    - description: Configure database cluster settings
+      name: database_config
+      namespace: ''
+    - description: Get database cluster configuration
+      name: database_config_info
+      namespace: ''
+    - description: Create or delete database connection pools
+      name: database_connection_pool
+      namespace: ''
+    - description: List all connection pools for a database cluster
+      name: database_connection_pools_info
+      namespace: ''
+    - description: Create or delete databases within a cluster
+      name: database_db
+      namespace: ''
+    - description: List all databases within a cluster
+      name: database_dbs_info
+      namespace: ''
+    - description: Manage database cluster firewall rules
+      name: database_firewall
+      namespace: ''
+    - description: List database cluster firewall rules
+      name: database_firewall_rules_info
+      namespace: ''
+    - description: Configure database cluster maintenance window
+      name: database_maintenance_window
+      namespace: ''
+    - description: Create or delete database read-only replicas
+      name: database_replica
+      namespace: ''
+    - description: List all read-only replicas for a database cluster
+      name: database_replicas_info
+      namespace: ''
+    - description: Create or delete database users
+      name: database_user
+      namespace: ''
+    - description: List all database users in a cluster
+      name: database_users_info
+      namespace: ''
+    - description: Create or delete Droplet Autoscale Pools
+      name: droplet_autoscale_pool
+      namespace: ''
+    - description: List all Droplet Autoscale Pools on your account
+      name: droplet_autoscale_pools_info
+      namespace: ''
+    - description: List backups for a Droplet
+      name: droplet_backups_info
+      namespace: ''
+    - description: List available kernels for a Droplet
+      name: droplet_kernels_info
+      namespace: ''
+    - description: List Droplet neighbors
+      name: droplet_neighbors_info
+      namespace: ''
+    - description: List snapshots for a Droplet
+      name: droplet_snapshots_info
+      namespace: ''
+    - description: Create or delete floating IPs (legacy)
+      name: floating_ip
+      namespace: ''
+    - description: Assign or unassign a floating IP to a Droplet (legacy)
+      name: floating_ip_action
+      namespace: ''
+    - description: List all floating IPs on your account (legacy)
+      name: floating_ips_info
+      namespace: ''
+    - description: Create or delete Functions namespaces
+      name: function_namespace
+      namespace: ''
+    - description: List all Functions namespaces on your account
+      name: function_namespaces_info
+      namespace: ''
+    - description: Manage custom images
+      name: image
+      namespace: ''
+    - description: Perform actions on images
+      name: image_action
+      namespace: ''
+    - description: Get invoice items by UUID
+      name: invoice_items_info
+      namespace: ''
+    - description: List account invoices
+      name: invoices_info
+      namespace: ''
+    - description: Create, update, or delete Kubernetes node pools
+      name: kubernetes_node_pool
+      namespace: ''
+    - description: List all node pools in a Kubernetes cluster
+      name: kubernetes_node_pools_info
+      namespace: ''
+    - description: Create or delete NFS file shares
+      name: nfs
+      namespace: ''
+    - description: Perform actions on NFS file shares
+      name: nfs_action
+      namespace: ''
+    - description: List all NFS file shares on your account
+      name: nfs_info
+      namespace: ''
+    - description: Assign or remove resources from a project
+      name: project_resource
+      namespace: ''
+    - description: Create or delete reserved IPv6 addresses
+      name: reserved_ipv6
+      namespace: ''
+    - description: Assign or unassign a reserved IPv6 address to a Droplet
+      name: reserved_ipv6_action
+      namespace: ''
+    - description: List all reserved IPv6 addresses on your account
+      name: reserved_ipv6s_info
+      namespace: ''
+    - description: Create or delete Spaces access keys
+      name: spaces_key
+      namespace: ''
+    - description: List all Spaces access keys on your account
+      name: spaces_keys_info
+      namespace: ''
+    - description: Create or delete uptime check alerts
+      name: uptime_alert
+      namespace: ''
+    - description: List all alerts for an uptime check
+      name: uptime_alerts_info
+      namespace: ''
+    - description: Create or delete VPC NAT Gateways
+      name: vpc_nat_gateway
+      namespace: ''
+    - description: List all VPC NAT Gateways on your account
+      name: vpc_nat_gateways_info
+      namespace: ''
+    - description: Create or delete VPC Peerings
+      name: vpc_peering
+      namespace: ''
+    - description: List all VPC Peerings on your account
+      name: vpc_peerings_info
+      namespace: ''
+    release_date: '2026-01-05'

@@ -1,0 +1,42 @@
+---
+- block:
+
+    - name: Verify API token
+      ansible.builtin.assert:
+        that:
+          - digitalocean_token is string
+          - digitalocean_token | length > 0
+        fail_msg: digitalocean_token should be defined in tests/integration/integration_config.yml
+
+    - name: Get invoices
+      digitalocean.cloud.invoices_info:
+        token: "{{ digitalocean_token }}"
+      register: invoices_result
+
+    - name: Check if invoices exist
+      ansible.builtin.set_fact:
+        skip_invoice_items_test: "{{ invoices_result.invoices | length == 0 }}"
+
+    - name: Skip message
+      ansible.builtin.debug:
+        msg: "Skipping invoice_items_info test - no invoices available in account"
+      when: skip_invoice_items_test
+
+    - name: Set invoice UUID
+      ansible.builtin.set_fact:
+        invoice_uuid: "{{ invoices_result.invoices[0].invoice_uuid }}"
+      when: not skip_invoice_items_test
+
+    - name: Get invoice items
+      digitalocean.cloud.invoice_items_info:
+        token: "{{ digitalocean_token }}"
+        invoice_uuid: "{{ invoice_uuid }}"
+      register: result
+      when: not skip_invoice_items_test
+
+    - name: Verify invoice items
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg is string
+      when: not skip_invoice_items_test
