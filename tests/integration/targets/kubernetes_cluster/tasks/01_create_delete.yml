@@ -13,7 +13,7 @@
           - size: "{{ kubernetes_default_pool_size }}"
             name: "{{ kubernetes_default_pool_name }}"
             count: "{{ kubernetes_default_pool_count }}"
-        timeout: 600
+        timeout: 900
       register: result
 
     - name: 01_create_delete | Verify create Kubernetes cluster
