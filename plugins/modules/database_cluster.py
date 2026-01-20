@@ -138,25 +138,25 @@ database:
     engine: pg
     version: '14'
     connection:
-      uri: 'postgres://doadmin:wv78n3zpz42xezdk@backend-do-user-19081923-0.db.ondigitalocean.com:25060/defaultdb?sslmode=require'
+      uri: 'postgres://doadmin:example-password@backend-do-user-19081923-0.db.ondigitalocean.com:25060/defaultdb?sslmode=require'
       database: ''
       host: backend-do-user-19081923-0.db.ondigitalocean.com
       port: 25060
       user: doadmin
-      password: wv78n3zpz42xezdk
+      password: example-password
       ssl: true
     private_connection:
-      uri: 'postgres://doadmin:wv78n3zpz42xezdk@private-backend-do-user-19081923-0.db.ondigitalocean.com:25060/defaultdb?sslmode=require'
+      uri: 'postgres://doadmin:example-password@private-backend-do-user-19081923-0.db.ondigitalocean.com:25060/defaultdb?sslmode=require'
       database: ''
       host: private-backend-do-user-19081923-0.db.ondigitalocean.com
       port: 25060
       user: doadmin
-      password: wv78n3zpz42xezdk
+      password: example-password
       ssl: true
     users:
       - name: doadmin
         role: primary
-        password: wv78n3zpz42xezdk
+        password: example-password
     db_names:
       - defaultdb
     num_nodes: 2
@@ -284,20 +284,23 @@ class DatabaseCluster(DigitalOceanCommonModule):
                 "backup_restore": self.backup_restore,
             }
             database = self.client.databases.create_cluster(body=body)["database"]
+            database_id = database["id"]
 
+            # Wait for the database cluster to become online
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and database["status"] != "online":
+            while time.monotonic() < end_time:
+                status = database.get("status", "").lower()
+                if status == "online":
+                    break
                 time.sleep(DigitalOceanConstants.SLEEP)
-                database["status"] = self.get_database_cluster_by_id(database["id"])[
-                    "status"
-                ]
+                database = self.get_database_cluster_by_id(database_id)
 
-            if database["status"] != "online":
+            if database.get("status", "").lower() != "online":
                 self.module.fail_json(
                     changed=True,
                     msg=(
-                        f"Created database cluster {database['name']} ({database['id']}) in {database['region']}"
-                        f" is not 'online', it is '{database['status']}'"
+                        f"Database cluster {database['name']} ({database['id']}) in {database['region']}"
+                        f" did not become 'online' within {self.timeout} seconds (current status: {database['status']})"
                     ),
                     database=database,
                 )

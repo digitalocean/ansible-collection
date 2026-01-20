@@ -1,0 +1,10 @@
+---
+- name: 99_teardown | Delete NFS share
+  digitalocean.cloud.nfs:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    name: "{{ nfs_name }}"
+    region: "{{ nfs_region }}"
+    id: "{{ nfs_id | default('') }}"
+  when: nfs_id is defined
+  ignore_errors: true

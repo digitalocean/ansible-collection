@@ -1,0 +1,20 @@
+---
+- block:
+    - name: Verify API token
+      ansible.builtin.assert:
+        that:
+          - digitalocean_token is string
+          - digitalocean_token | length > 0
+        fail_msg: digitalocean_token should be defined in tests/integration/integration_config.yml
+
+    - name: Get nfs_info
+      digitalocean.cloud.nfs_info:
+        token: "{{ digitalocean_token }}"
+        region: nyc3
+      register: result
+
+    - name: Verify nfs_info result
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg is string

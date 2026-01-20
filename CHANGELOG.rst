@@ -4,6 +4,131 @@ DigitalOcean Collection Release Notes
 
 .. contents:: Topics
 
+v1.9.0
+======
+
+Minor Changes
+-------------
+
+- actions_info - new module to list account actions history.
+- app - new module to manage App Platform applications.
+- apps_info - new module to list App Platform applications.
+- byoip_prefix - new module to manage BYOIP prefixes.
+- byoip_prefixes_info - new module to list BYOIP prefixes.
+- container_registry - new module to manage container registries.
+- database_backups_info - new module to list database cluster backups.
+- database_config - new module to configure database cluster settings.
+- database_config_info - new module to get database cluster configuration.
+- database_connection_pool - new module to manage database connection pools.
+- database_connection_pools_info - new module to list database connection pools.
+- database_db - new module to manage databases within a cluster.
+- database_dbs_info - new module to list databases in a cluster.
+- database_firewall - new module to manage database firewall rules.
+- database_firewall_rules_info - new module to list database firewall rules.
+- database_maintenance_window - new module to configure database maintenance windows.
+- database_replica - new module to manage database read replicas.
+- database_replicas_info - new module to list database replicas.
+- database_user - new module to manage database users.
+- database_users_info - new module to list database users.
+- droplet_autoscale_pool - new module to manage Droplet autoscale pools.
+- droplet_autoscale_pools_info - new module to list Droplet autoscale pools.
+- droplet_backups_info - new module to list Droplet backups.
+- droplet_kernels_info - new module to list available Droplet kernels.
+- droplet_neighbors_info - new module to list Droplet neighbors.
+- droplet_snapshots_info - new module to list Droplet snapshots.
+- floating_ip - new module to manage floating IPs (legacy compatibility).
+- floating_ip_action - new module to assign/unassign floating IPs (legacy compatibility).
+- floating_ips_info - new module to list floating IPs (legacy compatibility).
+- function_namespace - new module to manage Functions namespaces.
+- function_namespaces_info - new module to list Functions namespaces.
+- image - new module to manage custom images.
+- image_action - new module to perform image actions (transfer, convert).
+- invoice_items_info - new module to get invoice line items.
+- invoices_info - new module to list account invoices.
+- kubernetes_node_pool - new module to manage Kubernetes node pools.
+- kubernetes_node_pools_info - new module to list Kubernetes node pools.
+- nfs - new module to manage NFS file systems.
+- nfs_action - new module to perform NFS actions (resize).
+- nfs_info - new module to list NFS file systems.
+- project_resource - new module to assign resources to projects.
+- reserved_ipv6 - new module to manage reserved IPv6 addresses.
+- reserved_ipv6_action - new module to assign/unassign reserved IPv6.
+- reserved_ipv6s_info - new module to list reserved IPv6 addresses.
+- spaces_key - new module to manage Spaces access keys.
+- spaces_keys_info - new module to list Spaces access keys.
+- uptime_alert - new module to manage uptime check alerts.
+- uptime_alerts_info - new module to list uptime check alerts.
+- vpc_nat_gateway - new module to manage VPC NAT gateways.
+- vpc_nat_gateways_info - new module to list VPC NAT gateways.
+- vpc_peering - new module to manage VPC peerings.
+- vpc_peerings_info - new module to list VPC peerings.
+
+Bugfixes
+--------
+
+- droplet_autoscale_pool - integration test now creates an SSH key and includes it in the droplet_template.ssh_keys parameter, fixing the "ssh_keys is required" API error (https://github.com/digitalocean/ansible-collection/issues/280).
+- function_namespace - fixed KeyError when creating a namespace by using defensive response handling for the API response structure (https://github.com/digitalocean/ansible-collection/issues/281).
+- kubernetes_cluster - fixed KeyError when creating or getting a cluster by using defensive response handling for the API response structure (https://github.com/digitalocean/ansible-collection/issues/282).
+- nfs - fixed KeyError when creating or getting an NFS share by using defensive response handling for the API response structure (https://github.com/digitalocean/ansible-collection/issues/283).
+- tests - update pydo version from 0.1.7 to 0.23.0 and azure-core from 1.26.1 to 1.36.0 in test requirements to fix CI failures for modules using newer PyDO API attributes.
+- vpc_nat_gateway - fixed API request body structure to match current DigitalOcean API. The vpc_uuid is now sent in a vpcs array, type is set to PUBLIC, and size is now an integer instead of a string (https://github.com/digitalocean/ansible-collection/issues/284).
+
+New Modules
+-----------
+
+- actions_info - List all actions that have been executed on your account
+- app - Create or delete App Platform applications
+- apps_info - List all App Platform applications on your account
+- byoip_prefix - Manage Bring Your Own IP (BYOIP) prefixes
+- byoip_prefixes_info - List all BYOIP prefixes on your account
+- container_registry - Create or delete container registry
+- database_backups_info - List all backups for a database cluster
+- database_config - Configure database cluster settings
+- database_config_info - Get database cluster configuration
+- database_connection_pool - Create or delete database connection pools
+- database_connection_pools_info - List all connection pools for a database cluster
+- database_db - Create or delete databases within a cluster
+- database_dbs_info - List all databases within a cluster
+- database_firewall - Manage database cluster firewall rules
+- database_firewall_rules_info - List database cluster firewall rules
+- database_maintenance_window - Configure database cluster maintenance window
+- database_replica - Create or delete database read-only replicas
+- database_replicas_info - List all read-only replicas for a database cluster
+- database_user - Create or delete database users
+- database_users_info - List all database users in a cluster
+- droplet_autoscale_pool - Create or delete Droplet Autoscale Pools
+- droplet_autoscale_pools_info - List all Droplet Autoscale Pools on your account
+- droplet_backups_info - List backups for a Droplet
+- droplet_kernels_info - List available kernels for a Droplet
+- droplet_neighbors_info - List Droplet neighbors
+- droplet_snapshots_info - List snapshots for a Droplet
+- floating_ip - Create or delete floating IPs (legacy)
+- floating_ip_action - Assign or unassign a floating IP to a Droplet (legacy)
+- floating_ips_info - List all floating IPs on your account (legacy)
+- function_namespace - Create or delete Functions namespaces
+- function_namespaces_info - List all Functions namespaces on your account
+- image - Manage custom images
+- image_action - Perform actions on images
+- invoice_items_info - Get invoice items by UUID
+- invoices_info - List account invoices
+- kubernetes_node_pool - Create, update, or delete Kubernetes node pools
+- kubernetes_node_pools_info - List all node pools in a Kubernetes cluster
+- nfs - Create or delete NFS file shares
+- nfs_action - Perform actions on NFS file shares
+- nfs_info - List all NFS file shares on your account
+- project_resource - Assign or remove resources from a project
+- reserved_ipv6 - Create or delete reserved IPv6 addresses
+- reserved_ipv6_action - Assign or unassign a reserved IPv6 address to a Droplet
+- reserved_ipv6s_info - List all reserved IPv6 addresses on your account
+- spaces_key - Create or delete Spaces access keys
+- spaces_keys_info - List all Spaces access keys on your account
+- uptime_alert - Create or delete uptime check alerts
+- uptime_alerts_info - List all alerts for an uptime check
+- vpc_nat_gateway - Create or delete VPC NAT Gateways
+- vpc_nat_gateways_info - List all VPC NAT Gateways on your account
+- vpc_peering - Create or delete VPC Peerings
+- vpc_peerings_info - List all VPC Peerings on your account
+
 v1.8.0
 ======
 

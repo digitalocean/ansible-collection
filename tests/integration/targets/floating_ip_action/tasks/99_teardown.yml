@@ -1,0 +1,17 @@
+---
+- name: 99_teardown | Delete floating IP
+  digitalocean.cloud.floating_ip:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    ip: "{{ floating_ip | default('') }}"
+  when: floating_ip is defined
+  ignore_errors: true
+
+- name: 99_teardown | Delete Droplet
+  digitalocean.cloud.droplet:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    name: "{{ droplet_name }}"
+    region: "{{ droplet_region }}"
+    unique_name: true
+  ignore_errors: true

@@ -1,0 +1,20 @@
+---
+- block:
+    - name: Verify API token
+      ansible.builtin.assert:
+        that:
+          - digitalocean_token is string
+          - digitalocean_token | length > 0
+        fail_msg: digitalocean_token should be defined in tests/integration/integration_config.yml
+
+    - name: Get actions_info
+      digitalocean.cloud.actions_info:
+        token: "{{ digitalocean_token }}"
+        limit: 100
+      register: result
+
+    - name: Verify actions_info result
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg is string

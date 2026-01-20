@@ -1,11 +1,11 @@
 droplet:
-  name: "ansible-gh-ci-droplet-2-{{ pr_number }}"
+  name: "ansible-gh-ci-droplet-2-{{ pr_number | default(0, true) }}"
   region: nyc3
   size: s-1vcpu-2gb
   image: ubuntu-22-04-x64
 
 load_balancer:
-  name: ansible-gh-ci-lb-2-{{ pr_number }}
+  name: ansible-gh-ci-lb-2-{{ pr_number | default(0, true) }}
   region: nyc3
   forwarding_rules:
     - entry_protocol: http

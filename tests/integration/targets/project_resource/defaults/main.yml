@@ -1,0 +1,9 @@
+---
+project_name: "ansible-gh-ci-project-resource-{{ pr_number | default(0, true) }}"
+project_description: "Ansible test project resources"
+project_purpose: "Just for testing"
+project_environment: Development
+droplet_name: "ansible-gh-ci-project-resource-{{ pr_number | default(0, true) }}"
+droplet_region: nyc3
+droplet_size: s-1vcpu-2gb
+droplet_image: ubuntu-22-04-x64

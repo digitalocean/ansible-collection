@@ -1,0 +1,39 @@
+---
+- block:
+    - name: Create reserved IPv6
+      digitalocean.cloud.reserved_ipv6:
+        token: "{{ digitalocean_token }}"
+        state: present
+        region: "{{ reserved_ipv6_region }}"
+      register: result
+
+    - name: Verify create reserved IPv6
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+          - result.reserved_ipv6.ip is string
+
+    - name: Delete reserved IPv6
+      digitalocean.cloud.reserved_ipv6:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        region: "{{ reserved_ipv6_region }}"
+        ip: "{{ result.reserved_ipv6.ip }}"
+      register: delete_result
+
+    - name: Verify delete reserved IPv6
+      ansible.builtin.assert:
+        that:
+          - delete_result.changed
+          - delete_result.msg is string
+
+  always:
+    - name: Cleanup reserved IPv6
+      digitalocean.cloud.reserved_ipv6:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        region: "{{ reserved_ipv6_region }}"
+        ip: "{{ result.reserved_ipv6.ip | default('') }}"
+      when: result is defined and result.reserved_ipv6 is defined
+      ignore_errors: true

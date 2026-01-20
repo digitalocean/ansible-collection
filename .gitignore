@@ -113,6 +113,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.envrc
 
 # Spyder project settings
 .spyderproject
@@ -141,3 +142,7 @@ dmypy.json
 
 # macOS metadata
 .DS_Store
+
+# AI agent files (keep local only)
+AGENT.md
+CLAUDE.md

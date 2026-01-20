@@ -606,18 +606,30 @@ class ReservedIPAssign(DigitalOceanCommonModule):
             action = self.client.reserved_ips_actions.post(
                 reserved_ip=self.reserved_ip, body=body
             )["action"]
+            action_id = action["id"]
 
+            # Wait for the action to complete
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and action["status"] != "completed":
+            while time.monotonic() < end_time:
+                status = action.get("status", "").lower()
+                if status == "completed":
+                    break
+                if status == "errored":
+                    self.module.fail_json(
+                        changed=True,
+                        msg=f"Reserved IP {self.reserved_ip} assign action failed",
+                        action=action,
+                        reserved_ip=self.reserved_ip_data,
+                    )
                 time.sleep(DigitalOceanConstants.SLEEP)
-                action = self.get_action_by_id(action_id=action["id"])
+                action = self.get_action_by_id(action_id=action_id)
 
-            if action["status"] != "completed":
+            if action.get("status", "").lower() != "completed":
                 self.module.fail_json(
                     changed=True,
                     msg=(
-                        f"Reserved IP {self.reserved_ip} assigned to Droplet {droplet_name} ({droplet_id}) in {droplet_region} "
-                        f"and it has not completed, status is '{action['status']}'"
+                        f"Reserved IP {self.reserved_ip} assign action did not complete "
+                        f"within {self.timeout} seconds (current status: {action['status']})"
                     ),
                     action=action,
                     reserved_ip=self.reserved_ip_data,
@@ -718,18 +730,30 @@ class ReservedIPAssign(DigitalOceanCommonModule):
             action = self.client.reserved_ips_actions.post(
                 reserved_ip=self.reserved_ip, body=body
             )["action"]
+            action_id = action["id"]
 
+            # Wait for the action to complete
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and action["status"] != "completed":
+            while time.monotonic() < end_time:
+                status = action.get("status", "").lower()
+                if status == "completed":
+                    break
+                if status == "errored":
+                    self.module.fail_json(
+                        changed=True,
+                        msg=f"Reserved IP {self.reserved_ip} unassign action failed",
+                        action=action,
+                        reserved_ip=self.reserved_ip_data,
+                    )
                 time.sleep(DigitalOceanConstants.SLEEP)
-                action = self.get_action_by_id(action_id=action["id"])
+                action = self.get_action_by_id(action_id=action_id)
 
-            if action["status"] != "completed":
+            if action.get("status", "").lower() != "completed":
                 self.module.fail_json(
                     changed=True,
                     msg=(
-                        f"Reserved IP {self.reserved_ip} unassigned from Droplet {droplet_name} ({droplet_id}) in {droplet_region} "
-                        f"but it has not completed, status is '{action['status']}'"
+                        f"Reserved IP {self.reserved_ip} unassign action did not complete "
+                        f"within {self.timeout} seconds (current status: {action['status']})"
                     ),
                     action=action,
                     reserved_ip=self.reserved_ip_data,

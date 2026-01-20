@@ -1,0 +1,12 @@
+---
+- name: 01_info | Get database_firewall_rules_info
+  digitalocean.cloud.database_firewall_rules_info:
+    token: "{{ digitalocean_token }}"
+    cluster_id: "{ database_cluster_id }"
+  register: result
+
+- name: 01_info | Verify database_firewall_rules_info result
+  ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.msg is string

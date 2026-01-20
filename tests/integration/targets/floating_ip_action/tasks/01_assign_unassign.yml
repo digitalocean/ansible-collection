@@ -1,0 +1,27 @@
+---
+- name: 01_assign_unassign | Assign floating IP
+  digitalocean.cloud.floating_ip_action:
+    token: "{{ digitalocean_token }}"
+    ip: "{{ floating_ip }}"
+    action: assign
+    droplet_id: "{{ droplet_id }}"
+  register: result
+
+- name: 01_assign_unassign | Verify assign
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string
+
+- name: 01_assign_unassign | Unassign floating IP
+  digitalocean.cloud.floating_ip_action:
+    token: "{{ digitalocean_token }}"
+    ip: "{{ floating_ip }}"
+    action: unassign
+  register: result
+
+- name: 01_assign_unassign | Verify unassign
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string

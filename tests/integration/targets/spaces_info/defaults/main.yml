@@ -8,7 +8,7 @@ spaces_regions:
 
 # NOTE: Expected that this exists
 space_exists:
-  name: ansible-gh-ci-space-0
+  name: "ansible-gh-ci-space-0-{{ pr_number | default(0, true) }}"
   region: nyc3
 
 # NOTE: Expected that this does not exist

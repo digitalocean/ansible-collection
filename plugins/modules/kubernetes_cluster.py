@@ -260,9 +260,8 @@ class KubernetesCluster(DigitalOceanCommonModule):
 
     def get_kubernetes_cluster_by_id(self, id):
         try:
-            kubernetes_cluster = self.client.kubernetes.get_cluster(cluster_id=id)[
-                "kubernetes_cluster"
-            ]
+            response = self.client.kubernetes.get_cluster(cluster_id=id)
+            kubernetes_cluster = response.get("kubernetes_cluster", response)
             return kubernetes_cluster
         except DigitalOceanCommonModule.HttpResponseError as err:
             error = {
@@ -291,35 +290,66 @@ class KubernetesCluster(DigitalOceanCommonModule):
                 "surge_upgrade": self.surge_upgrade,
                 "ha": self.ha,
             }
-            kubernetes_cluster = self.client.kubernetes.create_cluster(body=body)[
-                "kubernetes_cluster"
-            ]
+            response = self.client.kubernetes.create_cluster(body=body)
 
-            end_time = time.monotonic() + self.timeout
-            while (
-                time.monotonic() < end_time
-                and kubernetes_cluster["status"]["state"] != "running"
+            # Check if the response contains an error (API returns 200 with error payload)
+            if (
+                response.get("id")
+                and response.get("message")
+                and not response.get("kubernetes_cluster")
             ):
-                time.sleep(DigitalOceanConstants.SLEEP)
-                kubernetes_cluster["status"]["state"] = (
-                    self.get_kubernetes_cluster_by_id(kubernetes_cluster["id"])[
-                        "status"
-                    ]["state"]
+                self.module.fail_json(
+                    changed=False,
+                    msg=response.get("message"),
+                    error={
+                        "Message": response.get("message"),
+                        "id": response.get("id"),
+                        "request_id": response.get("request_id"),
+                    },
+                    kubernetes_cluster={},
                 )
 
-            if kubernetes_cluster["status"]["state"] != "running":
+            kubernetes_cluster = response.get("kubernetes_cluster", response)
+            cluster_id = kubernetes_cluster.get("id")
+
+            if not cluster_id:
+                self.module.fail_json(
+                    changed=False,
+                    msg="API response missing 'id' field",
+                    error={"Message": "Unexpected API response structure"},
+                    kubernetes_cluster=kubernetes_cluster,
+                )
+
+            # Wait for the cluster to become running
+            end_time = time.monotonic() + self.timeout
+            while time.monotonic() < end_time:
+                status = kubernetes_cluster.get("status", {})
+                state = status.get("state", "").lower()
+                if state == "running":
+                    break
+                if state in ("error", "degraded"):
+                    self.module.fail_json(
+                        changed=True,
+                        msg=f"Kubernetes cluster {self.name} ({cluster_id}) entered {state} state",
+                        kubernetes_cluster=kubernetes_cluster,
+                    )
+                time.sleep(DigitalOceanConstants.SLEEP)
+                kubernetes_cluster = self.get_kubernetes_cluster_by_id(cluster_id)
+
+            final_state = kubernetes_cluster.get("status", {}).get("state", "").lower()
+            if final_state != "running":
                 self.module.fail_json(
                     changed=True,
                     msg=(
-                        f"Created Kubernetes cluster {self.name} ({kubernetes_cluster['id']}) in {self.region}"
-                        f" is not 'running', it is '{kubernetes_cluster['status']['state']}'"
+                        f"Kubernetes cluster {self.name} ({cluster_id}) in {self.region}"
+                        f" did not become 'running' within {self.timeout} seconds (current state: {final_state})"
                     ),
                     kubernetes_cluster=kubernetes_cluster,
                 )
 
             self.module.exit_json(
                 changed=True,
-                msg=f"Created Kubernetes cluster {self.name} ({kubernetes_cluster['id']}) in {self.region}",
+                msg=f"Created Kubernetes cluster {self.name} ({cluster_id}) in {self.region}",
                 kubernetes_cluster=kubernetes_cluster,
             )
         except DigitalOceanCommonModule.HttpResponseError as err:

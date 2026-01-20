@@ -1,0 +1,18 @@
+---
+- name: Test nfs | Cleanup any leftover resources
+  ansible.builtin.include_tasks:
+    file: 99_teardown.yml
+
+- block:
+    - name: Test nfs | Setup
+      ansible.builtin.include_tasks:
+        file: 00_setup.yml
+
+    - name: Test nfs | Create and delete
+      ansible.builtin.include_tasks:
+        file: 01_create_delete.yml
+
+  always:
+    - name: Test nfs | Teardown
+      ansible.builtin.include_tasks:
+        file: 99_teardown.yml

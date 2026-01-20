@@ -1,0 +1,7 @@
+---
+image_name: "ansible-gh-ci-image-{{ pr_number | default(0, true) }}"
+# Use Ubuntu cloud image - small and reliable
+image_url: "https://cloud-images.ubuntu.com/minimal/releases/jammy/release/ubuntu-22.04-minimal-cloudimg-amd64.img"
+image_region: nyc3
+image_distribution: Ubuntu
+image_description: "Ansible test image"

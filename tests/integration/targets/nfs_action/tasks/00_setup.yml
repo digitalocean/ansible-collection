@@ -1,0 +1,29 @@
+---
+# NFS requires VPCs - get first VPC in the region
+- name: 00_setup | Get VPCs
+  digitalocean.cloud.vpcs_info:
+    token: "{{ digitalocean_token }}"
+  register: vpcs_result
+
+- name: 00_setup | Set VPC ID for NFS region
+  ansible.builtin.set_fact:
+    nfs_vpc_id: "{{ vpcs_result.vpcs | selectattr('region', 'equalto', nfs_region) | map(attribute='id') | first }}"
+  when: vpcs_result.vpcs | selectattr('region', 'equalto', nfs_region) | list | length > 0
+
+- name: 00_setup | Create NFS share
+  digitalocean.cloud.nfs:
+    token: "{{ digitalocean_token }}"
+    state: present
+    name: "{{ nfs_name }}"
+    region: "{{ nfs_region }}"
+    size_gib: "{{ nfs_size_gib }}"
+    vpc_ids:
+      - "{{ nfs_vpc_id }}"
+    timeout: 900
+  register: nfs_result
+  when: nfs_vpc_id is defined
+
+- name: 00_setup | Set NFS ID
+  ansible.builtin.set_fact:
+    nfs_id: "{{ nfs_result.nfs.id }}"
+  when: nfs_result is defined and nfs_result.nfs is defined

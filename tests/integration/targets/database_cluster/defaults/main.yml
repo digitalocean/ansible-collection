@@ -1,5 +1,6 @@
+---
 region: nyc3
 size: db-s-1vcpu-2gb
 engine: valkey
-database_name: ansible-gh-ci-valkey-0
+database_name: ansible-gh-ci-valkey-{{ pr_number | default(0, true) }}
 num_nodes: 1

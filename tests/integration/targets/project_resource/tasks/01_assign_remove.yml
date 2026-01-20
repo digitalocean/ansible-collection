@@ -1,0 +1,28 @@
+---
+- name: 01_assign_remove | Assign resources
+  digitalocean.cloud.project_resource:
+    token: "{{ digitalocean_token }}"
+    state: present
+    project_id: "{{ project_id }}"
+    resources: "{{ resource_urns }}"
+  register: result
+
+- name: 01_assign_remove | Verify assign
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string
+
+- name: 01_assign_remove | Remove resources
+  digitalocean.cloud.project_resource:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    project_id: "{{ project_id }}"
+    resources: "{{ resource_urns }}"
+  register: result
+
+- name: 01_assign_remove | Verify remove
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string

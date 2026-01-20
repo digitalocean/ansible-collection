@@ -1,0 +1,23 @@
+---
+- name: 00_setup | Create Droplet
+  digitalocean.cloud.droplet:
+    token: "{{ digitalocean_token }}"
+    state: present
+    name: "{{ droplet_name }}"
+    region: "{{ droplet_region }}"
+    size: "{{ droplet_size }}"
+    image: "{{ droplet_image }}"
+    unique_name: true
+  register: droplet_result
+
+- name: 00_setup | Create reserved IPv6
+  digitalocean.cloud.reserved_ipv6:
+    token: "{{ digitalocean_token }}"
+    state: present
+    region: "{{ droplet_region }}"
+  register: ipv6_result
+
+- name: 00_setup | Set facts
+  ansible.builtin.set_fact:
+    droplet_id: "{{ droplet_result.droplet.id }}"
+    reserved_ipv6: "{{ ipv6_result.reserved_ipv6.ip }}"

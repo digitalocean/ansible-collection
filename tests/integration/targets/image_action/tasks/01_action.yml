@@ -1,0 +1,16 @@
+---
+- name: 01_action | Transfer image to another region
+  digitalocean.cloud.image_action:
+    token: "{{ digitalocean_token }}"
+    state: present
+    image_id: "{{ image_id }}"
+    type: transfer
+    region: "{{ image_action_region }}"
+    timeout: 600
+  register: result
+
+- name: 01_action | Verify image action
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string

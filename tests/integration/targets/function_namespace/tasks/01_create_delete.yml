@@ -1,0 +1,36 @@
+---
+- block:
+    - name: Create Functions namespace
+      digitalocean.cloud.function_namespace:
+        token: "{{ digitalocean_token }}"
+        state: present
+        namespace: "{{ function_namespace }}"
+        region: "{{ function_region }}"
+      register: result
+
+    - name: Verify create namespace
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+
+    - name: Delete Functions namespace
+      digitalocean.cloud.function_namespace:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        namespace: "{{ function_namespace }}"
+      register: result
+
+    - name: Verify delete namespace
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+
+  always:
+    - name: Cleanup Functions namespace
+      digitalocean.cloud.function_namespace:
+        token: "{{ digitalocean_token }}"
+        state: absent
+        namespace: "{{ function_namespace }}"
+      ignore_errors: true

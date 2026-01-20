@@ -1,0 +1,30 @@
+---
+- name: 01_create_delete | Create node pool
+  digitalocean.cloud.kubernetes_node_pool:
+    token: "{{ digitalocean_token }}"
+    state: present
+    cluster_id: "{{ kubernetes_cluster_id }}"
+    name: "{{ kubernetes_node_pool_name }}"
+    size: "{{ kubernetes_node_pool_size }}"
+    count: "{{ kubernetes_node_pool_count }}"
+  register: result
+
+- name: 01_create_delete | Verify create node pool
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string
+
+- name: 01_create_delete | Delete node pool
+  digitalocean.cloud.kubernetes_node_pool:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    cluster_id: "{{ kubernetes_cluster_id }}"
+    name: "{{ kubernetes_node_pool_name }}"
+  register: result
+
+- name: 01_create_delete | Verify delete node pool
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string

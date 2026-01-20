@@ -1,0 +1,28 @@
+---
+- name: 01_test | Create database user
+  digitalocean.cloud.database_user:
+    token: "{{ digitalocean_token }}"
+    state: present
+    cluster_id: "{{ database_cluster_id }}"
+    name: "{{ db_user }}"
+  register: result
+
+- name: 01_test | Verify create user
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string
+
+- name: 01_test | Delete database user
+  digitalocean.cloud.database_user:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    cluster_id: "{{ database_cluster_id }}"
+    name: "{{ db_user }}"
+  register: result
+
+- name: 01_test | Verify delete user
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string

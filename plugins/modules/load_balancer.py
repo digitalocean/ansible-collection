@@ -305,18 +305,36 @@ class LoadBalancer(DigitalOceanCommonModule):
             load_balancer = self.client.load_balancers.create(body=body)[
                 "load_balancer"
             ]
+            lb_id = load_balancer["id"]
 
-            status = load_balancer["status"]
+            # Wait for the load balancer to become active
             end_time = time.monotonic() + self.timeout
-            while time.monotonic() < end_time and (
-                status != "active" or status != "new"
-            ):
+            while time.monotonic() < end_time:
+                status = load_balancer.get("status", "").lower()
+                if status == "active":
+                    break
+                if status == "errored":
+                    self.module.fail_json(
+                        changed=True,
+                        msg=f"Load balancer {self.name} ({lb_id}) entered errored state",
+                        load_balancer=load_balancer,
+                    )
                 time.sleep(DigitalOceanConstants.SLEEP)
-                status = self.get_load_balancer_by_id(load_balancer["id"])["status"]
+                load_balancer = self.get_load_balancer_by_id(lb_id)
+
+            if load_balancer.get("status", "").lower() != "active":
+                self.module.fail_json(
+                    changed=True,
+                    msg=(
+                        f"Load balancer {self.name} ({lb_id}) did not become 'active' "
+                        f"within {self.timeout} seconds (current status: {load_balancer.get('status')})"
+                    ),
+                    load_balancer=load_balancer,
+                )
 
             self.module.exit_json(
                 changed=True,
-                msg=f"Created load balancer {self.name} ({load_balancer['id']})",
+                msg=f"Created load balancer {self.name} ({lb_id})",
                 load_balancer=load_balancer,
             )
         except DigitalOceanCommonModule.HttpResponseError as err:

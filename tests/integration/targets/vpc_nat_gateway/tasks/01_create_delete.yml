@@ -1,0 +1,29 @@
+---
+- name: 01_create_delete | Create VPC NAT Gateway
+  digitalocean.cloud.vpc_nat_gateway:
+    token: "{{ digitalocean_token }}"
+    state: present
+    name: "{{ nat_gateway_name }}"
+    vpc_uuid: "{{ vpc_uuid }}"
+    region: "{{ vpc_region }}"
+    size: "{{ nat_gateway_size }}"
+  register: result
+
+- name: 01_create_delete | Verify create NAT Gateway
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string
+
+- name: 01_create_delete | Delete VPC NAT Gateway
+  digitalocean.cloud.vpc_nat_gateway:
+    token: "{{ digitalocean_token }}"
+    state: absent
+    name: "{{ nat_gateway_name }}"
+  register: result
+
+- name: 01_create_delete | Verify delete NAT Gateway
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.msg is string

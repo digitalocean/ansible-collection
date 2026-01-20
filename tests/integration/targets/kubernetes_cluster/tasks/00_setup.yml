@@ -1,5 +1,4 @@
 ---
-# code: language=ansible
 - name: 00_setup | Testing block
   block:
     - name: 00_setup | Verify API token
@@ -8,22 +7,6 @@
           - digitalocean_token is string
           - digitalocean_token | length > 0
         fail_msg: digitalocean_token should be defined in tests/integration/integration_config.yml
-
-    # TODO: Create digitalocean.cloud.kubernetes_options_info module
-    - name: 00_setup | Get Kubernetes options
-      ansible.builtin.uri:
-        url: https://api.digitalocean.com/v2/kubernetes/options
-        method: GET
-        return_content: true
-        headers:
-          Content-Type: "application/json"
-          Authorization: "Bearer {{ digitalocean_token }}"
-      register: kubernetes_options
-      no_log: true
-
-    - name: 00_setup | Set fact for first Kubernetes version
-      ansible.builtin.set_fact:
-        kubernetes_version: "{{ kubernetes_options.json | community.general.json_query('options.versions[*].slug') | first }}"
 
     - name: 00_setup | Ensure Kubernetes version
       ansible.builtin.assert:
