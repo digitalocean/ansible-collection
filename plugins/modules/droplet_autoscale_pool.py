@@ -373,7 +373,7 @@ def main():
                 size=dict(type="str", required=False),
                 region=dict(type="str", required=False),
                 image=dict(type="str", required=False),
-                ssh_keys=dict(type="list", elements="str", required=False),
+                ssh_keys=dict(type="list", elements="str", required=False, no_log=True),
                 vpc_uuid=dict(type="str", required=False),
                 tags=dict(type="list", elements="str", required=False),
                 user_data=dict(type="str", required=False),
