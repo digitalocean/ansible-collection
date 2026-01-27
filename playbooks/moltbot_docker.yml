@@ -1,0 +1,511 @@
+---
+# code: language=ansible
+# Moltbot 1-Click Droplet Setup (Docker-based)
+#
+# This playbook creates a DigitalOcean Droplet and deploys Moltbot
+# using Docker, providing isolated and reproducible deployment.
+#
+# Prerequisites:
+#   - DIGITALOCEAN_TOKEN environment variable set
+#   - SSH key at ~/.ssh/moltbot.key and ~/.ssh/moltbot.key.pub
+#
+# Running this playbook:
+#   ansible-playbook -i localhost, playbooks/moltbot_docker.yml -v
+#
+# Variables (can be overridden via -e):
+#   - droplet_name: Name of the droplet (default: moltbot-docker)
+#   - droplet_region: DigitalOcean region (default: nyc3)
+#   - droplet_size: Droplet size (default: s-2vcpu-2gb)
+#   - moltbot_gateway_port: Gateway port (default: 18789)
+#   - moltbot_image: Docker image (default: ghcr.io/moltbot/moltbot:latest)
+#
+# Reference: https://github.com/digitalocean/droplet-1-clicks
+# Moltbot: https://github.com/moltbot/moltbot
+
+- name: Create Moltbot Droplet (Docker deployment)
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  vars:
+    digitalocean_token: "{{ lookup('ansible.builtin.env', 'DIGITALOCEAN_TOKEN') }}"
+    ssh_key_name: moltbot-docker
+    public_key: "{{ lookup('ansible.builtin.file', ansible_env['HOME'] ~ '/.ssh/moltbot.key.pub', errors='ignore') | default('') }}"
+    droplet_name: moltbot-docker
+    droplet_region: nyc3
+    droplet_size: s-2vcpu-2gb
+    droplet_image: ubuntu-24-04-x64
+
+  tasks:
+    - name: Validate DIGITALOCEAN_TOKEN is set
+      ansible.builtin.assert:
+        that:
+          - digitalocean_token | length > 0
+        fail_msg: "DIGITALOCEAN_TOKEN environment variable must be set"
+        success_msg: "DIGITALOCEAN_TOKEN is configured"
+
+    - name: Check if SSH key file exists
+      ansible.builtin.stat:
+        path: "{{ ansible_env['HOME'] }}/.ssh/moltbot.key.pub"
+      register: ssh_key_file
+
+    - name: Generate SSH key pair if not exists
+      community.crypto.openssh_keypair:
+        path: "{{ ansible_env['HOME'] }}/.ssh/moltbot.key"
+        type: ed25519
+        comment: "moltbot-droplet"
+      when: not ssh_key_file.stat.exists
+      register: generated_ssh_key
+
+    - name: Read public key after generation
+      ansible.builtin.set_fact:
+        public_key: "{{ lookup('ansible.builtin.file', ansible_env['HOME'] ~ '/.ssh/moltbot.key.pub') }}"
+      when: generated_ssh_key.changed | default(false)
+
+    - name: Create SSH key on DigitalOcean
+      digitalocean.cloud.ssh_key:
+        state: present
+        token: "{{ digitalocean_token }}"
+        public_key: "{{ public_key }}"
+        name: "{{ ssh_key_name }}"
+      register: ssh_key
+
+    - name: Create Moltbot Droplet
+      digitalocean.cloud.droplet:
+        state: present
+        token: "{{ digitalocean_token }}"
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        size: "{{ droplet_size }}"
+        image: "{{ droplet_image }}"
+        ssh_keys: ["{{ ssh_key.ssh_key.id }}"]
+        unique_name: true
+        tags:
+          - moltbot
+          - docker
+          - ai-assistant
+      register: droplet
+
+    - name: Wait for Droplet to be ready
+      ansible.builtin.wait_for:
+        host: "{{ droplet.droplet.networks.v4 | selectattr('type', 'equalto', 'public') | map(attribute='ip_address') | first }}"
+        port: 22
+        delay: 10
+        timeout: 300
+      when: droplet.changed
+
+    - name: Add Droplet to inventory
+      ansible.builtin.add_host:
+        name: moltbot_docker_host
+        ansible_host: "{{ droplet.droplet.networks.v4 | selectattr('type', 'equalto', 'public') | map(attribute='ip_address') | first }}"
+        ansible_user: root
+        ansible_ssh_private_key_file: "{{ ansible_env['HOME'] }}/.ssh/moltbot.key"
+        ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+    - name: Display Droplet information
+      ansible.builtin.debug:
+        msg: |
+          Moltbot Docker Droplet created successfully!
+          Name: {{ droplet.droplet.name }}
+          IP Address: {{ droplet.droplet.networks.v4 | selectattr('type', 'equalto', 'public') | map(attribute='ip_address') | first }}
+          Region: {{ droplet.droplet.region.slug }}
+          Size: {{ droplet.droplet.size.slug }}
+
+
+- name: Configure Docker and Moltbot on Droplet
+  hosts: moltbot_docker_host
+  gather_facts: true
+  become: true
+
+  vars:
+    moltbot_gateway_port: 18789
+    moltbot_bridge_port: 18790
+    moltbot_image: "ghcr.io/moltbot/moltbot:latest"
+    moltbot_user: moltbot
+    moltbot_home: /home/moltbot
+    moltbot_data_dir: /data/moltbot
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Upgrade all packages
+      ansible.builtin.apt:
+        upgrade: dist
+        autoremove: true
+
+    - name: Install required packages
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - git
+          - jq
+          - ufw
+          - software-properties-common
+        state: present
+
+    - name: Create keyrings directory
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Add Docker GPG key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+
+    - name: Add Docker repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch={{ ansible_architecture | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+        filename: docker
+
+    - name: Install Docker packages
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+        update_cache: true
+
+    - name: Start and enable Docker
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Verify Docker installation
+      ansible.builtin.command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Display Docker version
+      ansible.builtin.debug:
+        msg: "Docker version: {{ docker_version.stdout }}"
+
+    - name: Create moltbot user
+      ansible.builtin.user:
+        name: "{{ moltbot_user }}"
+        shell: /bin/bash
+        home: "{{ moltbot_home }}"
+        create_home: true
+        groups: docker
+        append: true
+
+    - name: Create Moltbot data directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ moltbot_user }}"
+        group: "{{ moltbot_user }}"
+        mode: '0755'
+      loop:
+        - "{{ moltbot_data_dir }}"
+        - "{{ moltbot_data_dir }}/config"
+        - "{{ moltbot_data_dir }}/workspace"
+
+    - name: Create Docker Compose file
+      ansible.builtin.copy:
+        dest: "{{ moltbot_data_dir }}/docker-compose.yml"
+        owner: "{{ moltbot_user }}"
+        group: "{{ moltbot_user }}"
+        mode: '0644'
+        content: |
+          services:
+            moltbot-gateway:
+              image: {{ moltbot_image }}
+              container_name: moltbot-gateway
+              environment:
+                HOME: /home/node
+                TERM: xterm-256color
+                NODE_ENV: production
+                # Configure these in .env file:
+                # CLAWDBOT_GATEWAY_TOKEN: ${CLAWDBOT_GATEWAY_TOKEN}
+                # CLAUDE_AI_SESSION_KEY: ${CLAUDE_AI_SESSION_KEY}
+              volumes:
+                - {{ moltbot_data_dir }}/config:/home/node/.clawdbot
+                - {{ moltbot_data_dir }}/workspace:/home/node/clawd
+              ports:
+                - "{{ moltbot_gateway_port }}:18789"
+                - "{{ moltbot_bridge_port }}:18790"
+              init: true
+              restart: unless-stopped
+              command:
+                [
+                  "node",
+                  "dist/index.js",
+                  "gateway",
+                  "--bind",
+                  "lan",
+                  "--port",
+                  "18789"
+                ]
+
+            moltbot-cli:
+              image: {{ moltbot_image }}
+              container_name: moltbot-cli
+              environment:
+                HOME: /home/node
+                TERM: xterm-256color
+                BROWSER: echo
+              volumes:
+                - {{ moltbot_data_dir }}/config:/home/node/.clawdbot
+                - {{ moltbot_data_dir }}/workspace:/home/node/clawd
+              stdin_open: true
+              tty: true
+              init: true
+              profiles:
+                - cli
+              entrypoint: ["node", "dist/index.js"]
+
+    - name: Create environment file template
+      ansible.builtin.copy:
+        dest: "{{ moltbot_data_dir }}/.env.example"
+        owner: "{{ moltbot_user }}"
+        group: "{{ moltbot_user }}"
+        mode: '0600'
+        content: |
+          # Moltbot Environment Configuration
+          #
+          # Copy this file to .env and configure your credentials:
+          #   cp .env.example .env
+          #   nano .env
+          #
+          # Then start Moltbot:
+          #   docker compose up -d
+
+          # Gateway authentication token (generate a secure random string)
+          CLAWDBOT_GATEWAY_TOKEN=your-secure-token-here
+
+          # AI Provider Credentials (choose one or more)
+          # Anthropic Claude (recommended)
+          # CLAUDE_AI_SESSION_KEY=your-anthropic-session-key
+          # CLAUDE_WEB_SESSION_KEY=your-claude-web-session-key
+          # CLAUDE_WEB_COOKIE=your-claude-cookie
+
+          # OpenAI (optional)
+          # OPENAI_API_KEY=your-openai-api-key
+
+    - name: Create Moltbot systemd service for Docker
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/moltbot.service
+        mode: '0644'
+        content: |
+          [Unit]
+          Description=Moltbot Gateway (Docker) - Personal AI Assistant
+          Documentation=https://docs.molt.bot
+          After=docker.service
+          Requires=docker.service
+
+          [Service]
+          Type=simple
+          User=root
+          WorkingDirectory={{ moltbot_data_dir }}
+          ExecStartPre=/usr/bin/docker compose pull
+          ExecStart=/usr/bin/docker compose up --remove-orphans
+          ExecStop=/usr/bin/docker compose down
+          Restart=always
+          RestartSec=10
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Configure UFW firewall - Allow SSH
+      community.general.ufw:
+        rule: limit
+        port: "22"
+        proto: tcp
+
+    - name: Configure UFW firewall - Allow Docker ports
+      community.general.ufw:
+        rule: allow
+        port: "{{ item.port }}"
+        proto: tcp
+        comment: "{{ item.comment }}"
+      loop:
+        - { port: "{{ moltbot_gateway_port }}", comment: 'Moltbot Gateway' }
+        - { port: "{{ moltbot_bridge_port }}", comment: 'Moltbot Bridge' }
+        - { port: "80", comment: 'HTTP' }
+        - { port: "443", comment: 'HTTPS' }
+
+    - name: Enable UFW
+      community.general.ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
+
+    - name: Create MOTD script
+      ansible.builtin.copy:
+        dest: /etc/update-motd.d/99-moltbot
+        mode: '0755'
+        content: |
+          #!/bin/sh
+          #
+          # Configured as part of the DigitalOcean Moltbot 1-Click setup (Docker)
+
+          myip=$(hostname -I | awk '{print$1}')
+          cat <<EOF
+          ********************************************************************************
+
+          Welcome to DigitalOcean's Moltbot Droplet (Docker) - Personal AI Assistant
+
+          Moltbot is a personal AI assistant that works across messaging platforms
+          including WhatsApp, Telegram, Slack, Discord, Signal, iMessage, and more.
+
+          SETUP REQUIRED:
+            1. Configure your credentials:
+               cd {{ moltbot_data_dir }}
+               cp .env.example .env
+               nano .env
+
+            2. Start the container:
+               docker compose up -d
+
+            3. View the onboarding wizard:
+               docker compose run --rm moltbot-cli onboard
+
+          Access Points:
+            Gateway WebSocket: ws://$myip:{{ moltbot_gateway_port }}
+            Control UI: http://$myip:{{ moltbot_gateway_port }}
+
+          Docker Commands:
+            Start:    cd {{ moltbot_data_dir }} && docker compose up -d
+            Stop:     cd {{ moltbot_data_dir }} && docker compose down
+            Logs:     cd {{ moltbot_data_dir }} && docker compose logs -f
+            Status:   docker ps
+            Update:   cd {{ moltbot_data_dir }} && docker compose pull && docker compose up -d
+            CLI:      docker compose run --rm moltbot-cli <command>
+
+          Systemd Service (alternative):
+            Start:   systemctl start moltbot
+            Stop:    systemctl stop moltbot
+            Status:  systemctl status moltbot
+
+          Data Directories:
+            Compose file: {{ moltbot_data_dir }}/docker-compose.yml
+            Config:       {{ moltbot_data_dir }}/config
+            Workspace:    {{ moltbot_data_dir }}/workspace
+
+          Security & Firewall:
+            UFW firewall is enabled with these open ports:
+              - 22 (SSH - rate limited)
+              - 80 (HTTP)
+              - 443 (HTTPS)
+              - {{ moltbot_gateway_port }} (Moltbot Gateway)
+              - {{ moltbot_bridge_port }} (Moltbot Bridge)
+
+          Documentation: https://docs.molt.bot
+          Docker Guide: https://docs.molt.bot/install/docker
+
+          ********************************************************************************
+          To delete this message of the day: rm -rf \$(readlink -f \${0})
+          EOF
+
+    - name: Create helper scripts directory
+      ansible.builtin.file:
+        path: /opt/moltbot
+        state: directory
+        mode: '0755'
+
+    - name: Create Docker management scripts
+      ansible.builtin.copy:
+        dest: "/opt/moltbot/{{ item.name }}"
+        mode: '0755'
+        content: "{{ item.content }}"
+      loop:
+        - name: start.sh
+          content: |
+            #!/bin/bash
+            cd {{ moltbot_data_dir }}
+            docker compose up -d
+            echo "Moltbot started. View logs with: docker compose logs -f"
+        - name: stop.sh
+          content: |
+            #!/bin/bash
+            cd {{ moltbot_data_dir }}
+            docker compose down
+            echo "Moltbot stopped."
+        - name: restart.sh
+          content: |
+            #!/bin/bash
+            cd {{ moltbot_data_dir }}
+            docker compose restart
+            echo "Moltbot restarted. View logs with: docker compose logs -f"
+        - name: logs.sh
+          content: |
+            #!/bin/bash
+            cd {{ moltbot_data_dir }}
+            docker compose logs -f
+        - name: update.sh
+          content: |
+            #!/bin/bash
+            cd {{ moltbot_data_dir }}
+            echo "Pulling latest Moltbot image..."
+            docker compose pull
+            echo "Restarting with new image..."
+            docker compose up -d
+            echo "Moltbot updated!"
+        - name: status.sh
+          content: |
+            #!/bin/bash
+            echo "=== Docker Container Status ==="
+            docker ps --filter "name=moltbot" --format "table {{ '{{' }}.Names{{ '}}' }}\t{{ '{{' }}.Status{{ '}}' }}\t{{ '{{' }}.Ports{{ '}}' }}"
+            echo ""
+            echo "=== Recent Logs ==="
+            cd {{ moltbot_data_dir }}
+            docker compose logs --tail=20
+        - name: cli.sh
+          content: |
+            #!/bin/bash
+            cd {{ moltbot_data_dir }}
+            docker compose run --rm moltbot-cli "$@"
+
+    - name: Add helper scripts to PATH
+      ansible.builtin.copy:
+        dest: /etc/profile.d/moltbot.sh
+        mode: '0644'
+        content: |
+          # Moltbot helper scripts
+          export PATH="/opt/moltbot:$PATH"
+          alias moltbot-cli="cd {{ moltbot_data_dir }} && docker compose run --rm moltbot-cli"
+
+    - name: Pull Moltbot Docker image
+      community.docker.docker_image:
+        name: "{{ moltbot_image }}"
+        source: pull
+      failed_when: false  # Don't fail if image doesn't exist yet
+
+    - name: Final status check
+      ansible.builtin.debug:
+        msg: |
+          Moltbot Docker deployment complete!
+
+          Next steps:
+          1. SSH to the droplet
+          2. Configure credentials:
+             cd {{ moltbot_data_dir }}
+             cp .env.example .env
+             nano .env
+          3. Start Moltbot:
+             docker compose up -d
+          4. Run the onboarding wizard:
+             docker compose run --rm moltbot-cli onboard
+
+          Helper commands available:
+          - /opt/moltbot/start.sh
+          - /opt/moltbot/stop.sh
+          - /opt/moltbot/restart.sh
+          - /opt/moltbot/logs.sh
+          - /opt/moltbot/update.sh
+          - /opt/moltbot/status.sh
+          - /opt/moltbot/cli.sh <command>

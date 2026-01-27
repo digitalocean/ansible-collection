@@ -1,0 +1,448 @@
+---
+# code: language=ansible
+# Moltbot 1-Click Droplet Setup
+#
+# This playbook creates a DigitalOcean Droplet and deploys Moltbot,
+# a personal AI assistant that works across messaging platforms.
+#
+# Prerequisites:
+#   - DIGITALOCEAN_TOKEN environment variable set
+#   - SSH key at ~/.ssh/moltbot.key and ~/.ssh/moltbot.key.pub
+#
+# Running this playbook:
+#   ansible-playbook -i localhost, playbooks/moltbot.yml -v
+#
+# Variables (can be overridden via -e):
+#   - droplet_name: Name of the droplet (default: moltbot-droplet)
+#   - droplet_region: DigitalOcean region (default: nyc3)
+#   - droplet_size: Droplet size (default: s-2vcpu-2gb)
+#   - moltbot_gateway_port: Gateway port (default: 18789)
+#
+# Reference: https://github.com/digitalocean/droplet-1-clicks
+# Moltbot: https://github.com/moltbot/moltbot
+
+- name: Create Moltbot Droplet and deploy application
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  vars:
+    digitalocean_token: "{{ lookup('ansible.builtin.env', 'DIGITALOCEAN_TOKEN') }}"
+    ssh_key_name: moltbot
+    public_key: "{{ lookup('ansible.builtin.file', ansible_env['HOME'] ~ '/.ssh/moltbot.key.pub', errors='ignore') | default('') }}"
+    droplet_name: moltbot-droplet
+    droplet_region: nyc3
+    droplet_size: s-2vcpu-2gb
+    droplet_image: ubuntu-24-04-x64
+    moltbot_gateway_port: 18789
+
+  tasks:
+    - name: Validate DIGITALOCEAN_TOKEN is set
+      ansible.builtin.assert:
+        that:
+          - digitalocean_token | length > 0
+        fail_msg: "DIGITALOCEAN_TOKEN environment variable must be set"
+        success_msg: "DIGITALOCEAN_TOKEN is configured"
+
+    - name: Check if SSH key file exists
+      ansible.builtin.stat:
+        path: "{{ ansible_env['HOME'] }}/.ssh/moltbot.key.pub"
+      register: ssh_key_file
+
+    - name: Generate SSH key pair if not exists
+      community.crypto.openssh_keypair:
+        path: "{{ ansible_env['HOME'] }}/.ssh/moltbot.key"
+        type: ed25519
+        comment: "moltbot-droplet"
+      when: not ssh_key_file.stat.exists
+      register: generated_ssh_key
+
+    - name: Read public key after generation
+      ansible.builtin.set_fact:
+        public_key: "{{ lookup('ansible.builtin.file', ansible_env['HOME'] ~ '/.ssh/moltbot.key.pub') }}"
+      when: generated_ssh_key.changed | default(false)
+
+    - name: Create SSH key on DigitalOcean
+      digitalocean.cloud.ssh_key:
+        state: present
+        token: "{{ digitalocean_token }}"
+        public_key: "{{ public_key }}"
+        name: "{{ ssh_key_name }}"
+      register: ssh_key
+
+    - name: Create Moltbot Droplet
+      digitalocean.cloud.droplet:
+        state: present
+        token: "{{ digitalocean_token }}"
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        size: "{{ droplet_size }}"
+        image: "{{ droplet_image }}"
+        ssh_keys: ["{{ ssh_key.ssh_key.id }}"]
+        unique_name: true
+        tags:
+          - moltbot
+          - ai-assistant
+      register: droplet
+
+    - name: Wait for Droplet to be ready
+      ansible.builtin.wait_for:
+        host: "{{ droplet.droplet.networks.v4 | selectattr('type', 'equalto', 'public') | map(attribute='ip_address') | first }}"
+        port: 22
+        delay: 10
+        timeout: 300
+      when: droplet.changed
+
+    - name: Add Droplet to inventory
+      ansible.builtin.add_host:
+        name: moltbot_host
+        ansible_host: "{{ droplet.droplet.networks.v4 | selectattr('type', 'equalto', 'public') | map(attribute='ip_address') | first }}"
+        ansible_user: root
+        ansible_ssh_private_key_file: "{{ ansible_env['HOME'] }}/.ssh/moltbot.key"
+        ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+    - name: Display Droplet information
+      ansible.builtin.debug:
+        msg: |
+          Moltbot Droplet created successfully!
+          Name: {{ droplet.droplet.name }}
+          IP Address: {{ droplet.droplet.networks.v4 | selectattr('type', 'equalto', 'public') | map(attribute='ip_address') | first }}
+          Region: {{ droplet.droplet.region.slug }}
+          Size: {{ droplet.droplet.size.slug }}
+
+
+- name: Configure Moltbot on Droplet
+  hosts: moltbot_host
+  gather_facts: true
+  become: true
+
+  vars:
+    moltbot_gateway_port: 18789
+    moltbot_bridge_port: 18790
+    moltbot_user: moltbot
+    moltbot_home: /home/moltbot
+    moltbot_config_dir: /home/moltbot/.moltbot
+    moltbot_workspace_dir: /home/moltbot/workspace
+    node_version: "22"
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Upgrade all packages
+      ansible.builtin.apt:
+        upgrade: dist
+        autoremove: true
+
+    - name: Install required packages
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - git
+          - jq
+          - unzip
+          - ufw
+          - software-properties-common
+        state: present
+
+    - name: Add NodeSource GPG key
+      ansible.builtin.get_url:
+        url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+        dest: /etc/apt/keyrings/nodesource.asc
+        mode: '0644'
+
+    - name: Add NodeSource repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/nodesource.asc] https://deb.nodesource.com/node_{{ node_version }}.x nodistro main"
+        state: present
+        filename: nodesource
+
+    - name: Install Node.js
+      ansible.builtin.apt:
+        name: nodejs
+        state: present
+        update_cache: true
+
+    - name: Verify Node.js version
+      ansible.builtin.command: node --version
+      register: node_version_result
+      changed_when: false
+
+    - name: Display Node.js version
+      ansible.builtin.debug:
+        msg: "Node.js version: {{ node_version_result.stdout }}"
+
+    - name: Create moltbot user
+      ansible.builtin.user:
+        name: "{{ moltbot_user }}"
+        shell: /bin/bash
+        home: "{{ moltbot_home }}"
+        create_home: true
+        system: false
+
+    - name: Create Moltbot directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ moltbot_user }}"
+        group: "{{ moltbot_user }}"
+        mode: '0755'
+      loop:
+        - "{{ moltbot_config_dir }}"
+        - "{{ moltbot_workspace_dir }}"
+
+    - name: Install Moltbot globally
+      ansible.builtin.command: npm install -g moltbot@latest
+      register: moltbot_install
+      changed_when: "'added' in moltbot_install.stdout or 'updated' in moltbot_install.stdout"
+
+    - name: Get Moltbot version
+      ansible.builtin.command: moltbot --version
+      register: moltbot_version
+      changed_when: false
+      failed_when: false
+
+    - name: Display Moltbot version
+      ansible.builtin.debug:
+        msg: "Moltbot version: {{ moltbot_version.stdout | default('installed') }}"
+
+    - name: Create Moltbot systemd service
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/moltbot.service
+        mode: '0644'
+        content: |
+          [Unit]
+          Description=Moltbot Gateway - Personal AI Assistant
+          Documentation=https://docs.molt.bot
+          After=network-online.target
+          Wants=network-online.target
+
+          [Service]
+          Type=simple
+          User={{ moltbot_user }}
+          Group={{ moltbot_user }}
+          WorkingDirectory={{ moltbot_home }}
+          Environment=HOME={{ moltbot_home }}
+          Environment=NODE_ENV=production
+          ExecStart=/usr/bin/moltbot gateway --bind lan --port {{ moltbot_gateway_port }}
+          Restart=always
+          RestartSec=10
+          StandardOutput=journal
+          StandardError=journal
+          SyslogIdentifier=moltbot
+
+          # Security hardening
+          NoNewPrivileges=true
+          PrivateTmp=true
+          ProtectSystem=strict
+          ProtectHome=read-only
+          ReadWritePaths={{ moltbot_config_dir }} {{ moltbot_workspace_dir }}
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Configure UFW firewall - Allow SSH
+      community.general.ufw:
+        rule: limit
+        port: "22"
+        proto: tcp
+
+    - name: Configure UFW firewall - Allow Moltbot Gateway
+      community.general.ufw:
+        rule: allow
+        port: "{{ moltbot_gateway_port }}"
+        proto: tcp
+        comment: 'Moltbot Gateway'
+
+    - name: Configure UFW firewall - Allow Moltbot Bridge
+      community.general.ufw:
+        rule: allow
+        port: "{{ moltbot_bridge_port }}"
+        proto: tcp
+        comment: 'Moltbot Bridge'
+
+    - name: Configure UFW firewall - Allow HTTP
+      community.general.ufw:
+        rule: allow
+        port: "80"
+        proto: tcp
+
+    - name: Configure UFW firewall - Allow HTTPS
+      community.general.ufw:
+        rule: allow
+        port: "443"
+        proto: tcp
+
+    - name: Enable UFW
+      community.general.ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
+
+    - name: Create MOTD script
+      ansible.builtin.copy:
+        dest: /etc/update-motd.d/99-moltbot
+        mode: '0755'
+        content: |
+          #!/bin/sh
+          #
+          # Configured as part of the DigitalOcean Moltbot 1-Click setup
+
+          myip=$(hostname -I | awk '{print$1}')
+          cat <<EOF
+          ********************************************************************************
+
+          Welcome to DigitalOcean's Moltbot Droplet - Personal AI Assistant
+
+          Moltbot is a personal AI assistant that works across messaging platforms
+          including WhatsApp, Telegram, Slack, Discord, Signal, iMessage, and more.
+
+          To access Moltbot:
+            Gateway WebSocket: ws://$myip:{{ moltbot_gateway_port }}
+            Control UI: http://$myip:{{ moltbot_gateway_port }}
+
+          IMPORTANT FIRST STEPS:
+            1. SSH into the droplet: ssh root@$myip
+            2. Switch to moltbot user: su - moltbot
+            3. Run the onboarding wizard: moltbot onboard
+            4. Configure your messaging channels and AI provider credentials
+
+          Management Commands:
+            Start Moltbot:    systemctl start moltbot
+            Stop Moltbot:     systemctl stop moltbot
+            Restart Moltbot:  systemctl restart moltbot
+            View status:      systemctl status moltbot
+            View logs:        journalctl -u moltbot -f
+
+          CLI Commands (as moltbot user):
+            moltbot gateway --verbose    # Start gateway manually
+            moltbot doctor               # Check configuration
+            moltbot onboard              # Run setup wizard
+            moltbot agent --message "Hello"  # Send a message
+
+          On the server:
+            Configuration: {{ moltbot_config_dir }}
+            Workspace:     {{ moltbot_workspace_dir }}
+
+          Security & Firewall:
+            UFW firewall is enabled with these open ports:
+              - 22 (SSH - rate limited)
+              - 80 (HTTP)
+              - 443 (HTTPS)
+              - {{ moltbot_gateway_port }} (Moltbot Gateway)
+              - {{ moltbot_bridge_port }} (Moltbot Bridge)
+
+          Documentation: https://docs.molt.bot
+          Getting Started: https://docs.molt.bot/start/getting-started
+
+          ********************************************************************************
+          To delete this message of the day: rm -rf \$(readlink -f \${0})
+          EOF
+
+    - name: Enable and start Moltbot service
+      ansible.builtin.systemd:
+        name: moltbot
+        enabled: true
+        state: started
+        daemon_reload: true
+      failed_when: false  # May fail on first run before configuration
+
+    - name: Create helper scripts directory
+      ansible.builtin.file:
+        path: /opt/moltbot
+        state: directory
+        mode: '0755'
+
+    - name: Create start script
+      ansible.builtin.copy:
+        dest: /opt/moltbot/start.sh
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          systemctl start moltbot
+          echo "Moltbot started. Check status with: systemctl status moltbot"
+
+    - name: Create stop script
+      ansible.builtin.copy:
+        dest: /opt/moltbot/stop.sh
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          systemctl stop moltbot
+          echo "Moltbot stopped."
+
+    - name: Create restart script
+      ansible.builtin.copy:
+        dest: /opt/moltbot/restart.sh
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          systemctl restart moltbot
+          echo "Moltbot restarted. Check status with: systemctl status moltbot"
+
+    - name: Create logs script
+      ansible.builtin.copy:
+        dest: /opt/moltbot/logs.sh
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          journalctl -u moltbot -f
+
+    - name: Create update script
+      ansible.builtin.copy:
+        dest: /opt/moltbot/update.sh
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          echo "Updating Moltbot..."
+          npm install -g moltbot@latest
+          systemctl restart moltbot
+          echo "Moltbot updated and restarted."
+          moltbot --version
+
+    - name: Create status script
+      ansible.builtin.copy:
+        dest: /opt/moltbot/status.sh
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          echo "=== Moltbot Service Status ==="
+          systemctl status moltbot --no-pager
+          echo ""
+          echo "=== Moltbot Version ==="
+          moltbot --version 2>/dev/null || echo "Unable to get version"
+          echo ""
+          echo "=== Recent Logs ==="
+          journalctl -u moltbot --no-pager -n 20
+
+    - name: Add helper scripts to PATH
+      ansible.builtin.copy:
+        dest: /etc/profile.d/moltbot.sh
+        mode: '0644'
+        content: |
+          # Moltbot helper scripts
+          export PATH="/opt/moltbot:$PATH"
+
+    - name: Final status check
+      ansible.builtin.debug:
+        msg: |
+          Moltbot deployment complete!
+
+          Next steps:
+          1. SSH to the droplet
+          2. Switch to moltbot user: su - moltbot
+          3. Run: moltbot onboard
+          4. Follow the wizard to configure your AI provider and messaging channels
+
+          Helper commands available:
+          - /opt/moltbot/start.sh
+          - /opt/moltbot/stop.sh
+          - /opt/moltbot/restart.sh
+          - /opt/moltbot/logs.sh
+          - /opt/moltbot/update.sh
+          - /opt/moltbot/status.sh
