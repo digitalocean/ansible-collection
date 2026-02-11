@@ -17,7 +17,7 @@ jmespath = "^1.0.1"
 setuptools = "80.9.0"
 certifi = "2025.10.5"
 aiohttp = "3.13.2"
-cryptography = "46.0.3"
+cryptography = "46.0.5"
 
 [tool.poetry.group.dev.dependencies]
 ansible-lint = { version = "^25.9.2", markers = "platform_system != 'Windows'" }
