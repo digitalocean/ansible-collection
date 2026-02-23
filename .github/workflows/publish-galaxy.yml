@@ -21,6 +21,6 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Build and publish
-        uses: artis3n/ansible_galaxy_collection@v2
+        uses: artis3n/ansible_galaxy_collection@v3
         with:
           api_key: '${{ secrets.GALAXY_TOKEN }}'
