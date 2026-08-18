@@ -10,17 +10,16 @@ repos:
     hooks:
       - id: ansible-lint
         name: Ansible-lint
-        entry: poetry run ansible-lint --fix
+        entry: uv run ansible-lint --fix
         language: system
         pass_filenames: false
         always_run: true
-  - repo: local
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.6
     hooks:
-      - id: black
-        name: black
-        entry: poetry run black
-        language: system
-        types: [python]
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
   - repo: https://github.com/koalaman/shellcheck-precommit
     rev: v0.9.0
     hooks:

@@ -7,12 +7,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
+from traceback import format_exc
+
+from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonModule,
 )
-
-from ansible.module_utils.common.text.converters import to_native
-from traceback import format_exc
 
 
 class Spaces(DigitalOceanCommonModule):

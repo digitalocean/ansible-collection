@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - poetry.lock
+      - uv.lock
       - pyproject.toml
       - 'plugins/module_utils/**'
       - 'plugins/modules/**'

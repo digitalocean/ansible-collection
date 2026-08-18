@@ -112,11 +112,12 @@ msg:
 """
 
 import time
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonModule,
-    DigitalOceanOptions,
     DigitalOceanConstants,
+    DigitalOceanOptions,
 )
 
 
@@ -180,9 +181,6 @@ class ReservedIP(DigitalOceanCommonModule):
     def unassign_reserved_ip(self, reserved_ip):
         """Unassign a reserved IP from its Droplet."""
         reserved_ip_addr = reserved_ip["ip"]
-        droplet_id = reserved_ip["droplet"]["id"]
-        droplet_name = reserved_ip["droplet"]["name"]
-        droplet_region = reserved_ip.get("region", {}).get("slug", "unknown")
 
         if self.module.check_mode:
             return

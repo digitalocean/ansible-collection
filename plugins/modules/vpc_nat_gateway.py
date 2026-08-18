@@ -124,14 +124,15 @@ msg:
     - VPC NAT Gateway my-nat-gateway does not exist
 """
 
-import time
 import json
+import time
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonModule,
-    DigitalOceanOptions,
-    DigitalOceanFunctions,
     DigitalOceanConstants,
+    DigitalOceanFunctions,
+    DigitalOceanOptions,
 )
 
 

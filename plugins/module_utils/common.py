@@ -6,11 +6,10 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-from ansible.module_utils.basic import env_fallback
-from ansible.module_utils.basic import missing_required_lib
-from ansible.module_utils.six.moves.urllib.parse import urlparse, parse_qs
-
 import traceback
+
+from ansible.module_utils.basic import env_fallback, missing_required_lib
+from ansible.module_utils.six.moves.urllib.parse import parse_qs, urlparse
 
 
 class DigitalOceanFunctions:

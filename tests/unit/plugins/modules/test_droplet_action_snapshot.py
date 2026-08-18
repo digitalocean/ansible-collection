@@ -6,12 +6,13 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-import pytest
+import json
 import sys
 from unittest.mock import MagicMock, patch
+
+import pytest
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
-import json
 
 
 # Create a custom Exception class for HttpResponseError

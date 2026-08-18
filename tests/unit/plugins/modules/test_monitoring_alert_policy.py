@@ -8,6 +8,7 @@ __metaclass__ = type
 
 import sys
 from unittest.mock import MagicMock, patch
+
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
 
@@ -363,13 +364,16 @@ def test_create_monitoring_alert_policy_http_error():
         # Create raises HttpResponseError
         client_mock.monitoring.create_alert_policy.side_effect = http_error
 
-        with patch(
-            "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
-            return_value=client_mock,
-        ), patch.object(
-            monitoring_alert_policy.DigitalOceanCommonModule,
-            "HttpResponseError",
-            HttpResponseError,
+        with (
+            patch(
+                "ansible_collections.digitalocean.cloud.plugins.module_utils.common.DigitalOceanReqs.Client",
+                return_value=client_mock,
+            ),
+            patch.object(
+                monitoring_alert_policy.DigitalOceanCommonModule,
+                "HttpResponseError",
+                HttpResponseError,
+            ),
         ):
             monitoring_alert_policy.MonitoringAlertPolicy(module)
 

@@ -1,0 +1,4 @@
+minor_changes:
+  - Migrated dependency management from Poetry to UV by Astral.
+  - Replaced Black with Ruff for Python formatting and linting.
+  - Replaced Dependabot with Renovate for automated dependency updates.

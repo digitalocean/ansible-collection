@@ -13,14 +13,13 @@
 		"ghcr.io/devcontainers/features/git:1": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {},
 		"ghcr.io/devcontainers-contrib/features/ansible:2": {},
-		"ghcr.io/devcontainers-contrib/features/poetry:2": {},
 		"ghcr.io/devcontainers-contrib/features/pre-commit:2": {},
 		"ghcr.io/devcontainers/features/common-utils:2": {
 			"installOhMyZsh": true,
 			"upgradePackages": true
 		},
 		"ghcr.io/devcontainers-contrib/features/zsh-plugins:0": {
-			"plugins": "ansible gh git poetry",
+			"plugins": "ansible gh git",
 			"omzPlugins":"https://github.com/zsh-users/zsh-syntax-highlighting.git"
 		},
 		"ghcr.io/devcontainers-contrib/features/apt-packages:1": {
@@ -29,7 +28,7 @@
 	},
 
 	"updateContentCommand": "make install",
-	"postCreateCommand": "sudo apt update --fix-missing && sudo apt full-upgrade -y",
+	"postCreateCommand": "curl -LsSf https://astral.sh/uv/install.sh -o /tmp/uv-install.sh && echo '57dc1fb1828ed9743579af01fa8e6e641660c03411f099d2eaafa4845a62ab0e /tmp/uv-install.sh' | sha256sum -c - && sh /tmp/uv-install.sh && rm /tmp/uv-install.sh && sudo apt update --fix-missing && sudo apt full-upgrade -y",
 	"postStartCommand": "git pull --prune; make install",
 
 	// Configure tool-specific properties.
@@ -42,7 +41,8 @@
                 "yzhang.markdown-all-in-one",
 				"tamasfe.even-better-toml",
 				"github.vscode-github-actions",
-				"ms-vscode.makefile-tools"
+				"ms-vscode.makefile-tools",
+				"charliermarsh.ruff"
             ]
         }
     }

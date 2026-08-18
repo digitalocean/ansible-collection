@@ -2,61 +2,69 @@
 
 .PHONY: install
 install:
-	poetry install --no-root --with=dev
-	poetry run pre-commit install --install-hooks
+	uv sync --all-groups
+	uv run pre-commit install --install-hooks
 
 .PHONY: update
-clean:
-	poetry update
-	poetry run pre-commit autoupdate
+update:
+	uv lock --upgrade
+	uv run pre-commit autoupdate
+
+.PHONY: format
+format:
+	uv run ruff format .
+
+.PHONY: check
+check:
+	uv run ruff check --fix .
 
 .PHONY: lint
 lint: collection-cleanup collection-prep
-	poetry run antsibull-changelog lint
-	poetry run ansible-lint --fix
+	uv run antsibull-changelog lint
+	uv run ansible-lint --fix
 
 # Assumes ansible-test is available in the global scope, such as within the devcontainer environment
 .PHONY: sanity
 sanity: collection-cleanup collection-prep
-	poetry run tests/run-sanity.sh $(filter-out $@,$(MAKECMDGOALS))
+	uv run tests/run-sanity.sh $(filter-out $@,$(MAKECMDGOALS))
 
 .PHONY: integration
 integration: collection-cleanup collection-prep
-	poetry run tests/run-integration.sh $(filter-out $@,$(MAKECMDGOALS))
+	uv run tests/run-integration.sh $(filter-out $@,$(MAKECMDGOALS))
 
 .PHONY: units
 units: collection-cleanup collection-prep
-	poetry run tests/run-units.sh $(filter-out $@,$(MAKECMDGOALS))
+	uv run tests/run-units.sh $(filter-out $@,$(MAKECMDGOALS))
 
 # Run unit tests with coverage collection
 .PHONY: units-coverage
 units-coverage: collection-cleanup collection-prep
-	poetry run tests/run-units.sh --coverage
+	uv run tests/run-units.sh --coverage
 
 # Generate coverage reports after running units-coverage
 .PHONY: coverage-report
 coverage-report:
-	poetry run ansible-test coverage combine
-	poetry run ansible-test coverage report
+	uv run ansible-test coverage combine
+	uv run ansible-test coverage report
 
 # Generate HTML coverage report (open tests/output/reports/coverage/index.html)
 .PHONY: coverage-html
 coverage-html:
-	poetry run ansible-test coverage combine
-	poetry run ansible-test coverage html
+	uv run ansible-test coverage combine
+	uv run ansible-test coverage html
 	@echo "HTML report: tests/output/reports/coverage/index.html"
 
 # Generate XML coverage report for CI/CD (codecov, etc.)
 .PHONY: coverage-xml
 coverage-xml:
-	poetry run ansible-test coverage combine
-	poetry run ansible-test coverage xml
+	uv run ansible-test coverage combine
+	uv run ansible-test coverage xml
 	@echo "XML report: tests/output/reports/coverage.xml"
 
 # Clean coverage data
 .PHONY: coverage-clean
 coverage-clean:
-	poetry run ansible-test coverage erase
+	uv run ansible-test coverage erase
 	rm -rf tests/output/coverage tests/output/reports/coverage*
 
 # Make a copy of the collection available in an expected Ansible path

@@ -213,12 +213,13 @@ msg:
 """
 
 import time
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.digitalocean.cloud.plugins.module_utils.common import (
     DigitalOceanCommonModule,
-    DigitalOceanOptions,
-    DigitalOceanFunctions,
     DigitalOceanConstants,
+    DigitalOceanFunctions,
+    DigitalOceanOptions,
 )
 
 
@@ -713,11 +714,6 @@ class ReservedIPAssign(DigitalOceanCommonModule):
         Returns:
             dict: The action object from the unassign operation.
         """
-        droplet_id = self.reserved_ip_data["droplet"]["id"]
-        droplet_name = self.reserved_ip_data["droplet"]["name"]
-        # Get region from reserved IP data, not droplet (droplet may not have region in response)
-        droplet_region = self.reserved_ip_data.get("region", {}).get("slug", "unknown")
-
         if self.module.check_mode:
             return None
 
