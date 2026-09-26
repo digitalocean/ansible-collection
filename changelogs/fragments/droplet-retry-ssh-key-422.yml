@@ -1,0 +1,2 @@
+bugfixes:
+  - droplet - retry the create request when the API rejects C(ssh_keys) with a 422 C(invalid key identifiers for Droplet creation) error. A key created moments earlier, for example with C(digitalocean.cloud.ssh_key), can be rejected until it reaches the Droplet service. Retries emit a warning and share the module's C(timeout) with the wait for the Droplet to become C(active), and every other error, including other 422 responses, still fails immediately.

@@ -8,6 +8,7 @@ __metaclass__ = type
 
 import pytest
 import sys
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
@@ -120,6 +121,72 @@ def sample_droplet():
         "size": {"slug": "s-1vcpu-1gb"},
         "image": {"slug": "ubuntu-20-04-x64"},
     }
+
+
+def make_droplet_obj(mock_module, mock_client, **attrs):
+    """Build a Droplet without running __init__, with the attributes present() and create_droplet() use"""
+    droplet_obj = droplet.Droplet.__new__(droplet.Droplet)
+    droplet_obj.module = mock_module
+    droplet_obj.client = mock_client
+    defaults = {
+        "state": "present",
+        "timeout": 300,
+        "name": "test-droplet",
+        "droplet_id": None,
+        "region": "nyc3",
+        "size": "s-1vcpu-1gb",
+        "image": "ubuntu-20-04-x64",
+        "ssh_keys": [],
+        "backups": False,
+        "ipv6": False,
+        "monitoring": False,
+        "resize": False,
+        "resize_disk": False,
+        "tags": [],
+        "user_data": None,
+        "volumes": [],
+        "vpc_uuid": None,
+        "with_droplet_agent": False,
+        "unique_name": False,
+        "module_override_options": None,
+    }
+    for key, value in {**defaults, **attrs}.items():
+        setattr(droplet_obj, key, value)
+    return droplet_obj
+
+
+class FakeClock:
+    """Stand-in for time.monotonic and time.sleep where sleeping advances the clock"""
+
+    def __init__(self):
+        self.now = 0
+        self.sleeps = []
+
+    def monotonic(self):
+        return self.now
+
+    def sleep(self, seconds):
+        self.sleeps.append(seconds)
+        self.now += seconds
+
+
+@pytest.fixture
+def fake_clock():
+    clock = FakeClock()
+    with patch("time.monotonic", clock.monotonic), patch("time.sleep", clock.sleep):
+        yield clock
+
+
+def http_response_error(status_code, reason, message):
+    """Build the HttpResponseError the module catches, shaped like a pydo API error"""
+    err = droplet.DigitalOceanCommonModule.HttpResponseError(message)
+    err.status_code = status_code
+    err.reason = reason
+    err.error = SimpleNamespace(message=message)
+    return err
+
+
+SSH_KEY_NOT_READY_MESSAGE = "51234567 are invalid key identifiers for Droplet creation."
 
 
 class TestDropletGetMethods:
@@ -653,3 +720,139 @@ class TestDropletCreateDelete:
             assert result["changed"] is True
             assert "Deleted Droplet" in result["msg"]
             mock_client.droplets.destroy.assert_called_once_with(droplet_id=123456)
+
+
+class TestDropletCreateRetry:
+    """Test retrying a Droplet create rejected because an SSH key is not usable yet"""
+
+    def test_create_retries_until_ssh_key_is_usable(
+        self, fake_clock, mock_module, mock_client, sample_droplet
+    ):
+        """Test a key 422 once, then success, returns the created droplet"""
+        mock_client.droplets.create.side_effect = [
+            http_response_error(422, "Unprocessable Entity", SSH_KEY_NOT_READY_MESSAGE),
+            {"droplet": sample_droplet},
+        ]
+        droplet_obj = make_droplet_obj(mock_module, mock_client, ssh_keys=["51234567"])
+
+        with pytest.raises(AnsibleExitJson) as exc:
+            droplet_obj.create_droplet()
+
+        result = exc.value.args[0]
+        assert result["changed"] is True
+        assert "Created Droplet" in result["msg"]
+        assert result["droplet"] == sample_droplet
+        assert mock_client.droplets.create.call_count == 2
+        first_call, second_call = mock_client.droplets.create.call_args_list
+        assert first_call == second_call
+        assert fake_clock.sleeps == [droplet.DigitalOceanConstants.SLEEP]
+        mock_module.warn.assert_called_once()
+        assert "invalid key identifier" in mock_module.warn.call_args.args[0]
+        assert "51234567" not in mock_module.warn.call_args.args[0]
+
+    def test_create_fails_when_ssh_key_never_usable(
+        self, fake_clock, mock_module, mock_client
+    ):
+        """Test a key 422 until the timeout fails unchanged with the API error"""
+        mock_client.droplets.create.side_effect = http_response_error(
+            422, "Unprocessable Entity", SSH_KEY_NOT_READY_MESSAGE
+        )
+        droplet_obj = make_droplet_obj(
+            mock_module, mock_client, ssh_keys=["51234567"], timeout=30
+        )
+
+        with pytest.raises(AnsibleFailJson) as exc:
+            droplet_obj.create_droplet()
+
+        result = exc.value.args[0]
+        assert result["changed"] is False
+        assert result["msg"] == SSH_KEY_NOT_READY_MESSAGE
+        assert result["error"] == {
+            "Message": SSH_KEY_NOT_READY_MESSAGE,
+            "Status Code": 422,
+            "Reason": "Unprocessable Entity",
+        }
+        assert result["droplet"] == []
+        assert mock_client.droplets.create.call_count > 1
+        assert fake_clock.now <= 30
+        mock_module.warn.assert_called_once()
+
+    def test_create_retry_shares_timeout_with_active_wait(
+        self, fake_clock, mock_module, mock_client, sample_droplet
+    ):
+        """Test time spent retrying the create counts against the active wait"""
+        new = {**sample_droplet, "status": "new"}
+        mock_client.droplets.create.side_effect = [
+            http_response_error(422, "Unprocessable Entity", SSH_KEY_NOT_READY_MESSAGE),
+            http_response_error(422, "Unprocessable Entity", SSH_KEY_NOT_READY_MESSAGE),
+            {"droplet": new},
+        ]
+        mock_client.droplets.get.return_value = {"droplet": new}
+        droplet_obj = make_droplet_obj(
+            mock_module, mock_client, ssh_keys=["51234567"], timeout=30
+        )
+
+        with pytest.raises(AnsibleFailJson) as exc:
+            droplet_obj.create_droplet()
+
+        result = exc.value.args[0]
+        assert result["changed"] is True
+        assert "did not become 'active' within 30 seconds" in result["msg"]
+        assert fake_clock.now <= 30
+
+    @pytest.mark.parametrize(
+        "message",
+        [
+            "You specified an invalid size for Droplet creation.",
+            "You specified an invalid image for Droplet creation.",
+            "",
+        ],
+    )
+    def test_create_other_422_fails_immediately(
+        self, message, fake_clock, mock_module, mock_client
+    ):
+        """Test a 422 for anything other than SSH keys fails without retrying"""
+        mock_client.droplets.create.side_effect = http_response_error(
+            422, "Unprocessable Entity", message
+        )
+        droplet_obj = make_droplet_obj(mock_module, mock_client)
+
+        with pytest.raises(AnsibleFailJson) as exc:
+            droplet_obj.create_droplet()
+
+        result = exc.value.args[0]
+        assert result["changed"] is False
+        assert result["error"]["Status Code"] == 422
+        assert result["droplet"] == []
+        mock_client.droplets.create.assert_called_once()
+        assert fake_clock.sleeps == []
+        mock_module.warn.assert_not_called()
+
+    @pytest.mark.parametrize(
+        "status_code, reason, message",
+        [
+            (500, "Internal Server Error", "Server was unable to give you a response."),
+            (429, "Too Many Requests", "API Rate limit exceeded."),
+            (400, "Bad Request", SSH_KEY_NOT_READY_MESSAGE),
+        ],
+        ids=["server-error", "rate-limited", "key-message-without-422"],
+    )
+    def test_create_non_422_error_fails_immediately(
+        self, status_code, reason, message, fake_clock, mock_module, mock_client
+    ):
+        """Test errors other than 422 fail without retrying, even with the SSH key message"""
+        mock_client.droplets.create.side_effect = http_response_error(
+            status_code, reason, message
+        )
+        droplet_obj = make_droplet_obj(mock_module, mock_client)
+
+        with pytest.raises(AnsibleFailJson) as exc:
+            droplet_obj.create_droplet()
+
+        result = exc.value.args[0]
+        assert result["changed"] is False
+        assert result["msg"] == message
+        assert result["error"]["Status Code"] == status_code
+        mock_client.droplets.create.assert_called_once()
+        assert fake_clock.sleeps == []
+        mock_module.warn.assert_not_called()
