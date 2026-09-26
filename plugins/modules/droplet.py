@@ -19,6 +19,11 @@ version_added: 0.2.0
 description:
   - Creates or deletes Droplets.
   - View the create API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/droplets_create).
+  - |
+    A created Droplet is returned once it is C(active) and has an IPv4 address, both within
+    the same C(timeout). The address is public, or private if C(module_override_options) sets
+    C(public_networking) to C(false).
+  - With C(unique_name), an existing Droplet is also only returned once it has that IPv4 address.
 
 author: Mark Mercado (@mamercad)
 
@@ -197,7 +202,7 @@ droplet:
       vcpus: 1
       disk: 25
       locked: false
-      status: new
+      status: active
       kernel:
       created_at: '2020-07-21T18:37:44Z'
       features:
@@ -263,7 +268,15 @@ droplet:
         description: Basic
       size_slug: s-1vcpu-1gb
       networks:
-        v4: []
+        v4:
+        - ip_address: 203.0.113.10
+          netmask: 255.255.240.0
+          gateway: 203.0.113.1
+          type: public
+        - ip_address: 10.108.0.2
+          netmask: 255.255.240.0
+          gateway: 10.108.0.1
+          type: private
         v6: []
       region:
         name: New York 3
@@ -315,6 +328,7 @@ msg:
   sample:
     - Created Droplet example.com (11223344) in nyc3
     - Created Droplet example.com (11223344) in nyc3 is not 'active', it is 'new'
+    - Droplet example.com (11223344) in nyc3 did not get a public IPv4 address within 300 seconds
     - Deleted Droplet example.com (11223344) in nyc3
     - Deleting Droplet example.com (11223344) in nyc3 has failed
     - Droplet example.com in nyc3 would be created
@@ -409,6 +423,42 @@ class Droplet(DigitalOceanCommonModule):
                 droplet=[],
             )
 
+    @staticmethod
+    def get_ipv4_address(droplet, address_type):
+        networks = droplet.get("networks") or {}
+        for network in networks.get("v4") or []:
+            if network.get("type") == address_type and network.get("ip_address"):
+                return network["ip_address"]
+        return None
+
+    @staticmethod
+    def get_expected_ipv4_type(options):
+        # The API defaults public_networking to true; only an explicit false
+        # creates a Droplet without a public IPv4 address.
+        if options and options.get("public_networking") is False:
+            return "private"
+        return "public"
+
+    def wait_for_ipv4(self, droplet, address_type, end_time, changed):
+        # A Droplet can be reported 'active' before its networks are populated.
+        while (
+            not self.get_ipv4_address(droplet, address_type)
+            and time.monotonic() < end_time
+        ):
+            time.sleep(DigitalOceanConstants.SLEEP)
+            droplet = self.get_droplet_by_id(droplet["id"])
+
+        if not self.get_ipv4_address(droplet, address_type):
+            self.module.fail_json(
+                changed=changed,
+                msg=(
+                    f"Droplet {droplet['name']} ({droplet['id']}) in {droplet['region']['slug']}"
+                    f" did not get a {address_type} IPv4 address within {self.timeout} seconds"
+                ),
+                droplet=droplet,
+            )
+        return droplet
+
     def create_droplet(self):
         try:
             body = {
@@ -450,6 +500,13 @@ class Droplet(DigitalOceanCommonModule):
                     ),
                     droplet=droplet,
                 )
+
+            droplet = self.wait_for_ipv4(
+                droplet=droplet,
+                address_type=self.get_expected_ipv4_type(body),
+                end_time=end_time,
+                changed=True,
+            )
 
             self.module.exit_json(
                 changed=True,
@@ -518,7 +575,15 @@ class Droplet(DigitalOceanCommonModule):
                     self.create_droplet()
 
             elif len(droplets) == 1:
-                self.droplet_id = droplets[0]["id"]
+                droplet = self.wait_for_ipv4(
+                    droplet=droplets[0],
+                    address_type=self.get_expected_ipv4_type(
+                        self.module_override_options
+                    ),
+                    end_time=time.monotonic() + self.timeout,
+                    changed=False,
+                )
+                self.droplet_id = droplet["id"]
 
                 if self.module.params.get("resize"):
                     if not self.droplet_id:
@@ -563,8 +628,8 @@ class Droplet(DigitalOceanCommonModule):
 
                 self.module.exit_json(
                     changed=False,
-                    msg=f"Droplet {self.name} ({droplets[0]['id']}) in {self.region} exists",
-                    droplet=droplets[0],
+                    msg=f"Droplet {self.name} ({droplet['id']}) in {self.region} exists",
+                    droplet=droplet,
                 )
 
             elif len(droplets) > 1:

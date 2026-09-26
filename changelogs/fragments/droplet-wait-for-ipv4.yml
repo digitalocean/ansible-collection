@@ -1,0 +1,2 @@
+bugfixes:
+  - droplet - wait for a newly created Droplet to have an IPv4 address before returning it. DigitalOcean can report a Droplet as C(active) before its networks are populated, which left C(droplet.networks.v4) empty. The module now waits for a public address, or a private address when C(module_override_options) sets C(public_networking) to C(false), within the same C(timeout) as the wait for C(active). An existing Droplet returned because of C(unique_name) is waited on the same way.
