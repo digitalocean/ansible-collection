@@ -109,6 +109,21 @@ def mock_client():
     return client
 
 
+PUBLIC_IPV4 = {
+    "ip_address": "203.0.113.10",
+    "netmask": "255.255.240.0",
+    "gateway": "203.0.113.1",
+    "type": "public",
+}
+
+PRIVATE_IPV4 = {
+    "ip_address": "10.108.0.2",
+    "netmask": "255.255.240.0",
+    "gateway": "10.108.0.1",
+    "type": "private",
+}
+
+
 @pytest.fixture
 def sample_droplet():
     """Fixture providing a sample droplet response"""
@@ -119,7 +134,67 @@ def sample_droplet():
         "region": {"slug": "nyc3", "name": "New York 3"},
         "size": {"slug": "s-1vcpu-1gb"},
         "image": {"slug": "ubuntu-20-04-x64"},
+        "networks": {"v4": [PUBLIC_IPV4, PRIVATE_IPV4], "v6": []},
     }
+
+
+def droplet_state(sample, status, *v4):
+    """Return a copy of a droplet response with the given status and IPv4 networks"""
+    return {**sample, "status": status, "networks": {"v4": list(v4), "v6": []}}
+
+
+def make_droplet_obj(mock_module, mock_client, **attrs):
+    """Build a Droplet without running __init__, with the attributes present() and create_droplet() use"""
+    droplet_obj = droplet.Droplet.__new__(droplet.Droplet)
+    droplet_obj.module = mock_module
+    droplet_obj.client = mock_client
+    defaults = {
+        "state": "present",
+        "timeout": 300,
+        "name": "test-droplet",
+        "droplet_id": None,
+        "region": "nyc3",
+        "size": "s-1vcpu-1gb",
+        "image": "ubuntu-20-04-x64",
+        "ssh_keys": [],
+        "backups": False,
+        "ipv6": False,
+        "monitoring": False,
+        "resize": False,
+        "resize_disk": False,
+        "tags": [],
+        "user_data": None,
+        "volumes": [],
+        "vpc_uuid": None,
+        "with_droplet_agent": False,
+        "unique_name": False,
+        "module_override_options": None,
+    }
+    for key, value in {**defaults, **attrs}.items():
+        setattr(droplet_obj, key, value)
+    return droplet_obj
+
+
+class FakeClock:
+    """Stand-in for time.monotonic and time.sleep where sleeping advances the clock"""
+
+    def __init__(self):
+        self.now = 0
+        self.sleeps = []
+
+    def monotonic(self):
+        return self.now
+
+    def sleep(self, seconds):
+        self.sleeps.append(seconds)
+        self.now += seconds
+
+
+@pytest.fixture
+def fake_clock():
+    clock = FakeClock()
+    with patch("time.monotonic", clock.monotonic), patch("time.sleep", clock.sleep):
+        yield clock
 
 
 class TestDropletGetMethods:
@@ -345,6 +420,8 @@ class TestDropletPresent:
             droplet_obj.name = "test-droplet"
             droplet_obj.region = "nyc3"
             droplet_obj.resize = False
+            droplet_obj.timeout = 300
+            droplet_obj.module_override_options = None
 
             with pytest.raises(AnsibleExitJson) as exc:
                 droplet_obj.present()
@@ -352,6 +429,54 @@ class TestDropletPresent:
             result = exc.value.args[0]
             assert result["changed"] is False
             assert "exists" in result["msg"]
+            mock_client.droplets.get.assert_not_called()
+
+    @patch(
+        "ansible_collections.digitalocean.cloud.plugins.modules.droplet.Droplet.get_droplets_by_name_and_region"
+    )
+    def test_present_unique_name_existing_waits_for_ipv4(
+        self, mock_get_droplets, fake_clock, mock_module, mock_client, sample_droplet
+    ):
+        """Test present with unique_name polls an existing droplet until its public IPv4 appears"""
+        active_empty = droplet_state(sample_droplet, "active")
+        active_public = droplet_state(
+            sample_droplet, "active", PUBLIC_IPV4, PRIVATE_IPV4
+        )
+        mock_get_droplets.return_value = [active_empty]
+        mock_client.droplets.get.return_value = {"droplet": active_public}
+        droplet_obj = make_droplet_obj(mock_module, mock_client, unique_name=True)
+
+        with pytest.raises(AnsibleExitJson) as exc:
+            droplet_obj.present()
+
+        result = exc.value.args[0]
+        assert result["changed"] is False
+        assert "exists" in result["msg"]
+        assert result["droplet"] == active_public
+        mock_client.droplets.get.assert_called_once_with(droplet_id=123456)
+
+    @patch(
+        "ansible_collections.digitalocean.cloud.plugins.modules.droplet.Droplet.get_droplets_by_name_and_region"
+    )
+    def test_present_unique_name_existing_fails_without_ipv4(
+        self, mock_get_droplets, fake_clock, mock_module, mock_client, sample_droplet
+    ):
+        """Test present with unique_name fails unchanged when an existing droplet never gets its IPv4"""
+        active_private = droplet_state(sample_droplet, "active", PRIVATE_IPV4)
+        mock_get_droplets.return_value = [active_private]
+        mock_client.droplets.get.return_value = {"droplet": active_private}
+        droplet_obj = make_droplet_obj(
+            mock_module, mock_client, unique_name=True, timeout=30
+        )
+
+        with pytest.raises(AnsibleFailJson) as exc:
+            droplet_obj.present()
+
+        result = exc.value.args[0]
+        assert result["changed"] is False
+        assert "did not get a public IPv4 address within 30 seconds" in result["msg"]
+        assert result["droplet"] == active_private
+        assert fake_clock.now <= 30
 
     @patch(
         "ansible_collections.digitalocean.cloud.plugins.modules.droplet.Droplet.get_droplets_by_name_and_region"
@@ -653,3 +778,184 @@ class TestDropletCreateDelete:
             assert result["changed"] is True
             assert "Deleted Droplet" in result["msg"]
             mock_client.droplets.destroy.assert_called_once_with(droplet_id=123456)
+
+
+class TestDropletWaitForIPv4:
+    """Test waiting for a new Droplet's IPv4 address after it becomes active"""
+
+    @pytest.mark.parametrize(
+        "response, address_type, expected",
+        [
+            ({}, "public", None),
+            ({"networks": None}, "public", None),
+            ({"networks": {"v4": []}}, "public", None),
+            (
+                {"networks": {"v4": [{"type": "public", "ip_address": ""}]}},
+                "public",
+                None,
+            ),
+            ({"networks": {"v4": [PRIVATE_IPV4]}}, "public", None),
+            (
+                {"networks": {"v4": [PRIVATE_IPV4, PUBLIC_IPV4]}},
+                "public",
+                "203.0.113.10",
+            ),
+            (
+                {"networks": {"v4": [PUBLIC_IPV4, PRIVATE_IPV4]}},
+                "private",
+                "10.108.0.2",
+            ),
+        ],
+    )
+    def test_get_ipv4_address(self, response, address_type, expected):
+        """Test get_ipv4_address only returns a non-empty address of the requested type"""
+        assert droplet.Droplet.get_ipv4_address(response, address_type) == expected
+
+    @pytest.mark.parametrize(
+        "options, expected",
+        [
+            (None, "public"),
+            ({}, "public"),
+            ({"public_networking": None}, "public"),
+            ({"public_networking": True}, "public"),
+            ({"public_networking": False}, "private"),
+        ],
+    )
+    def test_get_expected_ipv4_type(self, options, expected):
+        """Test only an explicit public_networking=false expects a private address"""
+        assert droplet.Droplet.get_expected_ipv4_type(options) == expected
+
+    def test_create_waits_for_public_ipv4_after_active(
+        self, fake_clock, mock_module, mock_client, sample_droplet
+    ):
+        """Test an active droplet with empty networks is polled until its public IPv4 appears"""
+        new = droplet_state(sample_droplet, "new")
+        active_empty = droplet_state(sample_droplet, "active")
+        active_private = droplet_state(sample_droplet, "active", PRIVATE_IPV4)
+        active_public = droplet_state(
+            sample_droplet, "active", PUBLIC_IPV4, PRIVATE_IPV4
+        )
+        mock_client.droplets.create.return_value = {"droplet": new}
+        mock_client.droplets.get.side_effect = [
+            {"droplet": active_empty},
+            {"droplet": active_private},
+            {"droplet": active_public},
+        ]
+        droplet_obj = make_droplet_obj(mock_module, mock_client)
+
+        with pytest.raises(AnsibleExitJson) as exc:
+            droplet_obj.create_droplet()
+
+        result = exc.value.args[0]
+        assert result["changed"] is True
+        assert "Created Droplet" in result["msg"]
+        assert result["droplet"] == active_public
+        assert mock_client.droplets.get.call_count == 3
+
+    @pytest.mark.parametrize(
+        "create_response_status, expected_polls",
+        [("active", 0), ("new", 1)],
+        ids=["populated-in-create-response", "populated-when-active"],
+    )
+    def test_create_no_extra_polling_when_ipv4_present(
+        self,
+        create_response_status,
+        expected_polls,
+        fake_clock,
+        mock_module,
+        mock_client,
+        sample_droplet,
+    ):
+        """Test no polling beyond the active wait when the droplet already has its IPv4"""
+        populated = droplet_state(sample_droplet, "active", PUBLIC_IPV4, PRIVATE_IPV4)
+        if create_response_status == "active":
+            mock_client.droplets.create.return_value = {"droplet": populated}
+        else:
+            mock_client.droplets.create.return_value = {
+                "droplet": droplet_state(sample_droplet, "new")
+            }
+            mock_client.droplets.get.return_value = {"droplet": populated}
+        droplet_obj = make_droplet_obj(mock_module, mock_client)
+
+        with pytest.raises(AnsibleExitJson) as exc:
+            droplet_obj.create_droplet()
+
+        result = exc.value.args[0]
+        assert result["changed"] is True
+        assert result["droplet"] == populated
+        assert mock_client.droplets.get.call_count == expected_polls
+        assert len(fake_clock.sleeps) == expected_polls
+
+    def test_create_private_networking_waits_for_private_ipv4(
+        self, fake_clock, mock_module, mock_client, sample_droplet
+    ):
+        """Test public_networking=false sends the option and waits for a private IPv4 only"""
+        new = droplet_state(sample_droplet, "new")
+        active_empty = droplet_state(sample_droplet, "active")
+        active_private = droplet_state(sample_droplet, "active", PRIVATE_IPV4)
+        mock_client.droplets.create.return_value = {"droplet": new}
+        mock_client.droplets.get.side_effect = [
+            {"droplet": active_empty},
+            {"droplet": active_private},
+        ]
+        droplet_obj = make_droplet_obj(
+            mock_module,
+            mock_client,
+            module_override_options={"public_networking": False},
+        )
+
+        with pytest.raises(AnsibleExitJson) as exc:
+            droplet_obj.create_droplet()
+
+        result = exc.value.args[0]
+        assert result["changed"] is True
+        assert result["droplet"] == active_private
+        assert mock_client.droplets.get.call_count == 2
+        body = mock_client.droplets.create.call_args.kwargs["body"]
+        assert body["public_networking"] is False
+
+    @pytest.mark.parametrize(
+        "module_override_options, networks_when_active, address_type",
+        [
+            (None, [PRIVATE_IPV4], "public"),
+            ({"public_networking": False}, [], "private"),
+        ],
+        ids=["public", "private"],
+    )
+    def test_create_fails_when_ipv4_never_assigned(
+        self,
+        module_override_options,
+        networks_when_active,
+        address_type,
+        fake_clock,
+        mock_module,
+        mock_client,
+        sample_droplet,
+    ):
+        """Test the IPv4 wait shares the timeout with the active wait and fails as changed"""
+        new = droplet_state(sample_droplet, "new")
+        active = droplet_state(sample_droplet, "active", *networks_when_active)
+        responses = iter([new])
+        mock_client.droplets.create.return_value = {"droplet": new}
+        mock_client.droplets.get.side_effect = lambda droplet_id: {
+            "droplet": next(responses, active)
+        }
+        droplet_obj = make_droplet_obj(
+            mock_module,
+            mock_client,
+            timeout=30,
+            module_override_options=module_override_options,
+        )
+
+        with pytest.raises(AnsibleFailJson) as exc:
+            droplet_obj.create_droplet()
+
+        result = exc.value.args[0]
+        assert result["changed"] is True
+        assert (
+            f"did not get a {address_type} IPv4 address within 30 seconds"
+            in result["msg"]
+        )
+        assert result["droplet"] == active
+        # Becoming active took 20 of the 30 seconds; the IPv4 wait only gets the rest.
+        assert fake_clock.now <= 30
