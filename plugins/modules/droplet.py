@@ -89,6 +89,9 @@ options:
       - |
         An array containing the IDs or fingerprints of the SSH keys that you wish to embed
         in the Droplet's root account upon creation.
+      - |
+        A key created moments earlier can briefly be rejected as an invalid key identifier.
+        The create request is retried, with a warning, until the key is accepted or C(timeout) is reached.
     type: list
     elements: str
     required: false
@@ -409,6 +412,34 @@ class Droplet(DigitalOceanCommonModule):
                 droplet=[],
             )
 
+    @staticmethod
+    def is_ssh_key_not_ready_error(err):
+        # An SSH key created moments earlier can be rejected until it reaches
+        # the Droplet service; the same request succeeds once it has.
+        message = getattr(err.error, "message", None) or ""
+        return err.status_code == 422 and "invalid key identifiers" in message.lower()
+
+    def request_droplet_create(self, body, end_time):
+        warned = False
+        while True:
+            try:
+                return self.client.droplets.create(body=body)["droplet"]
+            except DigitalOceanCommonModule.HttpResponseError as err:
+                if (
+                    not self.is_ssh_key_not_ready_error(err)
+                    or time.monotonic() >= end_time
+                ):
+                    raise
+                if not warned:
+                    # The API message names the key IDs, so it is not repeated here.
+                    self.module.warn(
+                        "Droplet create rejected an SSH key in ssh_keys as an invalid key identifier;"
+                        f" retrying every {DigitalOceanConstants.SLEEP} seconds for up to"
+                        f" {self.timeout} seconds while a newly created key becomes usable"
+                    )
+                    warned = True
+                time.sleep(DigitalOceanConstants.SLEEP)
+
     def create_droplet(self):
         try:
             body = {
@@ -429,11 +460,11 @@ class Droplet(DigitalOceanCommonModule):
             if self.module_override_options:
                 body.update(self.module_override_options)
 
-            droplet = self.client.droplets.create(body=body)["droplet"]
+            end_time = time.monotonic() + self.timeout
+            droplet = self.request_droplet_create(body, end_time)
             droplet_id = droplet["id"]
 
             # Wait for the droplet to become active
-            end_time = time.monotonic() + self.timeout
             while time.monotonic() < end_time:
                 status = droplet.get("status", "").lower()
                 if status == "active":
